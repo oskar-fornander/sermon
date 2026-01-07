@@ -7,3 +7,4 @@ def new():
     print("Skapa en ny predikan")
     title = typer.prompt("Titel")
     context = typer.prompt("Sammanhang")
+    print(f"title: {title}, context: {context}")
