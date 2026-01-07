@@ -2,7 +2,7 @@
 import typer
 
 
-def edit(id: str):
+def edit(sermon_id: str):
     """Redigera en specifik predikan: metadata, filer"""
-    print(f"Redigera predikan {id}")
+    print(f"Redigera predikan {sermon_id}")
 

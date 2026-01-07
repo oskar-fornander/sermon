@@ -1,8 +1,8 @@
 import typer
 
 
-def show(id: str):
+def show(sermon_id: str):
     """Visa en specifik predikan"""
-    print(f"Visa predikan {id}")
+    print(f"Visa predikan {sermon_id}")
 
 

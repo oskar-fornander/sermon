@@ -4,22 +4,22 @@ import typer
 app = typer.Typer()
 
 @app.command()
-def service(id: str, date: str, place: str, notice: str = ''):
+def service(sermon_id: str, date: str, place: str, notice: str = typer.Option('', '--notice', '-n')):
     """Koppla en gudstjänst till predikan"""
-    print(f"Koppla en gudstjänst till predikan {id}")
+    print(f"Koppla en gudstjänst till predikan {sermon_id}")
 
 @app.command()
-def manuscript(id: str, file_name: str):
+def manuscript(sermon_id: str, file_name: str):
     """Koppla ett manuskript till predikan"""
-    print(f"Koppla ett manuskript till predikan {id}")
+    print(f"Koppla ett manuskript till predikan {sermon_id}")
 
 @app.command()
-def recording(id: str, date: str, file_name: str):
+def recording(sermon_id: str, date: str, media_type: str, file_name: str):
     """Koppla en inspelning till predikan"""
-    print(f"Koppla en inspelning till predikan {id}")
+    print(f"Koppla en inspelning till predikan {sermon_id}")
 
 @app.command()
-def resource(id: str, file_name: str):
+def resource(sermon_id: str, file_name: str):
     """Koppla en övrig resurs till predikan"""
-    print(f"Koppla en övrig resurs till predikan {id}")
+    print(f"Koppla en övrig resurs till predikan {sermon_id}")
 

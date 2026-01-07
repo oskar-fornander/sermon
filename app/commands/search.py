@@ -2,7 +2,7 @@
 import typer
 
 
-def search(search_term: str, regex: bool = False, field: str = 'all'):
+def search(search_term: str, field: str = typer.Option('all', '--field', '-f'), regex: bool = typer.Option(False, '--regex', '-r')):
     """Sök"""
     print(f"Sök på {search_term} i fälten {field} bland predikningarna")
 
