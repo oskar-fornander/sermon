@@ -17,7 +17,7 @@ sermons/
 │       ├── list.py
 │       ├── search.py
 │       ├── new.py
-│       ├── service.py
+│       ├── attach.py
 │       ├── edit.py
 │       └── export.py
 │
