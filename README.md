@@ -44,10 +44,11 @@ sermons/
 * sermon list                   #Show (all) sermons in a list
 * sermon search joh             #Search and list sermons by ...
 * sermon new                    #Add new sermon [id, title, context, reference(s), introduction, message, (related), comment, report]
-    * sermon add-service P371       #Add a new service to an existing sermon [date, place, notice on service]
-        * sermon attach-manuscript P371 #Add a manuscript to a sermon [manuscript link]
-        * sermon attach-recording P371  #Add a recording to a sermon [date, type, link]
-        * sermon attach-resource P371   #Add a resource to a sermon [link]
+    * sermon attach service P371    #Add a new service to an existing sermon [date, place, notice on service]
+    * sermon attach manuscript P371 #Add a manuscript to a sermon [file name]
+    * sermon attach recording P371  #Add a recording to a sermon [date, type, link/file name]
+    * sermon attach resource P371   #Add a resource to a sermon [file name]
+* sermon delete P371            #Delete a post
 * sermon edit                   #Edit an existing sermon, its meta data and links
 * sermon export html            #Create a html overview of all sermons, to browse in mobile
 * sermon export podcast         #Export sermon for podcast
