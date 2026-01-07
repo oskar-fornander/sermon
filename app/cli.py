@@ -1,7 +1,7 @@
 import typer
 
 from commands import list as list_commands
-from commands import service as service_commands
+from commands import attach as attach_commands
 from commands import export as export_commands
 
 from commands.show import show
@@ -14,7 +14,7 @@ app = typer.Typer(help = "Predikoarkiv")
 
 #Sub commands
 app.add_typer(list_commands.app, name = "list")
-app.add_typer(service_commands.app, name = "service")
+app.add_typer(attach_commands.app, name = "attach")
 app.add_typer(export_commands.app, name = "export")
 
 #Single commands
