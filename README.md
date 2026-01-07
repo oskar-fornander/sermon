@@ -37,7 +37,9 @@ sermons/
 │
 └── README.md
 ````
+
 Mappar att synka med Google Drive (etc.): data, files och html
+
 Koden hanteras med Git.
 
 ## CLI Commands
