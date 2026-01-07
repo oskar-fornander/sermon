@@ -5,21 +5,21 @@
 Privat predikoregister för mina predikningar.
 
 
-## Mappstruktur:
+## Mappstruktur
 ````
 sermons/
 ├── app/
 │   ├── cli.py
 │   ├── db.py
 │   ├── models.py
-│   ├── commands/
-│   │   ├── show.py
-│   │   ├── list.py
-│   │   ├── search.py
-│   │   ├── new.py
-│   │   ├── edit.py
-│   │   ├── service.py
-│   │   └── export.py
+│   └── commands/
+│       ├── show.py
+│       ├── list.py
+│       ├── search.py
+│       ├── new.py
+│       ├── service.py
+│       ├── edit.py
+│       └── export.py
 │
 ├── data/
 │   └── sermons.db        # SQLite
@@ -35,7 +35,7 @@ sermons/
 ├── tools/
 │   └── import_xml.py     # engångsskript
 │
-├── README.md
+└── README.md
 ````
 
 ## CLI Commands
@@ -43,10 +43,11 @@ sermons/
 * sermon show P371              #Show particular sermon by ID
 * sermon list                   #Show (all) sermons in a list
 * sermon search joh             #Search and list sermons by ...
-* sermon new                    #Add new sermon
-    * sermon add-service P371       #Add a new service to an existing sermon
-        * sermon attach-manuscript P371 #Add a manuscript to a sermon
-        * sermon attach-recording P371  #Add a recording to a sermon
+* sermon new                    #Add new sermon [id, title, context, reference(s), introduction, message, (related), comment, report]
+    * sermon add-service P371       #Add a new service to an existing sermon [date, place, notice on service]
+        * sermon attach-manuscript P371 #Add a manuscript to a sermon [manuscript link]
+        * sermon attach-recording P371  #Add a recording to a sermon [date, type, link]
+        * sermon attach-resource P371   #Add a resource to a sermon [link]
 * sermon edit                   #Edit an existing sermon, its meta data and links
 * sermon export html            #Create a html overview of all sermons, to browse in mobile
 * sermon export podcast         #Export sermon for podcast
