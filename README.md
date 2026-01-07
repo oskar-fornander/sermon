@@ -47,5 +47,6 @@ sermons/
     * sermon attach-manuscript P371 #Add a manuscript to a sermon
     * sermon attach-recording P371  #Add a recording to a sermon
 * sermon export html            #Create a html overview of all sermons, to browse in mobile
+* sermon export podcast         #Export sermon for podcast
 ```
 
