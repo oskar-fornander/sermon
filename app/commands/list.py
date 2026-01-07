@@ -8,9 +8,9 @@ def all():
     print("Listar alla predikningar")
 
 @app.command()
-def recent():
-    """Lista senaste predikningar"""
-    print("Listar senaste")
+def recent(n: int = 5):
+    """Lista senaste n predikningar"""
+    print(f"Listar {n} senaste predikningarna")
 
 
 
