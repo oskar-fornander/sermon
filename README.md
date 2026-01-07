@@ -13,10 +13,11 @@ sermons/
 │   ├── db.py
 │   ├── models.py
 │   ├── commands/
-│   │   ├── new.py
-│   │   ├── list.py
 │   │   ├── show.py
+│   │   ├── list.py
 │   │   ├── search.py
+│   │   ├── new.py
+│   │   ├── edit.py
 │   │   ├── service.py
 │   │   └── export.py
 │
@@ -39,14 +40,31 @@ sermons/
 
 ## CLI Commands
 ```
-* sermon new                    #Add new sermon
-* sermon list                   #Show (all) sermons in a list
 * sermon show P371              #Show particular sermon by ID
+* sermon list                   #Show (all) sermons in a list
 * sermon search joh             #Search and list sermons by ...
-* sermon add-service P371       #Add a new service to an existing sermon
-    * sermon attach-manuscript P371 #Add a manuscript to a sermon
-    * sermon attach-recording P371  #Add a recording to a sermon
+* sermon new                    #Add new sermon
+    * sermon add-service P371       #Add a new service to an existing sermon
+        * sermon attach-manuscript P371 #Add a manuscript to a sermon
+        * sermon attach-recording P371  #Add a recording to a sermon
+* sermon edit                   #Edit an existing sermon, its meta data and links
 * sermon export html            #Create a html overview of all sermons, to browse in mobile
 * sermon export podcast         #Export sermon for podcast
 ```
 
+## Old XML-element
+```
+  <sermon index="P370" title="Messias" context="F&#xF6;rsta s&#xF6;ndagen i advent">
+    <reference>Sak 9:9-10</reference>
+    <introduction>&#x201D;Se, din konung kommer till dig&#x201D;; den som kommer &#xE4;r Messias man v&#xE4;ntat p&#xE5;.</introduction>
+    <message>Jesus f&#xE5;r b&#xE4;ra alla f&#xF6;rv&#xE4;ntningar p&#xE5; den v&#xE4;ntade messias/kungen. Mycket i evangelierna pekar p&#xE5; att han ses som den messias man v&#xE4;ntat p&#xE5;.</message>
+    <keyword/>
+    <related/>
+    <service date="2025-11-30" place="Missionskyrkan, Lagan" notice=""/>
+    <manuscript>P370.pdf</manuscript>
+    <resource title=""/>
+    <recording type="audio" date="2025-11-30">2025-11-30_Predikan.mp3</recording>
+    <comment/>
+    <report>B</report>
+  </sermon>
+````
