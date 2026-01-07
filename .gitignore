@@ -1,0 +1,21 @@
+# --- Python ---
+.venv/
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+# --- SQLite ---
+*.db
+*.sqlite
+*.sqlite3
+
+# --- Project data ---
+files/
+html/
+data/
+
+# --- macOS ---
+.DS_Store
+
+# --- Editor / IDE ---
