@@ -4,43 +4,50 @@
 
 Privat predikoregister för mina predikningar.
 
+överordnad mapp
+├── sermons/        #koden - synkas med git
+└── predikoarkiv/   #filerna - synkas med google Drive
 
 ## Mappstruktur
-````
-sermons/
-├── app/
-│   ├── cli.py
-│   ├── db.py
-│   ├── models.py
-│   └── commands/
-│       ├── show.py
-│       ├── list.py
-│       ├── search.py
-│       ├── new.py
-│       ├── attach.py
-│       ├── edit.py
-│       └── export.py
+```
+predikan/                   # överordnad mapp
+├── sermon/                 # CLI-projekt (GitHub)
+│   ├── app/                # Alla python-filer
+│   │   ├── cli.py          
+│   │   ├── db.py
+│   │   ├── models.py
+│   │   └── commands/       # Varje CLI-kommando har en egen fil
+│   │       ├── show.py
+│   │       ├── list.py
+│   │       ├── search.py
+│   │       ├── new.py
+│   │       ├── attach.py
+│   │       ├── edit.py
+│   │       └── export.py
+│   │
+│   ├── tools/
+│   │   └── import_xml.py     # engångsskript för import från gammalt system
+│   │
+│   ├── config.yaml           # Konfigurationsfil
+│   ├── requirements.txt      
+│   └── README.md
 │
-├── data/
-│   └── sermons.db        # SQLite
-│
-├── files/
-│   ├── manuscripts/      # PDF
-│   ├── recordings/       # MP3
-│   └── resources/
-│
-├── html/
-│   └── index.html        # Mobil översikt
-│
-├── tools/
-│   └── import_xml.py     # engångsskript
-│
-└── README.md
-````
+└── archive/                    # filer (Google Drive)
+    ├── data/
+    │   └── sermons.db        # SQLite
+    │
+    ├── files/
+    │   ├── manuscripts/      # PDF
+    │   ├── recordings/       # MP3
+    │   └── resources/        # PDF etc.
+    │
+    └── html/
+        └── index.html        # Mobil översikt
+```
 
-Mappar att synka med Google Drive (etc.): data, files och html
+All kod ligger i mappen `sermon/` och synkas med Git.
+Alla filer ligger i mappen `predikoargiv/` som synkas med Google Drive.
 
-Koden hanteras med Git.
 
 ## CLI Commands
 ```

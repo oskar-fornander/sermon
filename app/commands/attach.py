@@ -1,7 +1,7 @@
 
 import typer
 
-app = typer.Typer()
+app = typer.Typer(help = "Koppla gudstjänst, manuskript, inspelning eller övrig resurs till en predikan")
 
 @app.command()
 def service(sermon_id: str, date: str, place: str, notice: str = typer.Option('', '--notice', '-n')):

@@ -1,6 +1,6 @@
 import typer
 
-app = typer.Typer()
+app = typer.Typer(help = "Lista alla eller några av predikningarna.")
 
 @app.command()
 def all():

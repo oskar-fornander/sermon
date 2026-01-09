@@ -10,11 +10,6 @@ __pycache__/
 *.sqlite
 *.sqlite3
 
-# --- Project data ---
-files/
-html/
-data/
-
 # --- macOS ---
 .DS_Store
 
