@@ -4,11 +4,15 @@
 
 Privat predikoregister för mina predikningar.
 
-överordnad mapp
-├── sermons/        #koden - synkas med git
-└── predikoarkiv/   #filerna - synkas med google Drive
 
 ## Mappstruktur
+Överblick: 
+```
+predikan            # överordnad mapp
+├── sermon/         # koden - synkas med git
+└── archive/        # filerna - synkas med google Drive
+```
+Fullständig mappstruktur:
 ```
 predikan/                   # överordnad mapp
 ├── sermon/                 # CLI-projekt (GitHub)
