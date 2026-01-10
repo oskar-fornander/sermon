@@ -84,7 +84,7 @@ Resource: id, sermon_id, file_name, title, notes
 Bible_reference: id, sermon_id, reference_text
 ```
 
-*Bible_reference* är möjligt att utveckla senare, men i nuläget sparas varje inmatad bibelreferens som en egen rad, så som den skrevs. t.ex. sermon attach bible "Joh 1:1-5; Joh 8:12; 1Mos 1:1-3" –> 3 referenser
+*Bible_reference* är möjligt att utveckla senare, men i nuläget sparas varje inmatad bibelreferens som en egen rad, så som den skrevs. t.ex. `sermon attach bible "Joh 1:1-5; Joh 8:12; 1Mos 1:1-3"` –> 3 referenser
 
 
 ## CLI Commands
