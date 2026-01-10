@@ -77,14 +77,15 @@ Alla relationer är: enkelriktade, icke-cirkulära och lätta att fråga i SQLit
 
 ```
 Sermon: id, title, context, introduction, message, notes
-Service: id, sermon_id, date, place, notice
-Manuscript: id, sermon_id, file_name, version, note
-Recording: id, sermon_id, type, file_name, external_url, date, note
-Resource: id, sermon_id, file_name, title, note
-Bible_reference: id, sermon_id, reference, ...
-
-
+Service: id, sermon_id, date, place, notes
+Manuscript: id, sermon_id, file_name, version, date, notes
+Recording: id, sermon_id, type, file_name, external_url, date, notes
+Resource: id, sermon_id, file_name, title, notes
+Bible_reference: id, sermon_id, reference_text
 ```
+
+*Bible_reference* är möjligt att utveckla senare, men i nuläget sparas varje inmatad bibelreferens som en egen rad, så som den skrevs. t.ex. sermon attach bible "Joh 1:1-5; Joh 8:12; 1Mos 1:1-3" –> 3 referenser
+
 
 ## CLI Commands
 ```

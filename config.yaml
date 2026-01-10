@@ -12,3 +12,7 @@ files:
   manuscripts: manuscripts
   recordings: recordings
   resources: resources
+
+paths:
+  manuscripts: archive/files/manuscripts
+  recordings:  archive/files/recordings
