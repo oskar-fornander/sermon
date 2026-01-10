@@ -10,7 +10,7 @@ Privat predikoregister för mina predikningar.
 ```
 predikan            # överordnad mapp
 ├── sermon/         # koden - synkas med git
-└── archive/        # filerna - synkas med google Drive
+└── archive/        # filerna - synkas med molntjänst
 ```
 Fullständig mappstruktur:
 ```
@@ -36,7 +36,7 @@ predikan/                   # överordnad mapp
 │   ├── requirements.txt      
 │   └── README.md
 │
-└── archive/                    # filer (Google Drive)
+└── archive/                  # filer (molntjänst)
     ├── data/
     │   └── sermons.db        # SQLite
     │
@@ -50,7 +50,15 @@ predikan/                   # överordnad mapp
 ```
 
 All kod ligger i mappen `sermon/` och synkas med Git.
-Alla filer ligger i mappen `predikoargiv/` som synkas med Google Drive.
+Alla filer ligger i mappen `archive/` som synkas med valfri *molntjänst*.
+
+## Molntjänst
+
+Synkning av mappen `archive/`sker med valfri molntjänst. Denna är inte beroende av koden i `sermon/`och kan därför bytas ut när som helst.
+
+Använd förslagsvis *Google Drive*, *pCloud* eller *Mega*. Synkningen behöver ske automatiskt och gärna så att data sparas i molnet och syns på datorn utan att ta upp plats, men kan öppnas från datorn (laddas ned när en fil öppnas). Utrymmet behöver vara tillräckligt stort (uppskattningsvis >10GB till att börja med). Synkning till flera datorer. Notera att molntjänsten måste funka på de operativsystem och versioner som används.
+
+Start: **Mega**
 
 
 ## CLI Commands
