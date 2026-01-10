@@ -60,6 +60,31 @@ Använd förslagsvis *Google Drive*, *pCloud* eller *Mega*. Synkningen behöver 
 
 Start: **Mega**
 
+## Databas
+
+```
+sermon
+ ├── service
+ ├── manuscript
+ ├── recording
+ ├── resource
+ └── bible_reference
+```
+
+Alla relationer är: enkelriktade, icke-cirkulära och lätta att fråga i SQLite.
+
+### Tabeller
+
+```
+Sermon: id, title, context, introduction, message, notes
+Service: id, sermon_id, date, place, notice
+Manuscript: id, sermon_id, file_name, version, note
+Recording: id, sermon_id, type, file_name, external_url, date, note
+Resource: id, sermon_id, file_name, title, note
+Bible_reference: id, sermon_id, reference, ...
+
+
+```
 
 ## CLI Commands
 ```
