@@ -31,7 +31,7 @@ app.command()(edit)
 from pathlib import Path
 import yaml
 
-with open("app/config.yaml") as f:
+with open("config.yaml") as f:
     config = yaml.safe_load(f)
 
 ARCHIVE_ROOT = Path(config["archive"]["root"]).resolve()
