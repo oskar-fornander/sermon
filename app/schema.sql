@@ -26,7 +26,8 @@ CREATE TABLE manuscript (
     version INTEGER,
     date TEXT,
     notes TEXT,
-    FOREIGN KEY (sermon_id) REFERENCES sermon(id)
+    FOREIGN KEY (sermon_id) REFERENCES sermon(id),
+    UNIQUE (sermon_id, file_name)
 );
 
 CREATE TABLE recording (
@@ -34,7 +35,7 @@ CREATE TABLE recording (
     sermon_id INTEGER NOT NULL,
     type TEXT NOT NULL,
     date TEXT NOT NULL,
-    file_name TEXT NOT NULL,
+    file_name TEXT,
     external_url TEXT,
     notes TEXT,
     FOREIGN KEY (sermon_id) REFERENCES sermon(id)
