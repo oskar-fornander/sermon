@@ -32,6 +32,7 @@ predikan/                   # överordnad mapp
 │   ├── tools/
 │   │   └── import_xml.py     # engångsskript för import från gammalt system
 │   │
+│   ├── schema.sql            # Schema för databasen
 │   ├── config.yaml           # Konfigurationsfil
 │   ├── requirements.txt      
 │   └── README.md
