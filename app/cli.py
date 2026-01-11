@@ -1,5 +1,7 @@
 import typer
 
+from db import CONFIG
+
 from commands import list as list_commands
 from commands import attach as attach_commands
 from commands import export as export_commands

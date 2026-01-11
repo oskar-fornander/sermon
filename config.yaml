@@ -1,8 +1,9 @@
 
 archive:
-  root: ../arkiv
+  root: ../archive
 
 database:
+  path: ../archive/data/
   filename: sermons.db
 
 export:
@@ -14,5 +15,7 @@ files:
   resources: resources
 
 paths:
-  manuscripts: archive/files/manuscripts
-  recordings:  archive/files/recordings
+  manuscripts: ../archive/files/manuscripts
+  recordings:  ../archive/files/recordings
+  resources: ../archive/files/resources
+

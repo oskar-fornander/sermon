@@ -7,6 +7,7 @@ CREATE TABLE sermon (
     context TEXT,
     introduction TEXT,
     message TEXT,
+    report TEXT CHECK (report IN ('A', 'B', 'C')),
     notes TEXT
 );
 
@@ -57,8 +58,20 @@ CREATE TABLE bible_reference (
     FOREIGN KEY (sermon_id) REFERENCES sermon(id)
 );
 
+CREATE TABLE sermon_relation (
+    sermon_id INTEGER NOT NULL,
+    related_sermon_id INTEGER NOT NULL,
+    PRIMARY KEY (sermon_id, related_sermon_id),
+    FOREIGN KEY (sermon_id) REFERENCES sermon(id),
+    FOREIGN KEY (related_sermon_id) REFERENCES sermon(id)
+);
+
 CREATE INDEX idx_service_sermon ON service(sermon_id);
 CREATE INDEX idx_manuscript_sermon ON manuscript(sermon_id);
 CREATE INDEX idx_recording_sermon ON recording(sermon_id);
 CREATE INDEX idx_resource_sermon ON resource(sermon_id);
 CREATE INDEX idx_bible_sermon ON bible_reference(sermon_id);
+
+CREATE INDEX idx_relation_sermon ON sermon_relation(sermon_id);
+CREATE INDEX idx_relation_related ON sermon_relation(related_sermon_id);
+
