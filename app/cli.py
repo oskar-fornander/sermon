@@ -1,15 +1,16 @@
 import typer
 
-from db import CONFIG
+from app.db import CONFIG
 
-from commands import list as list_commands
-from commands import attach as attach_commands
-from commands import export as export_commands
 
-from commands.show import show
-from commands.search import search
-from commands.new import new
-from commands.edit import edit
+from app.commands import list as list_commands
+from app.commands import attach as attach_commands
+from app.commands import export as export_commands
+
+from app.commands.show import show
+from app.commands.search import search
+from app.commands.new import new
+from app.commands.edit import edit
 
 
 app = typer.Typer(help = "Predikoarkiv")

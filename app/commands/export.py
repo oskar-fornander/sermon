@@ -9,6 +9,7 @@ def html():
     print("Exportera listan av predikningar som html")
 
 @app.command()
-def podcast(sermon_id: str):
+def podcast(sermon_code: str):
     """Exportera en predikan som podcast."""
-    print(f"Exportera predikan {sermon_id} som podcast.")
+    print(f"Exportera predikan {sermon_code} som podcast.")
+
