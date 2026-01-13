@@ -3,7 +3,14 @@ import shutil
 from rich.console import Console
 from rich.panel import Panel #https://rich.readthedocs.io/en/stable/reference/panel.html
 from rich.text import Text
+from rich.console import Group
+from rich.align import Align
 from rich.style import Style
+from rich.table import Table
+from rich.columns import Columns
+from rich import box
+from rich.color import Color
+
 
 from app.db import (
     get_sermon_by_code,
@@ -35,6 +42,15 @@ def show(sermon_code: str):
 
     width = shutil.get_terminal_size().columns - 4 #Get width of terminal window (with some margin)
 
+
+    table = Table(title="Inspelningar")
+    table.add_column("Typ")
+    table.add_column("Datum")
+    table.add_column("Fil")
+    table.add_row("MP3", "2024-06-09", "p370.mp3")
+    table.add_row("Video", "2024-06-09", "länk")
+    console.print(table)
+
     
     body = (
         "[bold]Plats:[/bold] Storkyrkan\n"
@@ -42,9 +58,47 @@ def show(sermon_code: str):
         "[bold]Betyg:[/bold] A\n\n"
         "Här kan själva predikotexten eller sammanfattningen visas."
     )
-    console.print(Panel(body, title="P370 – Nådens evangelium"))
+    console.print(Panel(Columns([body, table]), title="P370 – Nådens evangelium"))
 
-    console.print(Panel("innehåll ...", title=Text(text="P401", style=Style(bold = True)), title_align="left", subtitle="underrubrik", subtitle_align="right"))
+    color = Color.from_rgb(100, 100, 100)
+    color = Color.default()
+    bgcolor = Color.from_rgb(0, 0, 0)
+    bgcolor = Color.default()
+    my_style = Style(color = Color.from_rgb(255, 0, 0), bold = True)
+    title = f"[bold]{sermon_code}[/bold] ─── {sermon['title']}"
+    subtitle = f"Oskar Fornander"
+
+    notes = sermon['notes']
+    report = sermon['report']
+    elements = []
+    elements.append(Align.right(f" [italic]{sermon['context']}[/italic]"))
+    elements.append("")
+    elements.append(f"[bold]Introduktion:[/bold] {sermon['introduction']}")
+    elements.append(f"[bold]Budskap:[/bold] {sermon['message']}")
+    if notes is not None:
+        elements.append(f"[bold]Kommentar:[/bold] {notes}")
+    if report is not None:
+        elements.append(f"[bold]Omdöme:[/bold] {report}")
+
+    body = Group(*elements)
+    console.print(
+        Panel(body,
+            title = title,
+            title_align = "left", 
+            subtitle = subtitle,
+            subtitle_align = "right",
+            box = box.ROUNDED 
+        )
+    )
+# x code
+# x title
+# x context
+# x introduction
+# x message
+#   report
+#   notes
+
+#   
 
 
 
