@@ -23,6 +23,12 @@ def show(sermon_code: str):
     related_sermons = get_related_sermons_for_sermon(sermon_code)
 
     print(sermon)
+    sermon_txt = f"""
+╭─ {sermon['code']}: {sermon['title']} ────────
+{sermon['context']} {sermon['notes']}
+
+"""
+    print(sermon_txt)
     
 
 
