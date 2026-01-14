@@ -85,7 +85,7 @@ def get_services_for_sermon(code: str):
     return row
 
 def get_manuscripts_for_sermon(code: str):
-    """Get all manuscripts connected to this sermon"""
+    """Get all manuscripts connected to this sermon, ordered by version"""
     conn = get_connection()
     cur = conn.cursor()
     cur.execute(

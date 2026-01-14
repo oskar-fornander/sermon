@@ -42,7 +42,6 @@ def show(sermon_code: str):
 
     width = shutil.get_terminal_size().columns - 4 #Get width of terminal window (with some margin)
 
-
     table = Table(title="Inspelningar")
     table.add_column("Typ")
     table.add_column("Datum")
@@ -86,6 +85,31 @@ def show(sermon_code: str):
     if report:
         elements.append(f"[bold]Omdöme:[/bold] {report}")
 
+    for service in services:
+        service_txt = f"{service['date']} {service['place']}"
+        if service['notes']:
+            service_txt += f" ({service['notes']})"
+        elements.append(service_txt)
+
+    for manuscript in manuscripts:
+        manuscript_txt = f"[underline]{manuscript['file_name']}[/underline] {manuscript['date']}"
+        if manuscript['notes']:
+            manuscript_txt += f" ({manuscript['notes']})"
+        elements.append(manuscript_txt)
+
+
+
+
+    console.print("[link=https://www.google.com]https://www.google.com[/link]")
+
+    console.print("[link=https://www.google.com]länk[/link]")
+
+    console.print('länk', style = "link https://www.google.com")
+
+
+
+
+
 
     body = Group(*elements)
     console.print(
@@ -97,6 +121,7 @@ def show(sermon_code: str):
             box = box.ROUNDED 
         )
     )
+#sermon:
 # x code
 # x title
 # x context
@@ -106,7 +131,33 @@ def show(sermon_code: str):
 # x notes
 
 # Bible reference:
-#   reference_text
+# x reference_text
+
+#service:
+# x date
+# x place
+# x notes
+
+#manuscript:
+#   file_name
+#   version
+#   date
+#   notes
+
+# recording:
+#   type
+#   date
+#   file_name
+#   external_url
+#   notes
+
+#resource:
+#   file_name
+#   title
+#   notes
+
+#related_sermons:
+#   related_sermon_id
 
 
 
