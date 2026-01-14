@@ -71,14 +71,21 @@ def show(sermon_code: str):
     notes = sermon['notes']
     report = sermon['report']
     elements = []
-    elements.append(Align.right(f" [italic]{sermon['context']}[/italic]"))
+    if sermon['context']:
+        elements.append(Align.right(f" [italic]{sermon['context']}[/italic]"))
+    else:
+        elements.append('')
+    bible_reference_text = ', '.join([x['reference_text'] for x in bible_references])
+    if bible_reference_text:
+        elements.append(f"{bible_reference_text}")
     elements.append("")
     elements.append(f"[bold]Introduktion:[/bold] {sermon['introduction']}")
     elements.append(f"[bold]Budskap:[/bold] {sermon['message']}")
-    if notes is not None:
+    if notes:
         elements.append(f"[bold]Kommentar:[/bold] {notes}")
-    if report is not None:
+    if report:
         elements.append(f"[bold]Omdöme:[/bold] {report}")
+
 
     body = Group(*elements)
     console.print(
@@ -95,10 +102,12 @@ def show(sermon_code: str):
 # x context
 # x introduction
 # x message
-#   report
-#   notes
+# x report
+# x notes
 
-#   
+# Bible reference:
+#   reference_text
+
 
 
 
