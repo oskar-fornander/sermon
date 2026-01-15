@@ -4,18 +4,12 @@ import sqlite3
 from pathlib import Path
 import yaml
 
+from app.utils import DB_PATH
+
 # --------------------
 # Configuration
 # --------------------
 
-
-def load_config():
-    config_path = Path(__file__).resolve().parent.parent / "config.yaml"
-    with open(config_path, 'r') as f:
-        return yaml.safe_load(f)
-
-CONFIG = load_config()
-DB_PATH = Path(CONFIG['database']['path'] + CONFIG['database']['filename'])
 
 # --------------------
 # Connection

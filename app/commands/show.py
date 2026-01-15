@@ -1,4 +1,7 @@
 import typer
+from app.utils import CONFIG, ARCHIVE_ROOT
+from pathlib import Path
+
 import shutil
 from rich.console import Console
 from rich.panel import Panel #https://rich.readthedocs.io/en/stable/reference/panel.html
@@ -33,6 +36,10 @@ def show(sermon_code: str):
     print(f"Visa predikan {sermon_code}")
 
     sermon = get_sermon_by_code(sermon_code)
+    if not sermon:
+        print(f"Predikan med kod {sermon_code} finns inte.")
+        return
+
     services = get_services_for_sermon(sermon_code)
     manuscripts = get_manuscripts_for_sermon(sermon_code)
     recordings = get_recordings_for_sermon(sermon_code)
@@ -92,18 +99,24 @@ def show(sermon_code: str):
         elements.append(service_txt)
 
     for manuscript in manuscripts:
-        manuscript_txt = f"[underline]{manuscript['file_name']}[/underline] {manuscript['date']}"
+        manuscript_file_path = ARCHIVE_ROOT / Path('files/manuscripts/' + manuscript['file_name'])
+        manuscript_txt = f"[link=file://{manuscript_file_path}]{manuscript['file_name']}[/link] ({manuscript['date']})"
         if manuscript['notes']:
             manuscript_txt += f" ({manuscript['notes']})"
         elements.append(manuscript_txt)
+
+    for recording in recordings:
+        recording_file_path = ARCHIVE_ROOT / Path('files/recordings/' + recording['file_name'])
+        recording_txt = f"[link=file://{recording_file_path}]{recording['file_name']}[/link] ({recording['date']})"
+        if recording['notes']:
+            recording_txt += f" ({recording['notes']})"
+        elements.append(recording_txt)
 
 
 
 
     console.print("[link=https://www.google.com]https://www.google.com[/link]")
-
     console.print("[link=https://www.google.com]länk[/link]")
-
     console.print('länk', style = "link https://www.google.com")
 
 
