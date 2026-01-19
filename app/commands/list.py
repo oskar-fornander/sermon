@@ -1,5 +1,6 @@
 import typer
 from app.db import list_sermons, get_services_for_sermon
+from app.presentation.sermon_list import render_sermon_list
 
 
 app = typer.Typer(help = 'Lista de senaste predikningarna', invoke_without_command=True)
@@ -26,15 +27,10 @@ def sermon_listing_function(
     if reverse:
         sermons.reverse() #Reverse the sorted list if flag --reverse is set
 
-    for sermon in sermons:
-        if date:
-            txt = f"{sermon['code']} {sermon['date']} {sermon['place']} {sermon['title']}"
-            print(txt)
-        else: #code
-            services = get_services_for_sermon(sermon['code'])
-            service = ''
-            if len(services) > 0:
-                service = services[-1]['date'] #Show only last service
-                service = ', '.join([s['date'] for s in services][::-1]) #Show all services in descending order
-            print(f"{sermon['code']} {sermon['title']} {service}")
+    if date:
+        render_sermon_list(sermons=sermons, order_by='date')
+    else:
+        services = [get_services_for_sermon(sermon['code']) for sermon in sermons] #Get all services for each sermon and store in a list
+        render_sermon_list(sermons=sermons, services=services, order_by='code')
+
 
