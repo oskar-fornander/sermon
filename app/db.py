@@ -18,7 +18,7 @@ from app.utils import DB_PATH
 def get_connection():
     conn = sqlite3.connect(DB_PATH)
     conn.row_factory = sqlite3.Row #Access via column names instead of indices
-    conn.execute("PRAGMA foreign_keys = ON")
+    conn.execute('PRAGMA foreign_keys = ON')
     return conn
 
 
@@ -47,13 +47,34 @@ def get_sermon_id(code:str) -> int:
     return row['id']
 
 
-def list_sermons():
-    """List sermons"""
+def list_sermons(order_by: str = 'code'):
+    """List sermons by code or date"""
     conn = get_connection()
     cur = conn.cursor()
-    cur.execute(
-        "SELECT code, title FROM sermon ORDER BY code ASC"
-    )
+    if order_by == 'date':
+        cur.execute(
+            """
+            SELECT 
+                service.date, 
+                service.place, 
+                service.notes AS service_notes, 
+                sermon.code, 
+                sermon.title
+            FROM service
+            JOIN sermon ON sermon.id = service.sermon_id
+            ORDER BY service.date
+            """
+        )
+    else: #'code'
+        cur.execute(
+            """
+            SELECT 
+                sermon.code, 
+                sermon.title
+            FROM sermon
+            ORDER BY sermon.code
+            """
+        )
     row = cur.fetchall()
     conn.close()
     return row
@@ -61,11 +82,9 @@ def list_sermons():
 
 def get_services_for_sermon(code: str):
     """Get all services connected to this sermon"""
-    #id = get_sermon_id(code) #use the internal id number
     conn = get_connection()
     cur = conn.cursor()
     cur.execute(
-        #"SELECT * FROM service WHERE sermon_id = ?",
         """
         SELECT service.* FROM service
         JOIN sermon ON service.sermon_id = sermon.id
@@ -77,6 +96,7 @@ def get_services_for_sermon(code: str):
     row = cur.fetchall()
     conn.close()
     return row
+
 
 def get_manuscripts_for_sermon(code: str):
     """Get all manuscripts connected to this sermon, ordered by version"""
