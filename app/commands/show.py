@@ -49,22 +49,22 @@ def show(sermon_code: str):
 
     width = shutil.get_terminal_size().columns - 4 #Get width of terminal window (with some margin)
 
-    table = Table(title="Inspelningar")
-    table.add_column("Typ")
-    table.add_column("Datum")
-    table.add_column("Fil")
-    table.add_row("MP3", "2024-06-09", "p370.mp3")
-    table.add_row("Video", "2024-06-09", "länk")
+    table = Table(title='Inspelningar')
+    table.add_column('Typ')
+    table.add_column('Datum')
+    table.add_column('Fil')
+    table.add_row('MP3', '2024-06-09', 'p370.mp3')
+    table.add_row('Video', '2024-06-09', 'länk')
     console.print(table)
 
     
     body = (
-        "[bold]Plats:[/bold] Storkyrkan\n"
-        "[bold]Text:[/bold] Joh 3:16\n"
-        "[bold]Betyg:[/bold] A\n\n"
-        "Här kan själva predikotexten eller sammanfattningen visas."
+        '[bold]Plats:[/bold] Storkyrkan\n'
+        '[bold]Text:[/bold] Joh 3:16\n'
+        '[bold]Betyg:[/bold] A\n\n'
+        'Här kan själva predikotexten eller sammanfattningen visas.'
     )
-    console.print(Panel(Columns([body, table]), title="P370 – Nådens evangelium"))
+    console.print(Panel(Columns([body, table]), title='P370 – Nådens evangelium'))
 
     color = Color.from_rgb(100, 100, 100)
     color = Color.default()
@@ -72,7 +72,7 @@ def show(sermon_code: str):
     bgcolor = Color.default()
     my_style = Style(color = Color.from_rgb(255, 0, 0), bold = True)
     title = f"[bold]{sermon_code}[/bold] ─── {sermon['title']}"
-    subtitle = f"Oskar Fornander"
+    subtitle = 'Oskar Fornander'
 
     notes = sermon['notes']
     report = sermon['report']
@@ -115,9 +115,9 @@ def show(sermon_code: str):
 
 
 
-    console.print("[link=https://www.google.com]https://www.google.com[/link]")
-    console.print("[link=https://www.google.com]länk[/link]")
-    console.print('länk', style = "link https://www.google.com")
+    console.print('[link=https://www.google.com]https://www.google.com[/link]')
+    console.print('[link=https://www.google.com]länk[/link]')
+    console.print('länk', style = 'link https://www.google.com')
 
 
 
@@ -128,9 +128,9 @@ def show(sermon_code: str):
     console.print(
         Panel(body,
             title = title,
-            title_align = "left", 
+            title_align = 'left', 
             subtitle = subtitle,
-            subtitle_align = "right",
+            subtitle_align = 'right',
             box = box.ROUNDED 
         )
     )

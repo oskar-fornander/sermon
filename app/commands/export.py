@@ -1,7 +1,7 @@
 
 import typer
 
-app = typer.Typer(help = "Exportera registret som html eller enskild predikan som podcast")
+app = typer.Typer(help = 'Exportera registret som html eller enskild predikan som podcast')
 
 @app.command()
 def html():

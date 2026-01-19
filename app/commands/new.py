@@ -4,7 +4,7 @@ import typer
 
 def new():
     """Skapa en ny predikan"""
-    print("Skapa en ny predikan")
-    title = typer.prompt("Titel")
-    context = typer.prompt("Sammanhang")
+    print('Skapa en ny predikan')
+    title = typer.prompt('Titel')
+    context = typer.prompt('Sammanhang')
     print(f"title: {title}, context: {context}")

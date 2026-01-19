@@ -18,13 +18,13 @@ from app.commands.edit import edit
 
 
 
-app = typer.Typer(help = "Predikoarkiv")
+app = typer.Typer(help = 'Predikoarkiv')
 
 #Sub commands
-app.add_typer(list_commands.app, name = "list")
-app.add_typer(open_commands.app, name = "open")
-app.add_typer(attach_commands.app, name = "attach")
-app.add_typer(export_commands.app, name = "export")
+app.add_typer(list_commands.app, name = 'list')
+app.add_typer(open_commands.app, name = 'open')
+app.add_typer(attach_commands.app, name = 'attach')
+app.add_typer(export_commands.app, name = 'export')
 
 #Single commands
 app.command()(show)
@@ -40,10 +40,10 @@ app.command()(edit)
 from pathlib import Path
 import yaml
 
-with open("config.yaml") as f:
+with open('config.yaml') as f:
     config = yaml.safe_load(f)
 
-ARCHIVE_ROOT = Path(config["archive"]["root"]).resolve()
+ARCHIVE_ROOT = Path(config['archive']['root']).resolve()
 
 
 
@@ -55,6 +55,6 @@ ARCHIVE_ROOT = Path(config["archive"]["root"]).resolve()
 
 
 
-if __name__ == "__main__":
+if __name__ == '__main__':
     app()
 

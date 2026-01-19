@@ -8,7 +8,7 @@ BASE_DIR, DB_PATH, ARCHIVE_ROOT = None, None, None
 def load_config():
     """Load config file"""
     global CONFIG
-    config_path = BASE_DIR / "config.yaml"
+    config_path = BASE_DIR / 'config.yaml'
     with open(config_path, 'r') as f:
         CONFIG = yaml.safe_load(f)
 
@@ -20,5 +20,5 @@ def define_paths():
         load_config()
 
     DB_PATH = Path(CONFIG['database']['path'] + CONFIG['database']['filename'])
-    ARCHIVE_ROOT = (BASE_DIR / CONFIG["archive"]["root"]).resolve()
+    ARCHIVE_ROOT = (BASE_DIR / CONFIG['archive']['root']).resolve()
 
