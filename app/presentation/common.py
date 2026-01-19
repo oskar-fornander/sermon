@@ -11,8 +11,10 @@ from rich.columns import Columns
 from rich import box
 from rich.color import Color
 
+from app.presentation.theme import custom_theme
 
-console = Console()
+console = Console(theme=custom_theme) #apply custom theme (defined in theme.py) to the console
+
 
 #width = shutil.get_terminal_size().columns - 4 #Get width of terminal window (with some margin)
 
