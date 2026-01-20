@@ -7,7 +7,7 @@ from app.db import get_sermon_by_code, get_services_for_sermon, get_manuscripts_
 
 def show(sermon_code: str):
     """Visa en specifik predikan, (identifierad av sermon-code)"""
-    print(f"Visa predikan {sermon_code}")
+    #print(f"Visa predikan {sermon_code}")
 
     sermon = get_sermon_by_code(sermon_code)
     if not sermon:
