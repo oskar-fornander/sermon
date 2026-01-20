@@ -1,21 +1,17 @@
 from rich.theme import Theme
 
+LIST_MARKER = '•' # Used to mark existence of resource in list
+
 ICON = {
-    'manuscript': '📝',
-    'recording': '🔊',
-    'resource': '📎'
+    'manuscript': '✎',  #📝',
+    'recording': '▶',  #🔊',
+    'resource': '✚',  #📎'
 }
+
 # Suggestions for icons to use:
-# 📄
-# 📕
-# 📝
-# 🔊
-# 🎧
-# 🎙️
-# ▶ 
-# 📎
-# 📁
-# 📚
+# ✎ ✍ ♪ ♫ ▸ ▶ ≡ ¶  ✚ ❑ ❏ ❦ ➕ ▤ ▢
+# 📄 📕 📝 🔊 🎧 🎙️ ▶ 📎 📁 📚
+
 
 custom_theme = Theme ({
     'info': 'italic',
@@ -23,7 +19,7 @@ custom_theme = Theme ({
     'sermon_code': 'bold',
     'key': 'bold yellow',
     'code': 'dim italic',
-    'link_style': 'bold dim'
+    'link_style': 'dim'    # Add this theme to links like this: [link=http...][link_style]link_text[/link_style][/link]
 })
 
 

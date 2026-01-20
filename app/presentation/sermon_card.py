@@ -1,60 +1,44 @@
 
-from app.utils import CONFIG, ARCHIVE_ROOT, PATH_MANUSCRIPTS, PATH_RECORDINGS, PATH_RESOURCES
+from app.utils import PATH_MANUSCRIPTS, PATH_RECORDINGS, PATH_RESOURCES
 from pathlib import Path
 from app.presentation.common import *
-
-
-
-
 
 
 def render_sermon_card(sermon, services, manuscripts, recordings, resources, bible_references, related_sermons):
     """Render a sermon card to show a sermon to the user."""
 
 
+    table = Table(title=None, box=box.SIMPLE, expand=False) #A table inside the panel
 
-    table = Table(title='Inspelningar')
-    table.add_column('Typ')
-    table.add_column('Datum')
-    table.add_column('Fil')
-    table.add_row('MP3', '2024-06-09', 'p370.mp3')
-    table.add_row('Video', '2024-06-09', 'länk')
-    console.print(table)
+    table.add_column('Kod', style='sermon_code', no_wrap=True, min_width=4)
+    table.add_column('[key]Datum[/]', style='key',  width=10)
+    table.add_column('Plats', no_wrap=True, min_width=4, overflow='ellipsis')
+    table.add_column('Titel', no_wrap=True, min_width=4, overflow='ellipsis')
 
-    
-    body = (
-        '[bold]Plats:[/bold] Storkyrkan\n'
-        '[bold]Text:[/bold] Joh 3:16\n'
-        '[bold]Betyg:[/bold] A\n\n'
-        'Här kan själva predikotexten eller sammanfattningen visas.'
-    )
-    console.print(Panel(Columns([body, table]), title='P370 – Nådens evangelium'))
 
-    color = Color.from_rgb(100, 100, 100)
-    color = Color.default()
-    bgcolor = Color.from_rgb(0, 0, 0)
-    bgcolor = Color.default()
-    my_style = Style(color = Color.from_rgb(255, 0, 0), bold = True)
-    title = f"[bold]{sermon['code']}[/bold] ─── {sermon['title']}"
-    subtitle = 'Oskar Fornander'
+
+
+    elements = []  # Gather elements to build the panel
 
     notes = sermon['notes']
     report = sermon['report']
-    elements = []
     if sermon['context']:
-        elements.append(Align.right(f" [italic]{sermon['context']}[/italic]"))
+        elements.append(Align.right(f" [info]{sermon['context']}[/info]"))
     else:
         elements.append('')
     bible_reference_text = ', '.join([x['reference_text'] for x in bible_references])
     if bible_reference_text:
         elements.append(f"{bible_reference_text}")
-    elements.append("")
-    elements.append(f"[bold]Introduktion:[/bold] {sermon['introduction']}")
-    elements.append(f"[bold]Budskap:[/bold] {sermon['message']}")
+    elements.append('')
+    elements.append(f"[title]Introduktion:[/title] {sermon['introduction']}")
+    elements.append(f"[title]Budskap:[/title] {sermon['message']}")
     if notes:
-        elements.append(f"[bold]Kommentar:[/bold] {notes}")
+        elements.append(f"[title]Kommentar:[/title] {notes}")
     if report:
-        elements.append(f"[bold]Omdöme:[/bold] {report}")
+        elements.append(f"[title]Omdöme:[/title] {report}")
+
+    body = Group(*elements)
+
 
     for service in services:
         service_txt = f"{service['date']} {service['place']}"
@@ -80,25 +64,27 @@ def render_sermon_card(sermon, services, manuscripts, recordings, resources, bib
 #PATH_RESOURCES
 
 
-    console.print('[link=https://www.google.com]https://www.google.com[/link]')
     console.print('[link=https://www.google.com]länk[/link]')
-    console.print('länk', style = 'link https://www.google.com')
 
 
 
 
-
-
-    body = Group(*elements)
+    #body = Group(elements)
+    #body = f"test"
+    title = f"[title][key]{sermon['code']}[/key] ─── {sermon['title']}[/title]"
+    subtitle = f"[dim]Tips:[/] [code]sermon open manuscript {sermon['code']}[/]"
+    print()
     console.print(
         Panel(body,
-            title = title,
-            title_align = 'left', 
-            subtitle = subtitle,
-            subtitle_align = 'right',
-            box = box.ROUNDED 
+            title=title,
+            title_align='left', 
+            subtitle=subtitle,
+            subtitle_align='right',
+            box=box.ROUNDED 
         )
     )
+    print()
+
 #sermon:
 # x code
 # x title

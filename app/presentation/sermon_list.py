@@ -27,9 +27,9 @@ def render_sermon_list(title, sermons, services = None, manuscripts = None, reco
         sermon = sermons[i]
 
         # Join all manuscripts, recordings and resources into single string for presentation in table
-        manuscript = ' '.join([f"[link=file://{PATH_MANUSCRIPTS}/{x['file_name']}][link_style]+[/]" for x in manuscripts[i]])
-        recording = ' '.join([f"[link=file://{PATH_RECORDINGS}/{x['file_name']}][link_style]+[/]" for x in recordings[i]])
-        resource = ' '.join([f"[link=file://{PATH_RESOURCES}/{x['file_name']}][link_style]+[/]" for x in resources[i]])
+        manuscript = ' '.join([f"[link=file://{PATH_MANUSCRIPTS}/{x['file_name']}][link_style]{LIST_MARKER}[/]" for x in manuscripts[i]])
+        recording = ' '.join([f"[link=file://{PATH_RECORDINGS}/{x['file_name']}][link_style]{LIST_MARKER}[/]" for x in recordings[i]])
+        resource = ' '.join([f"[link=file://{PATH_RESOURCES}/{x['file_name']}][link_style]{LIST_MARKER}[/]" for x in resources[i]])
 
         if order_by == 'date':
             table.add_row(sermon['code'], sermon['date'], sermon['place'], sermon['title'], manuscript, recording, resource)
@@ -39,8 +39,6 @@ def render_sermon_list(title, sermons, services = None, manuscripts = None, reco
                 service = ', '.join([s['date'] for s in services[i]][::-1]) #Show all services in descending order
             table.add_row(sermon['code'], sermon['title'], service, manuscript, recording, resource)
 
-    console.print('[link=https://www.google.com]länk[/link]')
-    console.print('länk', style = 'link https://www.google.com')
 
     body = Group(f"[info]{title}[/info]", table)
     print()

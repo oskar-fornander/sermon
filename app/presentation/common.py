@@ -11,7 +11,8 @@ from rich.columns import Columns
 from rich import box
 from rich.color import Color
 
-from app.presentation.theme import custom_theme, ICON
+from app.presentation.theme import custom_theme, ICON, LIST_MARKER
+
 
 console = Console(theme=custom_theme) #apply custom theme (defined in theme.py) to the console
 
