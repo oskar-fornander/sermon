@@ -39,16 +39,13 @@ def render_sermon_card(sermon, services, manuscripts, recordings, resources, bib
 
 
     # Add services
-    service_table = Table(title='Gudstjänster', box=box.SIMPLE, expand=False)
-    service_table.add_column('Datum', no_wrap=True, min_width=10)
-    service_table.add_column('Plats', no_wrap=True)
-    service_table.add_column('Kommentar', no_wrap=True)
+    elements.append('[title]Gudstjänster:[/]')
     for service in services:
-        service_notes = None
-        if service['notes']:
-            service_notes = f"({service['notes']})"
-        service_table.add_row(service['date'], service['place'], service_notes)
-    elements.append(service_table)
+        elements.append(f"{TAB}{service['date']}  {service['place']}")
+        if service['notes'] is not None:
+            elements.append(f"{TAB + ' ' * 12}[notes]• {service['notes']}[/notes]")
+        
+# ... To be continued ...
 
     # Add manuscripts
     for manuscript in manuscripts:

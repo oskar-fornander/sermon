@@ -1,6 +1,7 @@
 from rich.theme import Theme
 
 LIST_MARKER = '•' # Used to mark existence of resource in list
+TAB = ' ' * 4 # Define tab width in presentations
 
 ICON = {
     'manuscript': '✎',  #📝',
@@ -19,6 +20,7 @@ custom_theme = Theme ({
     'sermon_code': 'bold',
     'key': 'bold yellow',
     'code': 'dim italic',
+    'notes': 'dim',
     'link_style': 'dim'    # Add this theme to links like this: [link=http...][link_style]link_text[/link_style][/link]
 })
 
