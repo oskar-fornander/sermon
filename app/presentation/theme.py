@@ -1,13 +1,31 @@
 from rich.theme import Theme
 
+ICON = {
+    'manuscript': '📝',
+    'recording': '🔊',
+    'resource': '📎'
+}
+# Suggestions for icons to use:
+# 📄
+# 📕
+# 📝
+# 🔊
+# 🎧
+# 🎙️
+# ▶ 
+# 📎
+# 📁
+# 📚
+
 custom_theme = Theme ({
     'info': 'italic',
     'title': 'bold',
     'sermon_code': 'bold',
     'key': 'bold yellow',
-    'link': 'red underline',
-    'code': 'dim italic'
+    'code': 'dim italic',
+    'link_style': 'bold dim'
 })
+
 
 #  Styles:
 #  "bold" or "b" for bold text.

@@ -1,5 +1,5 @@
 import typer
-from app.db import list_sermons, get_services_for_sermon
+from app.db import list_sermons, get_services_for_sermon, get_manuscripts_for_sermon, get_recordings_for_sermon, get_resources_for_sermon
 from app.presentation.sermon_list import render_sermon_list
 
 
@@ -29,12 +29,16 @@ def sermon_listing_function(
         sermons.reverse() #Reverse the sorted list if flag --reverse is set
 
 
+    manuscripts = [get_manuscripts_for_sermon(sermon['code']) for sermon in sermons] #Get all manuscripts for each sermon and store in a list
+    recordings = [get_recordings_for_sermon(sermon['code']) for sermon in sermons] 
+    resources = [get_resources_for_sermon(sermon['code']) for sermon in sermons] 
+
     if date:
         title = f" {n} efter predikodatum"
-        render_sermon_list(title=title, sermons=sermons, order_by='date')
+        render_sermon_list(title=title, sermons=sermons, manuscripts=manuscripts, recordings=recordings, resources=resources, order_by='date')
     else:
         title = f" {n} efter predikokod"
         services = [get_services_for_sermon(sermon['code']) for sermon in sermons] #Get all services for each sermon and store in a list
-        render_sermon_list(title=title, sermons=sermons, services=services, order_by='code')
+        render_sermon_list(title=title, sermons=sermons, services=services, manuscripts=manuscripts, recordings=recordings, resources=resources, order_by='code')
 
 

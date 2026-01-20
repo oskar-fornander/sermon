@@ -1,7 +1,9 @@
 
-from app.utils import CONFIG, ARCHIVE_ROOT
+from app.utils import CONFIG, ARCHIVE_ROOT, PATH_MANUSCRIPTS, PATH_RECORDINGS, PATH_RESOURCES
 from pathlib import Path
 from app.presentation.common import *
+
+
 
 
 
@@ -61,20 +63,21 @@ def render_sermon_card(sermon, services, manuscripts, recordings, resources, bib
         elements.append(service_txt)
 
     for manuscript in manuscripts:
-        manuscript_file_path = ARCHIVE_ROOT / Path('files/manuscripts/' + manuscript['file_name'])
+        manuscript_file_path = PATH_MANUSCRIPTS / Path(manuscript['file_name'])
         manuscript_txt = f"[link=file://{manuscript_file_path}]{manuscript['file_name']}[/link] ({manuscript['date']})"
         if manuscript['notes']:
             manuscript_txt += f" ({manuscript['notes']})"
         elements.append(manuscript_txt)
 
     for recording in recordings:
-        recording_file_path = ARCHIVE_ROOT / Path('files/recordings/' + recording['file_name'])
+        recording_file_path = PATH_RECORDINGS / Path(recording['file_name'])
         recording_txt = f"[link=file://{recording_file_path}]{recording['file_name']}[/link] ({recording['date']})"
         if recording['notes']:
             recording_txt += f" ({recording['notes']})"
         elements.append(recording_txt)
 
 
+#PATH_RESOURCES
 
 
     console.print('[link=https://www.google.com]https://www.google.com[/link]')

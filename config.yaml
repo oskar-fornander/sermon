@@ -9,13 +9,8 @@ database:
 export:
   html_index: index.html
 
-files:
-  manuscripts: manuscripts
-  recordings: recordings
-  resources: resources
-
 paths:
-  manuscripts: ../archive/files/manuscripts
-  recordings:  ../archive/files/recordings
-  resources: ../archive/files/resources
+  manuscripts: files/manuscripts
+  recordings:  files/recordings
+  resources: files/resources
 
