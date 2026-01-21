@@ -6,7 +6,7 @@ from app.presentation.sermon_card import render_sermon_card
 from app.db import get_sermon_by_code, get_services_for_sermon, get_manuscripts_for_sermon, get_recordings_for_sermon, get_resources_for_sermon, get_bible_references_for_sermon, get_related_sermons_for_sermon
 
 def show(sermon_code: str):
-    """Visa en specifik predikan, (identifierad av sermon-code)"""
+    """Visa en specifik predikan (identifierad av sermon-code)"""
     #print(f"Visa predikan {sermon_code}")
 
     sermon = get_sermon_by_code(sermon_code)

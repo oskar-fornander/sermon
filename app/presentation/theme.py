@@ -6,7 +6,8 @@ TAB = ' ' * 4 # Define tab width in presentations
 ICON = {
     'manuscript': '✎',  #📝',
     'recording': '▶',  #🔊',
-    'resource': '✚',  #📎'
+    'resource': '✚',  #📎',
+    'missing_file': '✘'
 }
 
 # Suggestions for icons to use:
@@ -21,6 +22,7 @@ custom_theme = Theme ({
     'key': 'bold yellow',
     'code': 'dim italic',
     'notes': 'dim',
+    'alert': 'red bold',
     'link_style': 'dim'    # Add this theme to links like this: [link=http...][link_style]link_text[/link_style][/link]
 })
 

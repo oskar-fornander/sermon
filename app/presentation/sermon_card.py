@@ -3,6 +3,13 @@ from pathlib import Path
 from app.presentation.common import *
 
 
+def missing_file_marker(file_path):
+    """Mark if file is missing"""
+    if file_path.is_file(): 
+        return ''
+    return f"[alert]{ICON['missing_file']}[/alert] "  # Mark missing file with an icon and style
+
+
 def render_sermon_card(sermon, services, manuscripts, recordings, resources, bible_references, related_sermons):
     """Render a sermon card to show a sermon to the user."""
 
@@ -44,7 +51,8 @@ def render_sermon_card(sermon, services, manuscripts, recordings, resources, bib
         elements[-1] += ' – '  # Add at end of line if no data to show
     for manuscript in manuscripts:
         manuscript_file_path = PATH_MANUSCRIPTS / Path(manuscript['file_name'])
-        elements.append(f"{TAB}[notes]{manuscript['date']}[/notes]  [link=file://{manuscript_file_path}]{manuscript['file_name']}[/link]")
+        marker = missing_file_marker(manuscript_file_path)
+        elements.append(f"{TAB}[notes]{manuscript['date']}[/notes]  {marker}[link=file://{manuscript_file_path}]{manuscript['file_name']}[/link]")
         if manuscript['notes']:
             elements[-1] += f"{TAB}[notes]• {manuscript['notes']}[/notes]"  # Add notes at end of the same line
             #elements.append(f"{TAB + ' ' * 12}[notes]• {manuscript['notes']}[/notes]")
@@ -56,7 +64,8 @@ def render_sermon_card(sermon, services, manuscripts, recordings, resources, bib
     for recording in recordings:
         if recording['file_name']:
             recording_file_path = PATH_RECORDINGS / Path(recording['file_name'])
-            elements.append(f"{TAB}[notes]{recording['date']}[/notes]  [link=file://{recording_file_path}]{recording['file_name']}[/link]  [notes]{recording['type']}[/notes]")
+            marker = missing_file_marker(recording_file_path)
+            elements.append(f"{TAB}[notes]{recording['date']}[/notes]  {marker}[link=file://{recording_file_path}]{recording['file_name']}[/link]  [notes]{recording['type']}[/notes]")
         elif recording['external_url']: # Either a local file OR an external link for each recording
             link_title = 'extern url'
             elements.append(f"{TAB}[notes]{recording['date']}[/notes]  [link={recording['external_url']}]{link_title}[/link]  [notes]{recording['type']}[/notes]")
@@ -69,7 +78,8 @@ def render_sermon_card(sermon, services, manuscripts, recordings, resources, bib
         elements[-1] += ' – '  # Add at end of line if no data to show
     for resource in resources:
         resource_file_path = PATH_RESOURCES / Path(resource['file_name'])
-        elements.append(f"{TAB}[notes]{resource['date']}[/notes]  [link=file://{resource_file_path}]{resource['file_name']}[/link]")
+        marker = missing_file_marker(resource_file_path)
+        elements.append(f"{TAB + 12 * ' '}{marker}[link=file://{resource_file_path}]{resource['title']}[/link]")
         if resource['notes']:
             elements[-1] += f"{TAB}[notes]• {resource['notes']}[/notes]"  # Add notes at end of the same line
 
