@@ -59,7 +59,8 @@ def list_sermons(order_by: str = 'code'):
                 service.place, 
                 service.notes AS service_notes, 
                 sermon.code, 
-                sermon.title
+                sermon.title,
+                sermon.report
             FROM service
             JOIN sermon ON sermon.id = service.sermon_id
             ORDER BY service.date
@@ -70,7 +71,8 @@ def list_sermons(order_by: str = 'code'):
             """
             SELECT 
                 sermon.code, 
-                sermon.title
+                sermon.title,
+                sermon.report
             FROM sermon
             ORDER BY sermon.code
             """

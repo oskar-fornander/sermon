@@ -18,9 +18,10 @@ def render_sermon_list(title, sermons, services = None, manuscripts = None, reco
         table.add_column('Titel', no_wrap=True, min_width=4, overflow='ellipsis')
         table.add_column('Datum',  min_width=10, no_wrap=True)
         #Setting min_width, no_wrap and overflow does not seem to work properly
-    table.add_column(ICON['manuscript']) # table.add_column('Utkast')
+    table.add_column(ICON['manuscript']) # table.add_column('Manus')
     table.add_column(ICON['recording']) # table.add_column('Inspelning')
     table.add_column(ICON['resource']) # table.add_column('Resurs')
+    table.add_column('±', style='notes')
     
 
     for i in range(len(sermons)):
@@ -32,12 +33,12 @@ def render_sermon_list(title, sermons, services = None, manuscripts = None, reco
         resource = ' '.join([f"[link=file://{PATH_RESOURCES}/{x['file_name']}][link_style]{LIST_MARKER}[/]" for x in resources[i]])
 
         if order_by == 'date':
-            table.add_row(sermon['code'], sermon['date'], sermon['place'], sermon['title'], manuscript, recording, resource)
+            table.add_row(sermon['code'], sermon['date'], sermon['place'], sermon['title'], manuscript, recording, resource, sermon['report'])
         else: #code
             service = ''
             if services and services[i]:
                 service = ', '.join([s['date'] for s in services[i]][::-1]) #Show all services in descending order
-            table.add_row(sermon['code'], sermon['title'], service, manuscript, recording, resource)
+            table.add_row(sermon['code'], sermon['title'], service, manuscript, recording, resource, sermon['report'])
 
 
     body = Group(f"[info]{title}[/info]", table)
