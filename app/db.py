@@ -81,6 +81,12 @@ def list_sermons(order_by: str = 'code'):
     conn.close()
     return row
 
+def get_last_sermon_code():
+    """Get the code of the last sermon in the database."""
+    sermons = list_sermons()
+    last_sermon = sermons[-1]
+    return last_sermon['code']
+
 
 def get_services_for_sermon(code: str):
     """Get all services connected to this sermon"""

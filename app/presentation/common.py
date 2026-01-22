@@ -10,6 +10,7 @@ from rich.table import Table
 from rich.columns import Columns
 from rich import box
 from rich.color import Color
+from rich.prompt import Prompt, Confirm
 
 from app.presentation.theme import custom_theme, ICON, LIST_MARKER, TAB
 
