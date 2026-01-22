@@ -87,6 +87,12 @@ def get_last_sermon_code():
     last_sermon = sermons[-1]
     return last_sermon['code']
 
+def get_all_sermon_codes():
+    """Get a list of all sermon codes used in the database."""
+    sermons = list_sermons()
+    codes = [sermon['code'] for sermon in sermons]
+    return codes
+
 
 def get_services_for_sermon(code: str):
     """Get all services connected to this sermon"""

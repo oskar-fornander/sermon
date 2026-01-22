@@ -20,23 +20,25 @@ def render_info_panel(title: str, content: str='', subtitle: str=''):
 
 
 
-def user_input(title, default=None, pattern=None, allow_empty=True):
+def user_input(title, default=None, choices=None, pattern=None, allow_empty=True):
     """Custom function to get user input from terminal via rich.prompt() with some safety functions"""
     while True:
-        answer = Prompt.ask(title, default=default)
-        #print(f">>{answer}<<")
+        answer = Prompt.ask(title, choices=choices, default=default)
         if not answer:
             if allow_empty:
-                return None
+                answer = None  # or ''
+                break
             else:
-                console.print(f"[bold red]Värdet av [white]{title}[/white] får inte vara tomt.[/bold red]")
+                console.print(f"[bold red]Värdet av [white dim]{title}[/white dim] får inte vara tomt.[/bold red]")
         elif pattern:
             if pattern.match(answer):
-                return answer
+                break
             else:
-                console.print(f"[bold red]Värdet av [white]{title}[/white] matchar inte formatet.[/bold red]")
+                console.print(f"[bold red]Värdet av [white dim]{title}[/white dim] matchar inte formatet.[/bold red]")
         else:
-            return answer
+            break
+    print(f"--{answer}--")
+    return answer
 
 
 
