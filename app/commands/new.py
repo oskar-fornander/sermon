@@ -1,15 +1,17 @@
 import typer
 #from app.utils import CONFIG, ARCHIVE_ROOT
 #from pathlib import Path
-from app.db import get_last_sermon_code, get_all_sermon_codes
+from app.db import get_last_sermon_code, get_all_sermon_codes, list_sermons
 from app.presentation.new_sermon import render_info_panel, user_input, show_sermon_draft
 from app.presentation.common import console
 from rich.prompt import Prompt, Confirm
 import re
+from datetime import date, timedelta
 
 
 pattern_code = re.compile(r'^P\d{3}$')  # Sermon code on this format: P372 etc
 pattern_related_sermons = re.compile(r'^P\d{3}((\s*\;\s*)(P\d{3}))*$') # P001; P002 etc
+pattern_date = re.compile(r'^20\d{2}-(0[1-9]|1[0-2])-(0[1-9]|[12][0-9]|3[0-1])$') # Date: YYYY-MM-DD, does not validate dates
 
 
 
@@ -87,7 +89,22 @@ def new():
     print(draft)
 
     # Add a service?
-    service = Confirm.ask('Lägga till gudstjänst?', default=True)
+    add_service = Confirm.ask('Lägga till gudstjänst?', default=True)
+    service = {}  # Only a single service can be added here, use sermon attach service to add more
+    if add_service:
+        today = date.today()
+        days_since_sunday = (today.weekday() + 1) % 7
+        last_sunday = today - timedelta(days=days_since_sunday)  # Last sunday
+        default_date = last_sunday.isoformat()
+        default_place = list_sermons(order_by='date')[-1]['place']
+        service['date'] = user_input('Datum (ÅÅÅÅ-MM-DD)', pattern=pattern_date, default=default_date, allow_empty=False)
+        service['place'] = user_input('Plats', default=default_place, allow_empty=False)
+        service['notes'] = user_input('Kommentar')
+        
+
+
+
+    draft['services'] = [service]
 
 
 # 2. service?
