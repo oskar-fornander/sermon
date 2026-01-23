@@ -199,12 +199,22 @@ def get_related_sermons_for_sermon(code: str):
     return row
 
 
-
-
-
 # --------------------
-# 
+# Write to database
 # --------------------
+
+def create_sermon_from_draft(draft: sermonDraft):
+    """Skapa en ny predikan i databasen baserat på data i draft."""
+    pass
+
+def update_sermon_from_draft(draft: sermonDraft):
+    """Uppdatera en befintlig predikan i databasen baserat på data i draft."""
+    pass
+
+def load_sermon_as_draft(sermon_code: str) -> sermonDraft:
+    """Hämta data om en predikan och returnera som ett draft."""
+    pass
+
 
 # --------------------
 # 

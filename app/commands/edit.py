@@ -1,6 +1,6 @@
 import typer
 from app.services.edit_sermon import interactive_edit_sermon, update_sermon_code, update_sermon_title, update_sermon_context, update_sermon_introduction, update_sermon_message, update_sermon_report, update_sermon_notes
-#from db.services.edit_manuscript import ...
+from app.db import load_sermon_as_draft, create_sermon_from_draft, update_sermon_from_draft
 
 
 # sermon edit P371              # interaktivt läge
@@ -11,10 +11,15 @@ app = typer.Typer(help='Redigera predikan')
 
 @app.callback(invoke_without_command=True)  # Default (interaktiv edit): sermon edit P371
 def edit(ctx: typer.Context, sermon_code: str):
+    """Interaktiv redigering av en predikan"""
     ctx.obj = {'sermon_code': sermon_code}  # Make sermon_code available for all sub commands
     if ctx.invoked_subcommand is None:
         print(f"interactive edit: {sermon_code}")
-        interactive_edit_sermon(sermon_code)
+        sermon_draft = load_sermon_as_draft(sermon_code)
+        updated_sermon_draft = interactive_edit_sermon(sermon_draft)
+        update_sermon_from_draft(updated_sermon_draft)
+
+        
 
 @app.command()
 def code(ctx: typer.Context, code: str):

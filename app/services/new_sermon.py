@@ -137,7 +137,9 @@ def new_sermon():
 
     if user_confirmation('Spara predikan?', default=True):
         print('save ...')
-        pass
+
+        updated_sermon_draft = interactive_edit_sermon(draft)
+        create_sermon_from_draft(updated_sermon_draft)
 
 
 # Enter to accept default or empty

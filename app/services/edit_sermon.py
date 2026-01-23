@@ -5,8 +5,6 @@ from app.presentation.common import console, render_info_panel, user_input, user
 from app.presentation.new_sermon import show_sermon_draft
 
 
-def edit_sermon():
-    """Redigera predikan"""
 
 def update_sermon_code(sermon_code: str, code: str):
     """Ändra predikans kod"""
@@ -39,7 +37,7 @@ def update_sermon_notes(sermon_code: str, notes: str):
 
 
 # ---------- Interactive edit ---------- #
-def interactive_edit_sermon(sermon_code: str):
+def interactive_edit_sermon(draft):
     """Interaktiv redigering av predikan"""
     pass
 
