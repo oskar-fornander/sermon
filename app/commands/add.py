@@ -1,7 +1,7 @@
 
 import typer
 
-app = typer.Typer(help = 'Koppla bibelreferens(er), gudstjänst, manuskript, inspelning eller övrig resurs till en predikan')
+app = typer.Typer(help = 'Skapa och koppla bibelreferens(er), gudstjänst, manuskript, inspelning eller övrig resurs till en predikan')
 
 @app.command()
 def service(sermon_code: str, date: str, place: str, notice: str = typer.Option('', '--notice', '-n')):

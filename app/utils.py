@@ -1,9 +1,20 @@
 from pathlib import Path
 import yaml
+from datetime import date, timedelta
+import re
 
 CONFIG = None
 BASE_DIR, DB_PATH, ARCHIVE_ROOT = None, None, None  
 PATH_MANUSCRIPTS, PATH_RECORDINGS, PATH_RESOURCES = None, None, None
+
+
+PATTERN = {}  # Patterns to check validity of user inputs when creating and editing a sermon
+PATTERN['code'] = re.compile(r'^P\d{3}$')  # Sermon code on this format: P372 etc
+PATTERN['related_sermons'] = re.compile(r'^P\d{3}((\s*\;\s*)(P\d{3}))*$') # P001; P002 etc
+PATTERN['date'] = re.compile(r'^20\d{2}-(0[1-9]|1[0-2])-(0[1-9]|[12][0-9]|3[0-1])$') # Date: YYYY-MM-DD, does not validate dates
+PATTERN['manuscript'] = re.compile(r'^P\d{3}[abcde]?\.(pdf|PDF)$')  # Manuscript P371.pdf, P371b.PDF
+PATTERN['recording'] = re.compile(r'^20\d{2}-(0[1-9]|1[0-2])-(0[1-9]|[12][0-9]|3[0-1])_Predikan.mp3$')  # Recording 2026-01-25_Predikan.mp3
+PATTERN['url'] = re.compile(r'^https?\:\/\/')  # URL http(s)://...
 
 
 def load_config():
@@ -27,4 +38,10 @@ def define_paths():
     PATH_RESOURCES = (ARCHIVE_ROOT / CONFIG['paths']['resources']).resolve()
 
 
+def get_last_sunday():
+    """Gets date of the last Sunday (including today)."""
+    today = date.today()
+    days_since_sunday = (today.weekday() + 1) % 7
+    last_sunday = today - timedelta(days=days_since_sunday)
+    return last_sunday.isoformat()  
 

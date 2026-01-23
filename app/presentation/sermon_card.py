@@ -10,8 +10,8 @@ def missing_file_marker(file_path):
     return f"[alert]{ICON['missing_file']}[/alert] "  # Mark missing file with an icon and style
 
 
-def render_sermon_card(sermon, services, manuscripts, recordings, resources, bible_references, related_sermons):
-    """Render a sermon card to show a sermon to the user."""
+def render_sermon_card(sermon, services, manuscripts, recordings, resources, bible_references, related_sermons, draft=False):
+    """Render a sermon card to show a sermon to the user. Also used to preview a draft."""
 
     elements = []  # Gather elements to build the panel
 
@@ -79,7 +79,8 @@ def render_sermon_card(sermon, services, manuscripts, recordings, resources, bib
     for resource in resources:
         resource_file_path = PATH_RESOURCES / Path(resource['file_name'])
         marker = missing_file_marker(resource_file_path)
-        elements.append(f"{TAB + 12 * ' '}{marker}[link=file://{resource_file_path}]{resource['title']}[/link]")
+        resource_title = resource['title'] or resource['file_name']  # Use file name if no title exists
+        elements.append(f"{TAB + 12 * ' '}{marker}[link=file://{resource_file_path}]{resource_title}[/link]")
         if resource['notes']:
             elements[-1] += f"{TAB}[notes]• {resource['notes']}[/notes]"  # Add notes at end of the same line
 
@@ -87,6 +88,12 @@ def render_sermon_card(sermon, services, manuscripts, recordings, resources, bib
     body = Group(*elements)
     title = f"[title][key]{sermon['code']}[/key] ─── {sermon['title']}[/title]"
     subtitle = f"[dim]Tips:[/] [code]sermon open manuscript {sermon['code']}[/]"
+    style = ''
+    if draft:  # Other title and subtitle if it is a draft that is shown
+        title = f"[title]FÖRHANDSGRANSKNING: [key]{sermon['code']}[/key] ─── {sermon['title']}[/title]"
+        subtitle = f"[dim]Tips:[/] Lägg till fler resurser i efterhand med t.ex. [code]sermon attach recording[/]"
+        style = 'on gray50'
+
     print()
     console.print(
         Panel(body,
@@ -94,7 +101,8 @@ def render_sermon_card(sermon, services, manuscripts, recordings, resources, bib
             title_align='left', 
             subtitle=subtitle,
             subtitle_align='right',
-            box=box.ROUNDED 
+            box=box.ROUNDED,
+            style=style
         )
     )
     print()
