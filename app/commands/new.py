@@ -1,6 +1,7 @@
 import typer
 #from app.utils import CONFIG, ARCHIVE_ROOT
 #from pathlib import Path
+from app.utils import PATH_MANUSCRIPTS, PATH_RECORDINGS, PATH_RESOURCES 
 from app.db import get_last_sermon_code, get_all_sermon_codes, list_sermons
 from app.presentation.new_sermon import render_info_panel, user_input, show_sermon_draft
 from app.presentation.common import console
@@ -9,9 +10,11 @@ import re
 from datetime import date, timedelta
 
 
-pattern_code = re.compile(r'^P\d{3}$')  # Sermon code on this format: P372 etc
-pattern_related_sermons = re.compile(r'^P\d{3}((\s*\;\s*)(P\d{3}))*$') # P001; P002 etc
-pattern_date = re.compile(r'^20\d{2}-(0[1-9]|1[0-2])-(0[1-9]|[12][0-9]|3[0-1])$') # Date: YYYY-MM-DD, does not validate dates
+pattern = {}  # Patterns to check validity of user inputs
+pattern['code'] = re.compile(r'^P\d{3}$')  # Sermon code on this format: P372 etc
+pattern['related_sermons'] = re.compile(r'^P\d{3}((\s*\;\s*)(P\d{3}))*$') # P001; P002 etc
+pattern['date'] = re.compile(r'^20\d{2}-(0[1-9]|1[0-2])-(0[1-9]|[12][0-9]|3[0-1])$') # Date: YYYY-MM-DD, does not validate dates
+pattern['manuscript'] = re.compile(r'^P\d{3}\.(pdf|PDF)$')  # Manuscript P371.pdf
 
 
 
@@ -37,7 +40,7 @@ def new():
     used_codes = get_all_sermon_codes()  # A new sermon code must be unique
     default_code = 'P' + str(int(get_last_sermon_code()[1:]) + 1)  # Default code for new sermon: last code + 1
     while True:
-        code = user_input('Predikokod', default=default_code, pattern=pattern_code, allow_empty=False)
+        code = user_input('Predikokod', default=default_code, pattern=pattern['code'], allow_empty=False)
         if code in used_codes:
             console.print(f"[bold red]Det finns redan en predikan med denna kod i databasen.[/bold red]")
         else:
@@ -73,7 +76,7 @@ def new():
     
     # Related sermon
     related_sermons = []
-    sermons = user_input('Relaterad predikan (separera flera med semikolon)', pattern=pattern_related_sermons)
+    sermons = user_input('Relaterad predikan (separera flera med semikolon)', pattern=pattern['related_sermons'])
     if sermons:
         sermons = sermons.split(';')
         for s in sermons:
@@ -91,33 +94,42 @@ def new():
     # Add a service?
     add_service = Confirm.ask('Lägga till gudstjänst?', default=True)
     service = {}  # Only a single service can be added here, use sermon attach service to add more
+    today = date.today()
+    days_since_sunday = (today.weekday() + 1) % 7
+    last_sunday = today - timedelta(days=days_since_sunday)
+    default_date = last_sunday.isoformat()  # Use last Sunday as the default date
     if add_service:
-        today = date.today()
-        days_since_sunday = (today.weekday() + 1) % 7
-        last_sunday = today - timedelta(days=days_since_sunday)  # Last sunday
-        default_date = last_sunday.isoformat()
         default_place = list_sermons(order_by='date')[-1]['place']
-        service['date'] = user_input('Datum (ÅÅÅÅ-MM-DD)', pattern=pattern_date, default=default_date, allow_empty=False)
+        service['date'] = user_input('Datum (ÅÅÅÅ-MM-DD)', pattern=pattern['date'], default=default_date, allow_empty=False)
+        default_date = service['date']  # Save to reuse later
         service['place'] = user_input('Plats', default=default_place, allow_empty=False)
         service['notes'] = user_input('Kommentar')
-        
-
-
-
     draft['services'] = [service]
 
+    # Manuscript
+    manuscript = {}
+    default_pdf = sermon['code'] + '.pdf'
+    render_info_panel('Predikomanus', content=f"Filen (t.ex. {default_pdf}) ska placeras i mappen [link=file://{PATH_MANUSCRIPTS}]{PATH_MANUSCRIPTS}[/link]")
+    manuscript['file_name'] = user_input('Filnamn', default=default_pdf, pattern=pattern['manuscript'], allow_empty=False)
+    manuscript['date'] = user_input('Datum', defalut=default_date, pattern=pattern['date'])
+    manuscript['notes'] = user_input('Kommentar')
 
-# 2. service?
-#   date (default=last Sunday)
-#   place (default=last place?)
-#   notes?
-# 3. manuscript
-#   file name (default)
+
+# 4. recording?
 #   date (default)
+#   type
+#   file or external link?
+#   file name/external link
 #   notes?
+# 5. resource? (allow more than one)
+#   file name
+#   title
+#   notes?
+# 
 
 
 
+    render_info_panel('Mer att tillägga?', content=f"Fler tillägg till en predikan kan göras i efterhand med kommandon som [dim]sermon attach recording[/dim] m.fl.")
 
 
 
