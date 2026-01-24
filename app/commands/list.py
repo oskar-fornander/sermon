@@ -1,5 +1,6 @@
 import typer
 from app.services.list_sermons import list_sermons_by_code, list_sermons_by_date
+from app.presentation.common import clear_screen
 
 
 app = typer.Typer(help = 'Lista de senaste predikningarna', invoke_without_command=True)
@@ -12,6 +13,8 @@ def sermon_listing_function(
         date: bool = typer.Option(False, '--date', help='Sorterat efter datum för framförande istället för kod'),
         reverse: bool = typer.Option(False, '--reverse', '-r', help='Omvänd sortering')):
     """Lista alla eller några av predikningarna"""
+
+    clear_screen()
     
     if not all:  # How many to display?
         n = limit
