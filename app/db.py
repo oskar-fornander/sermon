@@ -3,6 +3,7 @@
 import sqlite3
 from pathlib import Path
 import yaml
+from app.services.sermon_draft import new_sermon_draft, new_service_draft, new_manuscript_draft, new_recording_draft, new_resource_draft
 
 from app.utils import DB_PATH
 
@@ -47,51 +48,117 @@ def get_sermon_id(code:str) -> int:
     return row['id']
 
 
-def list_sermons(order_by: str = 'code'):
-    """List sermons by code or date"""
+def list_sermon_codes():
+    """List sermon codes by code"""
     conn = get_connection()
     cur = conn.cursor()
-    if order_by == 'date':
-        cur.execute(
-            """
-            SELECT 
-                service.date, 
-                service.place, 
-                service.notes AS service_notes, 
-                sermon.code, 
-                sermon.title,
-                sermon.report
-            FROM service
-            JOIN sermon ON sermon.id = service.sermon_id
-            ORDER BY service.date
-            """
-        )
-    else: #'code'
-        cur.execute(
-            """
-            SELECT 
-                sermon.code, 
-                sermon.title,
-                sermon.report
-            FROM sermon
-            ORDER BY sermon.code
-            """
-        )
+    cur.execute(
+        """
+        SELECT 
+            sermon.code 
+        FROM sermon
+        ORDER BY sermon.code
+        """
+    )
     row = cur.fetchall()
     conn.close()
     return row
 
+def list_service_dates():
+    """List sermons by service date"""
+    conn = get_connection()
+    cur = conn.cursor()
+    cur.execute(
+        """
+        SELECT 
+            service.date 
+        FROM service
+        JOIN sermon ON sermon.id = service.sermon_id
+        ORDER BY service.date
+        """
+    )
+    row = cur.fetchall()
+    conn.close()
+    return row
+
+
+#def list_sermons(order_by: str = 'code'):
+#    """List sermons by code or date"""
+#    conn = get_connection()
+#    cur = conn.cursor()
+#    if order_by == 'date':
+#        cur.execute(
+#            """
+#            SELECT 
+#                service.date, 
+#                service.place, 
+#                service.notes AS service_notes, 
+#                sermon.code, 
+#                sermon.title,
+#                sermon.report
+#            FROM service
+#            JOIN sermon ON sermon.id = service.sermon_id
+#            ORDER BY service.date
+#            """
+#        )
+#    else: #'code'
+#        cur.execute(
+#            """
+#            SELECT 
+#                sermon.code, 
+#                sermon.title,
+#                sermon.report
+#            FROM sermon
+#            ORDER BY sermon.code
+#            """
+#        )
+#    row = cur.fetchall()
+#    conn.close()
+#    return row
+
 def get_last_sermon_code():
     """Get the code of the last sermon in the database."""
-    sermons = list_sermons()
+    sermons = list_sermon_codes()
     last_sermon = sermons[-1]
     return last_sermon['code']
 
 def get_all_sermon_codes():
     """Get a list of all sermon codes used in the database."""
-    sermons = list_sermons()
+    sermons = list_sermon_codes()
     codes = [sermon['code'] for sermon in sermons]
     return codes
+
+def get_sermon_code_by_service_date(date: str):
+    """Get code for a sermon based on the given service date"""
+    conn = get_connection()
+    cur = conn.cursor()
+    cur.execute(
+        """
+        SELECT sermon.code
+        FROM service
+        JOIN sermon ON service.sermon_id = sermon.id
+        WHERE service.date = ?
+        """,
+        (date,)
+    )
+    row = cur.fetchone()
+    conn.close()
+    return row
+
+def get_last_place():
+    """Get the place for the last service"""
+    conn = get_connection()
+    cur = conn.cursor()
+    cur.execute(
+        """
+        SELECT place
+        FROM service
+        ORDER BY date
+        """
+    )
+    row = cur.fetchone()
+    conn.close()
+    return row
 
 
 def get_services_for_sermon(code: str):
@@ -200,8 +267,32 @@ def get_related_sermons_for_sermon(code: str):
 
 
 # --------------------
-# Write to database
+# Load and write to database with sermonDraft
 # --------------------
+
+def load_sermon_as_draft(sermon_code: str) -> sermonDraft:
+    """Hämta data om en predikan och returnera som ett draft."""
+
+    # Get data from the database
+    sermon = get_sermon_by_code(sermon_code)
+    services = get_services_for_sermon(sermon_code)
+    manuscripts = get_manuscripts_for_sermon(sermon_code)
+    recordings = get_recordings_for_sermon(sermon_code)
+    resources = get_resources_for_sermon(sermon_code)
+    bible_references = get_bible_references_for_sermon(sermon_code)
+    related_sermons = get_related_sermons_for_sermon(sermon_code)
+
+    # Convert that data into a sermonDraft
+    sermon_draft = new_sermon_draft(sermon)  # Create a new sermonDraft with data from the given sermon
+    sermon_draft.services = [new_service_draft(s) for s in services]  # The same for all sub tables (some may be more than one element in a list)
+    sermon_draft.manuscripts = [new_manuscript_draft(m) for m in manuscripts]
+    sermon_draft.recordings = [new_recording_draft(r) for r in recordings]
+    sermon_draft.resources = [new_resource_draft(r) for r in resources]
+    sermon_draft.bible = '; '.join([b['reference_text'] for b in bible_references])
+    sermon_draft.related = ', '.join([s['code'] for s in related_sermons])
+
+    return sermon_draft
+
 
 def create_sermon_from_draft(draft: sermonDraft):
     """Skapa en ny predikan i databasen baserat på data i draft."""
@@ -211,9 +302,6 @@ def update_sermon_from_draft(draft: sermonDraft):
     """Uppdatera en befintlig predikan i databasen baserat på data i draft."""
     pass
 
-def load_sermon_as_draft(sermon_code: str) -> sermonDraft:
-    """Hämta data om en predikan och returnera som ett draft."""
-    pass
 
 
 # --------------------

@@ -3,7 +3,7 @@ from app.utils import PATH_MANUSCRIPTS, PATH_RECORDINGS, PATH_RESOURCES
 from app.presentation.common import *
 
 
-def render_sermon_list(title, sermons, services = None, manuscripts = None, recordings = None, resources = None, order_by = 'code'):
+def render_sermon_list(title, sermons, order_by = 'code'):
     """Render a presentation of a list of sermons, sorted by code or date."""
 
     table = Table(title=None, box=box.SIMPLE, expand=False) #A table inside the panel
@@ -24,21 +24,23 @@ def render_sermon_list(title, sermons, services = None, manuscripts = None, reco
     table.add_column('±', style='notes')
     
 
-    for i in range(len(sermons)):
-        sermon = sermons[i]
+    for sermon in sermons:  # Each sermon is a sermonDraft
 
         # Join all manuscripts, recordings and resources into single string for presentation in table
-        manuscript = ' '.join([f"[link=file://{PATH_MANUSCRIPTS}/{x['file_name']}][link_style]{LIST_MARKER}[/]" for x in manuscripts[i]])
-        recording = ' '.join([f"[link=file://{PATH_RECORDINGS}/{x['file_name']}][link_style]{LIST_MARKER}[/]" for x in recordings[i]])
-        resource = ' '.join([f"[link=file://{PATH_RESOURCES}/{x['file_name']}][link_style]{LIST_MARKER}[/]" for x in resources[i]])
+        manuscript = ' '.join([f"[link=file://{PATH_MANUSCRIPTS}/{x.file_name}][link_style]{LIST_MARKER}[/]" for x in sermon.manuscripts])
+        recording = ' '.join([f"[link=file://{PATH_RECORDINGS}/{x.file_name}][link_style]{LIST_MARKER}[/]" for x in sermon.recordings])
+        resource = ' '.join([f"[link=file://{PATH_RESOURCES}/{x.file_name}][link_style]{LIST_MARKER}[/]" for x in sermon.resources])
 
         if order_by == 'date':
-            table.add_row(sermon['code'], sermon['date'], sermon['place'], sermon['title'], manuscript, recording, resource, sermon['report'])
+            if sermon.services:
+                date = sermon.services[-1].date  # Get the last date this sermon was preached in a service
+                place = sermon.services[-1].place
+                table.add_row(sermon.code, date, place, sermon.title, manuscript, recording, resource, sermon.report)
         else: #code
             service = ''
-            if services and services[i]:
-                service = ', '.join([s['date'] for s in services[i]][::-1]) #Show all services in descending order
-            table.add_row(sermon['code'], sermon['title'], service, manuscript, recording, resource, sermon['report'])
+            if sermon.services:
+                service = ', '.join([s.date for s in sermon.services][::-1]) #Show all services in descending order
+            table.add_row(sermon.code, sermon.title, service, manuscript, recording, resource, sermon.report)
 
 
     body = Group(f"[info]{title}[/info]", table)
@@ -47,7 +49,7 @@ def render_sermon_list(title, sermons, services = None, manuscripts = None, reco
         Panel(body,
             title = f"[title]Predikoarkiv[/title]",
             title_align = 'left', 
-            subtitle = f"[dim]Tips:[/] [code]sermon show {sermons[-1]['code']}[/]",
+            subtitle = f"[dim]Tips:[/] [code]sermon show {sermons[-1].code}[/]",
             subtitle_align = 'right',
             box = box.ROUNDED 
         )
