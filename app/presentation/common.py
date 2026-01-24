@@ -1,4 +1,5 @@
 import shutil
+import os
 
 from rich.console import Console
 from rich.panel import Panel #https://rich.readthedocs.io/en/stable/reference/panel.html
@@ -15,6 +16,10 @@ from rich.prompt import Prompt, Confirm
 from app.presentation.theme import custom_theme, ICON, LIST_MARKER, TAB
 
 console = Console(theme=custom_theme) #apply custom theme (defined in theme.py) to the console
+
+
+def clear_screen():
+    os.system("cls" if os.name == "nt" else "clear")
 
 
 def render_info_panel(title: str, content: str='', subtitle: str=''):
@@ -60,4 +65,21 @@ def user_confirmation(q, default=True, blank_line=True):
         console.print()
     answer = Confirm.ask(q, default=default)
     return answer
+
+def user_choice(title='Ditt val', options = None, default = None):
+    """Wait for user to make a choice (from a list of options)"""
+    
+    while True:
+        choice = Prompt.ask(title, default=default)
+        if not choice:
+            return False  # empty choice
+        if options:
+            if choice.strip() not in options:
+                console.print(f"[bold red]Välj ett av alternativen ([white dim]{', '.join(options)}[/white dim]).[/bold red]")
+                continue
+        return choice
+
+
+
+
 

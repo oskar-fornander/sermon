@@ -22,6 +22,7 @@ def list_sermons_by_code(n = 0, reverse = False):
     render_sermon_list(title=desc, sermons=sermons, order_by='code')
 
 
+
 def list_sermons_by_date(n = 0, reverse = False):
     """Listar predikningar efter predikodatum"""
 
@@ -36,7 +37,7 @@ def list_sermons_by_date(n = 0, reverse = False):
 
     sermons = []
     for date in dates:
-        code = get_sermon_code_by_service_date(date['date'])
+        code = get_sermon_code_by_service_date(date['date'])  # Get code for the sermon at this date
         sermons.append(load_sermon_as_draft(code['code']))  # Get sermons as sermondDraft objects and store in a list
 
     render_sermon_list(title=desc, sermons=sermons, order_by='date')
