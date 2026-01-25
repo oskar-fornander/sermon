@@ -1,5 +1,6 @@
 
 import typer
+from app.presentation.common import clear_screen
 
 app = typer.Typer(help = 'Exportera registret som html eller enskild predikan som podcast')
 

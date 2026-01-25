@@ -1,5 +1,6 @@
 
 import typer
+from app.presentation.common import clear_screen
 
 app = typer.Typer(help = 'Skapa och koppla bibelreferens(er), gudstjänst, manuskript, inspelning eller övrig resurs till en predikan')
 

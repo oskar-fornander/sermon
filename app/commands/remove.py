@@ -1,5 +1,6 @@
 
 import typer
+from app.presentation.common import clear_screen
 
 app = typer.Typer(help = 'Radera bibelreferens(er), gudstjänst, manuskript, inspelning eller övrig resurs som är kopplad till en predikan')
 
