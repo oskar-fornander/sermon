@@ -21,7 +21,7 @@ def render_sermon_card(sermon_draft, preview=False):
         elements.append(Align.right(f" [info]{sermon_draft.context}[/info]"))
     else:
         elements.append('')
-    bible_reference_text = ', '.join([x['reference_text'] for x in sermon_draft.bible_references])
+    bible_reference_text = '; '.join(sermon_draft.bible_references)
     if bible_reference_text:
         elements.append(f"{bible_reference_text}")
     elements.append('')

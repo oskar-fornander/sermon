@@ -3,7 +3,7 @@ from app.utils import PATH_MANUSCRIPTS, PATH_RECORDINGS, PATH_RESOURCES, get_las
 from app.db import get_last_sermon_code, get_all_sermon_codes
 from app.presentation.common import console, clear_screen, render_info_panel, user_input, user_confirmation, user_choice
 from app.presentation.new_sermon import show_sermon_draft
-from app.presentation.edit_sermon import render_edit_menu, user_edit
+from app.presentation.edit_sermon import render_edit_menu, user_edit_short_text, user_edit_short_text_list, user_edit_long_text
 
 
 # interactive_edit_sermon() down below
@@ -44,13 +44,31 @@ def update_sermon_notes(sermon_code: str, notes: str):
 def interactive_edit_sermon(sermon_draft):
     """Interaktiv redigering av predikan"""
 
+    EDIT_FIELDS = {
+        'Predikokod': ('code', user_edit_short_text),
+        'Rubrik': ('title', user_edit_short_text),
+        'Sammanhang': ('context', user_edit_short_text),
+        'Bibelreferenser': ('bible_references', user_edit_short_text_list),
+        'Introduktion': ('introduction', user_edit_long_text),
+        'Budskap': ('message', user_edit_long_text),
+        'Omdöme': ('report', user_edit_short_text),
+        'Kommentar': ('notes', user_edit_long_text),
+        'Gudstjänst': (),
+        'Manus': (),
+        'Inspelning': (),
+        'Resurs': ()
+    }
+    menu = list(EDIT_FIELDS.keys())  # A list of all menu options based on keys in dict
+
     while True:  # Loop until user exits edit mode
         clear_screen()  # Clear terminal window
         show_sermon_draft(sermon_draft)  # Show a preview of the draft 
-        menu = ['Predikokod', 'Rubrik', 'Sammanhang', 'Bibelreferenser', 'Introduktion', 'Budskap', 'Omdöme', 'Kommentar', 'Gudstjänst', 'Manus', 'Inspelning', 'Resurs']
         render_edit_menu(title='Redigera predikan', options=menu)  # Show a menu for interactive editing
         choice = user_choice(title='Ditt val', options = [str(x + 1) for x in range(len(menu))] + ['s', 'q'], default = None)
 
+        if not choice:
+            continue
+        
         if choice == 's':
             #save and exit
             return sermon_draft  # Updated version is returned
@@ -60,39 +78,11 @@ def interactive_edit_sermon(sermon_draft):
             return None
 
         option = menu[int(choice) - 1]  # A numerical choice from the menu
-        print(option)
+        field_name, editor = EDIT_FIELDS[option]  # Select field to edit and edit function to use
+        current_value = getattr(sermon_draft, field_name)
+        new_value = editor(option, current_value)  # Get new value with the desired editor function
 
-        print(user_edit(option, sermon_draft.title))
-1. Predikokod  2. Rubrik  3. Sammanhang  4. Bibelreferenser  5. Introduktion  6. Budskap  7. Omdöme  8.          │
-│ Kommentar  9. Gudstjänst  10. Manus  11. Inspelning  12. Resurs
-        menu = ['Predikokod', 'Rubrik', 'Sammanhang', 'Bibelreferenser', 'Introduktion', 'Budskap', 'Omdöme', 'Kommentar', 'Gudstjänst', 'Manus', 'Inspelning', 'Resurs']
-        
-
-
-1 kod
-7 omdöme
-
-9 gtj
-10 manus
-11 rec
-12 resource
-
-
-
-
-
-        # Redigering av långa texter - se chatGPT:s förslag: 2️⃣ Lösning A (rekommenderad): Öppna extern editor - det ska funka med neovim också!
-
-        
-
-
-
-        # + hjälptext ... ? Hjälp, och tips: Lämna tomt för att behålla värdet
-
-
-
-
-
-
+        if new_value is not None:
+            setattr(sermon_draft, field_name, new_value)  # Update value i sermon draft
 
 

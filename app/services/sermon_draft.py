@@ -127,7 +127,7 @@ def new_resource_draft(template = None) -> ResourceDraft:
 
 def deep_copy(draft: sermonDraft):
     """Make a deep copy of a sermon draft."""
-    return copy.deepcopy(sermon_draft)
+    return copy.deepcopy(draft)
 
 
 
