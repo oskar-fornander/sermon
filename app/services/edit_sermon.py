@@ -3,7 +3,7 @@ from app.utils import PATH_MANUSCRIPTS, PATH_RECORDINGS, PATH_RESOURCES, get_las
 from app.db import get_last_sermon_code, get_all_sermon_codes
 from app.presentation.common import console, clear_screen, render_info_panel, user_input, user_confirmation, user_choice
 from app.presentation.new_sermon import show_sermon_draft
-from app.presentation.edit_sermon import render_edit_menu
+from app.presentation.edit_sermon import render_edit_menu, user_edit
 
 
 # interactive_edit_sermon() down below
@@ -12,6 +12,7 @@ from app.presentation.edit_sermon import render_edit_menu
 def update_sermon_code(sermon_code: str, code: str):
     """Ändra predikans kod"""
     pass
+
 def update_sermon_title(sermon_code: str, title: str):
     """Ändra predikans titel"""
     pass
@@ -44,28 +45,46 @@ def interactive_edit_sermon(sermon_draft):
     """Interaktiv redigering av predikan"""
 
     while True:  # Loop until user exits edit mode
-
         clear_screen()  # Clear terminal window
         show_sermon_draft(sermon_draft)  # Show a preview of the draft 
         menu = ['Predikokod', 'Rubrik', 'Sammanhang', 'Bibelreferenser', 'Introduktion', 'Budskap', 'Omdöme', 'Kommentar', 'Gudstjänst', 'Manus', 'Inspelning', 'Resurs']
         render_edit_menu(title='Redigera predikan', options=menu)  # Show a menu for interactive editing
         choice = user_choice(title='Ditt val', options = [str(x + 1) for x in range(len(menu))] + ['s', 'q'], default = None)
+
         if choice == 's':
             #save and exit
-            pass
+            return sermon_draft  # Updated version is returned
 
         elif choice == 'q':
             #exit without saving
-            pass
+            return None
 
-        option = menu[int(choice) - 1]
+        option = menu[int(choice) - 1]  # A numerical choice from the menu
         print(option)
 
-
-        # Redigering av långa texter - se chatGPT:s förslag: 2️⃣ Lösning A (rekommenderad): Öppna extern editor
+        print(user_edit(option, sermon_draft.title))
+1. Predikokod  2. Rubrik  3. Sammanhang  4. Bibelreferenser  5. Introduktion  6. Budskap  7. Omdöme  8.          │
+│ Kommentar  9. Gudstjänst  10. Manus  11. Inspelning  12. Resurs
+        menu = ['Predikokod', 'Rubrik', 'Sammanhang', 'Bibelreferenser', 'Introduktion', 'Budskap', 'Omdöme', 'Kommentar', 'Gudstjänst', 'Manus', 'Inspelning', 'Resurs']
         
 
-        user_edit('2. Rubrik', sermon_draft.title)
+
+1 kod
+7 omdöme
+
+9 gtj
+10 manus
+11 rec
+12 resource
+
+
+
+
+
+        # Redigering av långa texter - se chatGPT:s förslag: 2️⃣ Lösning A (rekommenderad): Öppna extern editor - det ska funka med neovim också!
+
+        
+
 
 
         # + hjälptext ... ? Hjälp, och tips: Lämna tomt för att behålla värdet

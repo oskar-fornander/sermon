@@ -17,6 +17,8 @@ from app.presentation.theme import custom_theme, ICON, LIST_MARKER, TAB
 
 console = Console(theme=custom_theme) #apply custom theme (defined in theme.py) to the console
 
+NBSP = "\u00A0"  # Non breaking space &nbsp;  --- Not working: SyntaxError: invalid non-printable character U+00A0
+
 
 def clear_screen():
     os.system("cls" if os.name == "nt" else "clear")

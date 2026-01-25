@@ -1,7 +1,7 @@
 
 from dataclasses import dataclass, field
 from typing import Optional, List
-
+import copy
 
 @dataclass
 class SermonDraft:
@@ -123,6 +123,11 @@ def new_resource_draft(template = None) -> ResourceDraft:
         return ResourceDraft(
             file_name=''
         )
+
+
+def deep_copy(draft: sermonDraft):
+    """Make a deep copy of a sermon draft."""
+    return copy.deepcopy(sermon_draft)
 
 
 
