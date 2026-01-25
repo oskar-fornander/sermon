@@ -53,7 +53,7 @@ def user_edit_short_text_list(title, value):
     return None
 
 
-def user_edit_short_text(title, value):
+def user_edit_short_text(title, value, pattern = None):
     """Let user edit a value"""
     subtitle = '[dim]Lämna tomt för att behålla värdet.[/dim]'
     print()
@@ -67,7 +67,7 @@ def user_edit_short_text(title, value):
         )
     )
     
-    new_value = user_input('Nytt värde', default=None, choices=None, pattern=None, allow_empty=True, blank_line=True)
+    new_value = user_input('Nytt värde', default=None, choices=None, pattern=pattern, allow_empty=True, blank_line=True)
 
     if new_value:
         console.print(f"{title} uppdaterad till {new_value}")

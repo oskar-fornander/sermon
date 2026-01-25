@@ -80,7 +80,20 @@ def interactive_edit_sermon(sermon_draft):
         option = menu[int(choice) - 1]  # A numerical choice from the menu
         field_name, editor = EDIT_FIELDS[option]  # Select field to edit and edit function to use
         current_value = getattr(sermon_draft, field_name)
-        new_value = editor(option, current_value)  # Get new value with the desired editor function
+
+        if option == 'Predikokod':  # Make sure the sermon code is unique and valid
+            used_codes = get_all_sermon_codes()  # A new sermon code must be unique
+            while True:
+                new_value = user_edit_short_text('Predikokod', current_value, pattern=PATTERN['code'])
+                if not new_value:  # no value no change
+                    break
+                if new_value in used_codes:
+                    console.print(f"[bold red]Det finns redan en predikan med denna kod i databasen.[/bold red]")
+                else:
+                    break
+        else:  # All other fields than sermon code
+            new_value = editor(option, current_value)  # Get new value with the desired editor function
+
 
         if new_value is not None:
             setattr(sermon_draft, field_name, new_value)  # Update value i sermon draft
