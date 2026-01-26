@@ -113,7 +113,6 @@ def user_edit_generic_complex(sermon_code, title, data, fields, path = None):
                 value = ''
             if field[0] == 'file_name' and path:  # Add a link if a file
                 value = get_file_link(path, value)
-
             row.append(value)  # Get the correct values
         table.add_row(*row)  # Add all rows
 
@@ -132,6 +131,7 @@ def user_edit_generic_complex(sermon_code, title, data, fields, path = None):
         Confirm.ask('Tryck enter för att fortsätta', default = True)
         return None
 
+    # Show the fields possible to edit along with index number to select
     txt = ''
     index = 1
     for field in fields:
@@ -149,6 +149,16 @@ def user_edit_generic_complex(sermon_code, title, data, fields, path = None):
         box=box.ROUNDED 
         )
     )
+
+    # User selection of row and item to change
+    row = 0
+    if len(data) > 1:  # Select row of table if more than one
+        row = user_choice(title='Rad', options='A B C D E F G H '[:2 * len(data)].strip().split(' '), default = 'A')  
+        row = 'ABCDEFGH'.index(row)
+    item = user_choice(title='Kolumn', options=[str(x + 1) for x in range(len(fields))], default = None)
+
+# ... I am here ...
+
 
     new_value = user_input('Nytt värde', default=None, allow_empty=True, blank_line=True)
     return new_value
