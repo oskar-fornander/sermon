@@ -2,6 +2,7 @@ from pathlib import Path
 import yaml
 from datetime import date, timedelta
 import re
+from app.presentation.common import ICON
 
 CONFIG = None
 BASE_DIR, DB_PATH, ARCHIVE_ROOT = None, None, None  
@@ -44,4 +45,20 @@ def get_last_sunday():
     days_since_sunday = (today.weekday() + 1) % 7
     last_sunday = today - timedelta(days=days_since_sunday)
     return last_sunday.isoformat()  
+
+
+def get_file_link(path, file_name, title = None, show_missing_file = True):
+    """Get a link to path/file with styles for print in console"""
+    if not title:
+        title = file_name
+    if 'http' in file_name:  # Probably not a file but an URL
+        return f"[link={file_name}]{title}[/link]"
+    if not file_name:
+        return ''
+    file_path = path / Path(file_name)
+    marker = ''
+    if show_missing_file:
+        if not file_path.is_file(): 
+            marker = f"[alert]{ICON['missing_file']}[/alert] "  # Mark missing file with an icon and style
+    return f"{marker}[link=file://{file_path}]{title}[/link]"
 

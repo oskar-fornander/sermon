@@ -1,5 +1,5 @@
 
-from app.utils import PATH_MANUSCRIPTS, PATH_RECORDINGS, PATH_RESOURCES
+from app.utils import PATH_MANUSCRIPTS, PATH_RECORDINGS, PATH_RESOURCES, get_file_link
 from app.presentation.common import *
 
 
@@ -27,9 +27,13 @@ def render_sermon_list(title, sermons, order_by = 'code'):
     for sermon in sermons:  # Each sermon is a sermonDraft
 
         # Join all manuscripts, recordings and resources into single string for presentation in table
-        manuscript = ' '.join([f"[link=file://{PATH_MANUSCRIPTS}/{x.file_name}][link_style]{LIST_MARKER}[/]" for x in sermon.manuscripts])
-        recording = ' '.join([f"[link=file://{PATH_RECORDINGS}/{x.file_name}][link_style]{LIST_MARKER}[/]" for x in sermon.recordings])
-        resource = ' '.join([f"[link=file://{PATH_RESOURCES}/{x.file_name}][link_style]{LIST_MARKER}[/]" for x in sermon.resources])
+        #manuscript = ' '.join([f"[link=file://{PATH_MANUSCRIPTS}/{x.file_name}][link_style]{LIST_MARKER}[/]" for x in sermon.manuscripts])
+        #recording = ' '.join([f"[link=file://{PATH_RECORDINGS}/{x.file_name}][link_style]{LIST_MARKER}[/]" for x in sermon.recordings])
+        #resource = ' '.join([f"[link=file://{PATH_RESOURCES}/{x.file_name}][link_style]{LIST_MARKER}[/]" for x in sermon.resources])
+        manuscript = ' '.join([get_file_link(PATH_MANUSCRIPTS, x.file_name, title=LIST_MARKER) for x in sermon.manuscripts])
+        recording = ' '.join([get_file_link(PATH_RECORDINGS, x.file_name or x.external_url, title=LIST_MARKER) for x in sermon.recordings])
+        resource = ' '.join([get_file_link(PATH_RESOURCES, x.file_name, title=LIST_MARKER) for x in sermon.resources])
+
 
         if order_by == 'date':
             if sermon.services:
