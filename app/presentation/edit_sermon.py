@@ -28,7 +28,7 @@ def user_edit_long_text(title, value):
     
 
     console.print(f"[dim]Öppnar editor: {' '.join(editor_cmd)}[/dim]")
-    time.sleep(2)
+    time.sleep(1)
 
     with tempfile.NamedTemporaryFile(suffix=".txt", mode="w+", delete=False) as tf:
         tf.write(value or '')
@@ -68,11 +68,6 @@ def user_edit_short_text(title, value, pattern = None):
     )
     
     new_value = user_input('Nytt värde', default=None, choices=None, pattern=pattern, allow_empty=True, blank_line=True)
-
-    if new_value:
-        console.print(f"{title} uppdaterad till {new_value}")
-    else:
-        console.print(f"{title} lämnad oredigerad")
 
     return new_value
 

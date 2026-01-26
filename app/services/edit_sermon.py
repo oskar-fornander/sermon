@@ -4,6 +4,7 @@ from app.db import get_last_sermon_code, get_all_sermon_codes
 from app.presentation.common import console, clear_screen, render_info_panel, user_input, user_confirmation, user_choice
 from app.presentation.new_sermon import show_sermon_draft
 from app.presentation.edit_sermon import render_edit_menu, user_edit_short_text, user_edit_short_text_list, user_edit_long_text
+import time
 
 
 # interactive_edit_sermon() down below
@@ -81,7 +82,7 @@ def interactive_edit_sermon(sermon_draft):
         field_name, editor = EDIT_FIELDS[option]  # Select field to edit and edit function to use
         current_value = getattr(sermon_draft, field_name)
 
-        if option == 'Predikokod':  # Make sure the sermon code is unique and valid
+        if option == 'Predikokod':  # Special case: sermon code. Make sure the sermon code is unique and valid
             used_codes = get_all_sermon_codes()  # A new sermon code must be unique
             while True:
                 new_value = user_edit_short_text('Predikokod', current_value, pattern=PATTERN['code'])
@@ -91,9 +92,19 @@ def interactive_edit_sermon(sermon_draft):
                     console.print(f"[bold red]Det finns redan en predikan med denna kod i databasen.[/bold red]")
                 else:
                     break
+        elif option == 'Omdöme':  # Special case: report. Limit options to valid reports
+
+            pass
+
         else:  # All other fields than sermon code
             new_value = editor(option, current_value)  # Get new value with the desired editor function
 
+        if new_value:
+            console.print(f"{option} uppdaterad till {new_value}")
+        else:
+            console.print(f"{option} lämnad oredigerad")
+
+        time.sleep(1)
 
         if new_value is not None:
             setattr(sermon_draft, field_name, new_value)  # Update value i sermon draft
