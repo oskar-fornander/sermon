@@ -3,7 +3,7 @@ from app.utils import PATH_MANUSCRIPTS, PATH_RECORDINGS, PATH_RESOURCES, get_las
 from app.db import get_last_sermon_code, get_all_sermon_codes
 from app.presentation.common import console, clear_screen, render_info_panel, user_input, user_confirmation, user_choice
 from app.presentation.new_sermon import show_sermon_draft
-from app.presentation.edit_sermon import render_edit_menu, user_edit_short_text, user_edit_short_text_list, user_edit_long_text
+from app.presentation.edit_sermon import render_edit_menu, user_edit_short_text, user_edit_short_text_list, user_edit_long_text, user_edit_services, user_edit_manuscripts, user_edit_recordings, user_edit_resources
 import time
 
 
@@ -52,12 +52,12 @@ def interactive_edit_sermon(sermon_draft):
         'Bibelreferenser': ('bible_references', user_edit_short_text_list),
         'Introduktion': ('introduction', user_edit_long_text),
         'Budskap': ('message', user_edit_long_text),
+        'Kommentar': ('notes', user_edit_short_text),
         'Omdöme': ('report', user_edit_short_text),
-        'Kommentar': ('notes', user_edit_long_text),
-        'Gudstjänst': (),
-        'Manus': (),
-        'Inspelning': (),
-        'Resurs': ()
+        'Gudstjänst': ('services', user_edit_services),
+        'Manus': ('manuscripts', user_edit_manuscripts),
+        'Inspelning': ('recordings', user_edit_recordings),
+        'Resurs': ('resources', user_edit_resources)
     }
     menu = list(EDIT_FIELDS.keys())  # A list of all menu options based on keys in dict
 
@@ -85,7 +85,7 @@ def interactive_edit_sermon(sermon_draft):
         if option == 'Predikokod':  # Special case: sermon code. Make sure the sermon code is unique and valid
             used_codes = get_all_sermon_codes()  # A new sermon code must be unique
             while True:
-                new_value = user_edit_short_text('Predikokod', current_value, pattern=PATTERN['code'])
+                new_value = user_edit_short_text(sermon_draft.code, 'Predikokod', current_value, pattern=PATTERN['code'])
                 if not new_value:  # no value no change
                     break
                 if new_value in used_codes:
@@ -93,11 +93,9 @@ def interactive_edit_sermon(sermon_draft):
                 else:
                     break
         elif option == 'Omdöme':  # Special case: report. Limit options to valid reports
-
-            pass
-
+            new_value = user_edit_short_text(sermon_draft.code, 'Omdöme', current_value, choices=['A', 'B', 'C'])
         else:  # All other fields than sermon code
-            new_value = editor(option, current_value)  # Get new value with the desired editor function
+            new_value = editor(sermon_draft.code, option, current_value)  # Get new value with the desired editor function
 
         if new_value:
             console.print(f"{option} uppdaterad till {new_value}")
