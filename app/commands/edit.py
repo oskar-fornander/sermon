@@ -24,12 +24,12 @@ def edit(ctx: typer.Context, sermon_code: str):
         sermon_draft = interactive_edit_sermon(sermon_draft)  # Launch interactive editor
         if sermon_draft:
             if sermon_draft == original_sermon_draft:  # No need to write to database if no changes were made
-                console.print(f"No changes in sermon {sermon_code}.")
+                console.print(f"Inga förändringar i predikan {sermon_code}.")
             else:
                 update_sermon_from_draft(sermon_draft)
-                console.print(f"Sermon {sermon_code} is updated.")
+                console.print(f"Predikan {sermon_code} är uppdaterad.")
         else:  # None indicates exit edit mode without saving
-            console.print(f"No changes made to sermon {sermon_code}.")
+            console.print(f"Inga ändringar sparade för predikan {sermon_code}.")
 
         
 

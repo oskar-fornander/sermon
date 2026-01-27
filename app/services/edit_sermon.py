@@ -4,6 +4,7 @@ from app.db import get_last_sermon_code, get_all_sermon_codes
 from app.presentation.common import console, clear_screen, render_info_panel, user_input, user_confirmation, user_choice
 from app.presentation.new_sermon import show_sermon_draft
 from app.presentation.edit_sermon import render_edit_menu, user_edit_short_text, user_edit_short_text_list, user_edit_long_text, user_edit_services, user_edit_manuscripts, user_edit_recordings, user_edit_resources
+from app.services.sermon_draft import deep_copy
 import time
 
 
@@ -80,7 +81,7 @@ def interactive_edit_sermon(sermon_draft):
 
         option = menu[int(choice) - 1]  # A numerical choice from the menu
         field_name, editor = EDIT_FIELDS[option]  # Select field to edit and edit function to use
-        current_value = getattr(sermon_draft, field_name)
+        current_value = deep_copy(getattr(sermon_draft, field_name))
 
         if option == 'Predikokod':  # Special case: sermon code. Make sure the sermon code is unique and valid
             used_codes = get_all_sermon_codes()  # A new sermon code must be unique
@@ -93,18 +94,23 @@ def interactive_edit_sermon(sermon_draft):
                 else:
                     break
         elif option == 'Omdöme':  # Special case: report. Limit options to valid reports
-            new_value = user_edit_short_text(sermon_draft.code, 'Omdöme', current_value, choices=['A', 'B', 'C'])
+            new_value = user_edit_short_text(sermon_draft.code, 'Omdöme', current_value, choices=['A', 'B', 'C', '-'])
         else:  # All other fields than sermon code
             new_value = editor(sermon_draft.code, option, current_value)  # Get new value with the desired editor function
 
+
+        # Update value
         if new_value:
-            console.print(f"{option} uppdaterad till {new_value}")
+            if new_value == '-':  # Leave field empty (if allowed)
+                if field_name in ['context', 'bible_references', 'introduction', 'message', 'notes', 'report']:  # Only these fields may be empty
+                    setattr(sermon_draft, field_name, '')  # Clear value in sermon draft
+                else:
+                    console.print('Detta fält får inte vara tomt')
+            else:
+                setattr(sermon_draft, field_name, new_value)  # Update value in sermon draft
+                console.print('Uppdaterat')
         else:
-            console.print(f"{option} lämnad oredigerad")
-
+            console.print('Ej uppdaterat')
         time.sleep(1)
-
-        if new_value is not None:
-            setattr(sermon_draft, field_name, new_value)  # Update value i sermon draft
 
 

@@ -74,7 +74,8 @@ def user_choice(title='Ditt val', options = None, default = None):
     while True:
         choice = Prompt.ask(title, default=default)
         if not choice:
-            return False  # empty choice
+            continue  # empty choice is not an option
+            #return False  # empty choice
         if options:
             if choice.strip() not in options:
                 console.print(f"[bold red]Välj ett av alternativen ([white dim]{', '.join(options)}[/white dim]).[/bold red]")

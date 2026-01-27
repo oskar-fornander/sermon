@@ -87,7 +87,7 @@ def render_sermon_card(sermon_draft, preview=False):
     if preview:  # Other title and subtitle if it is a preview that is shown
         title = f"[title]FÖRHANDSGRANSKNING: [key]{sermon_draft.code}[/key] ─── {sermon_draft.title}[/title]"
         subtitle = f"[dim]Tips:[/] Lägg till fler resurser i efterhand med t.ex. [code]sermon add recording[/]"
-        style = 'on gray15'
+        #style = 'on gray15'
 
     print()
     console.print(

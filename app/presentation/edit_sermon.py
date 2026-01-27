@@ -5,7 +5,9 @@ import shutil
 import tempfile
 import subprocess
 import time
-from app.utils import PATH_MANUSCRIPTS, PATH_RECORDINGS, PATH_RESOURCES, get_file_link
+from app.utils import PATH_MANUSCRIPTS, PATH_RECORDINGS, PATH_RESOURCES, get_file_link, PATTERN
+from app.services.sermon_draft import deep_copy
+
 
 
 def render_edit_menu(title, options):
@@ -95,73 +97,108 @@ def user_edit_short_text(sermon_code, title, value, choices = None, pattern = No
 def user_edit_generic_complex(sermon_code, title, data, fields, path = None):
     """Let user edit services, manuscripts, recordings and resources - all in one generic function."""
 
-    clear_screen()
+    original_data = deep_copy(data)
 
-    # Build a table to show the data
-    table = Table(title=None, box=box.SIMPLE, expand=False) # A table inside the panel
-    table.add_column('  ', style='key', no_wrap=True)  # Index column
-    for field in fields:  # Add column headers from the used fields
-        table.add_column(field[1], style='title', no_wrap=False)
+    while True:  # Edit until escape edit mode
+        clear_screen()
 
-    for i in range(len(data)):  # Fill table with data
-        item = data[i]
-        index = 'ABCDEF'[i]  # Index for each row
-        row = [index]
+        # Build a table to show the data
+        table = Table(title=None, box=box.SIMPLE, expand=False) # A table inside the panel
+        table.add_column('  ', style='key', no_wrap=True)  # Index column
+        index = 1
+        for field in fields:  # Add column headers from the used fields along with index for selection
+            table.add_column(f"[key]{index}.[/key] {field[1]}", style='title', no_wrap=False)
+            index += 1
+
+        for i in range(len(data)):  # Fill table with data
+            item = data[i]
+            row = ['']
+            if len(data) > 1:
+                index = 'ABCDEFGH'[i]  # Index for each row, only if more than one row
+                row = [index]
+            for field in fields:
+                value = str(getattr(item, field[0]))
+                if value == 'None':
+                    value = ''
+                if field[0] == 'file_name' and path:  # Add a link if a file
+                    value = get_file_link(path, value)
+                row.append(value)  # Get the correct values
+            table.add_row(*row)  # Add all rows
+
+        print()
+        console.print(  # Show table in panel
+            Panel(table,
+            title=f"[key]{sermon_code}: {title}[/key]",
+            title_align='left', 
+            box=box.ROUNDED 
+            )
+        )
+
+        # Abort if no data to edit
+        if not data:
+            console.print(f"Det finns ingen {title} kopplad till denna predikan att redigera. Lägg till gudstjänst/manus/inspelning/resurs med [code]sermon add ...[/code]")
+            Confirm.ask('Tryck enter för att fortsätta', default = True)
+            return None
+
+        # Show the fields possible to edit along with index number to select
+        txt = ''
+        index = 1
         for field in fields:
-            value = str(getattr(item, field[0]))
-            if value == 'None':
-                value = ''
-            if field[0] == 'file_name' and path:  # Add a link if a file
-                value = get_file_link(path, value)
-            row.append(value)  # Get the correct values
-        table.add_row(*row)  # Add all rows
+            txt += f"[key]{index}.[/key] {field[1]}  "
+            index += 1
 
-    print()
-    console.print(  # Show table in panel
-        Panel(table,
-        title=f"[key]{sermon_code}: {title}[/key]",
-        title_align='left', 
-        box=box.ROUNDED 
+        subtitle = f"[bold][key]s[/key]: spara, [key]q[/key]: avbryt[/bold]"
+        print()
+        console.print(
+            Panel(f"Välj vad du vill redigera. Enter (tomt) behåller värdet, '-' rensar (om tillåtet).",
+                title=f"[title]Redigera {title}[/title]",
+                title_align='left', 
+                subtitle=subtitle,
+                subtitle_align='right',
+                box=box.ROUNDED 
+            )
         )
-    )
+        print()
 
-    # Abort if no data to edit
-    if not data:
-        console.print(f"Det finns ingen {title} kopplad till denna predikan att redigera. Lägg till gudstjänst/manus/inspelning/resurs med [code]sermon add ...[/code]")
-        Confirm.ask('Tryck enter för att fortsätta', default = True)
-        return None
+        # User selection of row and item to change
+        row = 0
+        if len(data) > 1:  # Select row of table if more than one
+            row = user_choice(title='Rad', options='A B C D E F G H '[:2 * len(data)].strip().split(' ') + ['s', 'q'])
+            if row == 's':
+                return data  # Save
+            elif row == 'q':
+                return None  # Quit
+            row = 'ABCDEFGH'.index(row)
+        item = user_choice(title='Kolumn', options=[str(x + 1) for x in range(len(fields))] + ['s', 'q'])
+        if item == 's':
+            return data  # Save
+        elif item == 'q':
+            return None  # Quit
+        item = int(item)
 
-    # Show the fields possible to edit along with index number to select
-    txt = ''
-    index = 1
-    for field in fields:
-        txt += f"[key]{index}.[/key] {field[1]}  "
-        index += 1
+        # Enter new value for selected field
+        field_name = fields[item -1][1]
+        pattern = None  # Special patterns for some fields
+        choices = None  # Defined choices for some
+        if field_name.lower() == 'datum':
+            pattern = PATTERN['date']
+        elif field_name.lower() == 'filnamn':
+            pattern = PATTERN['file_name']
+        elif field_name.lower() == 'extern url':
+            pattern = PATTERN['url']
+        elif field_name.lower() == 'typ':
+            choices = ['audio', 'video']
+        new_value = user_input(f"{field_name}", pattern=pattern, choices=choices, default=None, allow_empty=True, blank_line=True)
+        if new_value:  # No change if empty: keep value
+            if new_value == '-':  # Clear field if allowed
+                if field_name.lower() in ['rubrik', 'kommentar']:  # Only these fields can be empty
+                    setattr(data[row], fields[item - 1][0], '')
+                else:
+                    console.print('Detta fält får inte vara tomt')
+                    time.sleep(1)
+            else:
+                setattr(data[row], fields[item - 1][0], new_value)  # Update value
 
-    subtitle = '[dim]Lämna tomt för att behålla värdet.[/dim]'
-    print()
-    console.print(
-        Panel(txt,
-        title=f"[key]Ändra {title}[/key]",
-        title_align='left', 
-        subtitle=subtitle,
-        subtitle_align='right',
-        box=box.ROUNDED 
-        )
-    )
-
-    # User selection of row and item to change
-    row = 0
-    if len(data) > 1:  # Select row of table if more than one
-        row = user_choice(title='Rad', options='A B C D E F G H '[:2 * len(data)].strip().split(' '), default = 'A')  
-        row = 'ABCDEFGH'.index(row)
-    item = user_choice(title='Kolumn', options=[str(x + 1) for x in range(len(fields))], default = None)
-
-# ... I am here ...
-
-
-    new_value = user_input('Nytt värde', default=None, allow_empty=True, blank_line=True)
-    return new_value
 
 
 def user_edit_services(sermon_code, title, value):
