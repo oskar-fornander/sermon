@@ -23,6 +23,7 @@ custom_theme = Theme ({
     'code': 'dim italic',
     'notes': 'dim',
     'alert': 'red bold',
+    'edited': 'yellow underline',
     'link_style': 'dim'    # Add this theme to links like this: [link=http...][link_style]link_text[/link_style][/link]
 })
 

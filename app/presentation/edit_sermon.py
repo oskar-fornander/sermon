@@ -68,7 +68,7 @@ def user_edit_long_text(sermon_code, title, value):
 
 def user_edit_short_text_list(sermon_code, title, value):
     """Conver list to string before edit"""
-    str = user_edit_short_text(title, '; '.join(value))
+    str = user_edit_short_text(sermon_code, title, '; '.join(value))
     if str:
         str = str.split(';')
         return [s.strip() for s in str]
@@ -89,7 +89,7 @@ def user_edit_short_text(sermon_code, title, value, choices = None, pattern = No
         )
     )
     
-    new_value = user_input('Nytt värde', default=None, choices=choices, pattern=pattern, allow_empty=True, blank_line=True)
+    new_value = user_input(title, default=None, choices=choices, pattern=pattern, allow_empty=True, blank_line=True)
 
     return new_value
 
@@ -98,6 +98,7 @@ def user_edit_generic_complex(sermon_code, title, data, fields, path = None):
     """Let user edit services, manuscripts, recordings and resources - all in one generic function."""
 
     original_data = deep_copy(data)
+    edited = []  # Save the edited posts as (row, field) to highlight them
 
     while True:  # Edit until escape edit mode
         clear_screen()
@@ -122,6 +123,8 @@ def user_edit_generic_complex(sermon_code, title, data, fields, path = None):
                     value = ''
                 if field[0] == 'file_name' and path:  # Add a link if a file
                     value = get_file_link(path, value)
+                if (i, field[0]) in edited:  # Mark the edited values
+                    value = f"[edited]{value}[/edited]"
                 row.append(value)  # Get the correct values
             table.add_row(*row)  # Add all rows
 
@@ -198,6 +201,7 @@ def user_edit_generic_complex(sermon_code, title, data, fields, path = None):
                     time.sleep(1)
             else:
                 setattr(data[row], fields[item - 1][0], new_value)  # Update value
+                edited.append((row, fields[item - 1][0]))  # Used to indicate in preview what was just changed
 
 
 

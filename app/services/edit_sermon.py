@@ -2,7 +2,7 @@
 from app.utils import PATH_MANUSCRIPTS, PATH_RECORDINGS, PATH_RESOURCES, get_last_sunday, PATTERN
 from app.db import get_last_sermon_code, get_all_sermon_codes
 from app.presentation.common import console, clear_screen, render_info_panel, user_input, user_confirmation, user_choice
-from app.presentation.new_sermon import show_sermon_draft
+from app.presentation.sermon_card import render_sermon_card
 from app.presentation.edit_sermon import render_edit_menu, user_edit_short_text, user_edit_short_text_list, user_edit_long_text, user_edit_services, user_edit_manuscripts, user_edit_recordings, user_edit_resources
 from app.services.sermon_draft import deep_copy
 import time
@@ -61,10 +61,12 @@ def interactive_edit_sermon(sermon_draft):
         'Resurs': ('resources', user_edit_resources)
     }
     menu = list(EDIT_FIELDS.keys())  # A list of all menu options based on keys in dict
+    edited = []  # Keep track of the edited fields to show in format
 
     while True:  # Loop until user exits edit mode
         clear_screen()  # Clear terminal window
-        show_sermon_draft(sermon_draft)  # Show a preview of the draft 
+        #show_sermon_draft(sermon_draft, edited_fields=edited)  # Show a preview of the draft 
+        render_sermon_card(sermon_draft, preview=True, edited_fields=edited)  # Show a preview of the draft 
         render_edit_menu(title='Redigera predikan', options=menu)  # Show a menu for interactive editing
         choice = user_choice(title='Ditt val', options = [str(x + 1) for x in range(len(menu))] + ['s', 'q'], default = None)
 
@@ -108,6 +110,7 @@ def interactive_edit_sermon(sermon_draft):
                     console.print('Detta fält får inte vara tomt')
             else:
                 setattr(sermon_draft, field_name, new_value)  # Update value in sermon draft
+                edited.append(field_name)
                 console.print('Uppdaterat')
         else:
             console.print('Ej uppdaterat')

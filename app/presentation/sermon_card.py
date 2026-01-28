@@ -3,35 +3,40 @@ from app.presentation.common import *
 from app.utils import get_file_link
 
 
-def render_sermon_card(sermon_draft, preview=False):
-    """Render a sermon card to show a sermon to the user. Also used to preview a draft."""
+def render_sermon_card(sermon_draft, preview=False, edited_fields=None):
+    """Render a sermon card to show a sermon to the user. Also used to preview a draft and show edited fields."""
+
+    edited, edited_ = {}, {}  # Style edited fields (used when showing a preview)
+    for field in edited_fields:
+        edited[field] = '[edited]'  # Use this below to get styling when needed: {edited.get('context', '')}
+        edited_[field] = '[/edited]'
 
     elements = []  # Gather elements to build the panel
 
     notes = sermon_draft.notes
     report = sermon_draft.report
     if sermon_draft.context:
-        elements.append(Align.right(f" [info]{sermon_draft.context}[/info]"))
+        elements.append(Align.right(f" [info]{edited.get('context', '')}{sermon_draft.context}{edited_.get('context', '')}[/info]"))
     else:
         elements.append('')
     bible_reference_text = '; '.join(sermon_draft.bible_references)
     if bible_reference_text:
-        elements.append(f"{bible_reference_text}")
+        elements.append(f"{edited.get('bible_references', '')}{bible_reference_text}{edited_.get('bible_references', '')}")
     elements.append('')
-    elements.append(f"[title]Introduktion:[/title] {sermon_draft.introduction or '–'}")
-    elements.append(f"[title]Budskap:[/title] {sermon_draft.message or '–'}")
+    elements.append(f"[title]Introduktion:[/title] {edited.get('introduction', '')}{sermon_draft.introduction or '–'}{edited_.get('introduction', '')}")
+    elements.append(f"[title]Budskap:[/title] {edited.get('message', '')}{sermon_draft.message or '–'}{edited_.get('message', '')}")
     if notes:
-        elements.append(f"[title]Kommentar:[/title] {notes}")
+        elements.append(f"[title]Kommentar:[/title] {edited.get('notes', '')}{notes}{edited_.get('notes', '')}")
     #if report:
-    elements.append(f"[title]Omdöme:[/title] {report or '–'}")
+    elements.append(f"[title]Omdöme:[/title] {edited.get('report', '')}{report or '–'}{edited_.get('report', '')}")
     related_sermons = sermon_draft.related_sermons
     if related_sermons:
         related_sermons = ', '.join([r['code'] for r in related_sermons])
-        elements.append(f"[title]Relaterad predikan:[/title] {related_sermons}")
+        elements.append(f"[title]Relaterad predikan:[/title] {edited.get('related_sermons', '')}{related_sermons}{edited_.get('related_sermons', '')}")
 
 
     # Add services
-    elements.append('[title]Gudstjänst:[/]')
+    elements.append(f"[title]{edited.get('services', '')}Gudstjänst:[/]")
     services = sermon_draft.services
     if not services:
         elements[-1] += ' – '  # Add at end of line if no data to show
@@ -41,7 +46,7 @@ def render_sermon_card(sermon_draft, preview=False):
             elements[-1] += f"{TAB}[notes]• {service.notes}[/notes]"  # Add notes at end of the same line
 
     # Add manuscripts
-    elements.append('[title]Manus:[/]')
+    elements.append(f"[title]{edited.get('manuscripts', '')}Manus:[/]")
     manuscripts = sermon_draft.manuscripts
     if not manuscripts:
         elements[-1] += ' – '  # Add at end of line if no data to show
@@ -54,7 +59,7 @@ def render_sermon_card(sermon_draft, preview=False):
 
     # Add recordings
     recordings = sermon_draft.recordings
-    elements.append('[title]Inspelning:[/]')
+    elements.append(f"[title]{edited.get('recordings', '')}Inspelning:[/]")
     if not recordings:
         elements[-1] += ' – '  # Add at end of line if no data to show
     for recording in recordings:
@@ -69,7 +74,7 @@ def render_sermon_card(sermon_draft, preview=False):
 
     # Add resources
     resources = sermon_draft.resources
-    elements.append('[title]Resurs:[/]')
+    elements.append(f"[title]{edited.get('resources', '')}Resurs:[/]")
     if not resources:
         elements[-1] += ' – '  # Add at end of line if no data to show
     for resource in resources:
@@ -85,7 +90,7 @@ def render_sermon_card(sermon_draft, preview=False):
     subtitle = f"[dim]Tips:[/] [code]sermon open manuscript {sermon_draft.code}[/]"
     style = ''
     if preview:  # Other title and subtitle if it is a preview that is shown
-        title = f"[title]FÖRHANDSGRANSKNING: [key]{sermon_draft.code}[/key] ─── {sermon_draft.title}[/title]"
+        title = f"[title]FÖRHANDSGRANSKNING: [key]{edited.get('code', '')}{sermon_draft.code}{edited_.get('code', '')}[/key] ─── {edited.get('title', '')}{sermon_draft.title}{edited_.get('title', '')}[/title]"
         subtitle = f"[dim]Tips:[/] Lägg till fler resurser i efterhand med t.ex. [code]sermon add recording[/]"
         #style = 'on gray15'
 
