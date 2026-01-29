@@ -77,7 +77,7 @@ def user_edit_short_text_list(sermon_code, title, value):
 
 def user_edit_short_text(sermon_code, title, value, choices = None, pattern = None):
     """Let user edit a value"""
-    subtitle = '[dim]Lämna tomt för att behålla värdet.[/dim]'
+    subtitle = f"[dim]Enter (tomt) behåller värdet, '-' rensar (om tillåtet).[/dim]"
     print()
     console.print(
         Panel(f"{value}",

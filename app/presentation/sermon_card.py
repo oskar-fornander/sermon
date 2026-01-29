@@ -3,7 +3,7 @@ from app.presentation.common import *
 from app.utils import get_file_link
 
 
-def render_sermon_card(sermon_draft, preview=False, edited_fields=None):
+def render_sermon_card(sermon_draft, preview=False, edited_fields=[]):
     """Render a sermon card to show a sermon to the user. Also used to preview a draft and show edited fields."""
 
     edited, edited_ = {}, {}  # Style edited fields (used when showing a preview)
@@ -15,14 +15,10 @@ def render_sermon_card(sermon_draft, preview=False, edited_fields=None):
 
     notes = sermon_draft.notes
     report = sermon_draft.report
-    if sermon_draft.context:
-        elements.append(Align.right(f" [info]{edited.get('context', '')}{sermon_draft.context}{edited_.get('context', '')}[/info]"))
-    else:
-        elements.append('')
-    bible_reference_text = '; '.join(sermon_draft.bible_references)
-    if bible_reference_text:
-        elements.append(f"{edited.get('bible_references', '')}{bible_reference_text}{edited_.get('bible_references', '')}")
     elements.append('')
+    elements.append(f"[title]Sammanhang:[/title] [info]{edited.get('context', '')}{sermon_draft.context or '–'}{edited_.get('context', '')}[/info]")
+    bible_reference_text = '; '.join(sermon_draft.bible_references)
+    elements.append(f"[title]Bibelreferens:[/title] {edited.get('bible_references', '')}{bible_reference_text or '–'}{edited_.get('bible_references', '')}")
     elements.append(f"[title]Introduktion:[/title] {edited.get('introduction', '')}{sermon_draft.introduction or '–'}{edited_.get('introduction', '')}")
     elements.append(f"[title]Budskap:[/title] {edited.get('message', '')}{sermon_draft.message or '–'}{edited_.get('message', '')}")
     if notes:
@@ -90,7 +86,7 @@ def render_sermon_card(sermon_draft, preview=False, edited_fields=None):
     subtitle = f"[dim]Tips:[/] [code]sermon open manuscript {sermon_draft.code}[/]"
     style = ''
     if preview:  # Other title and subtitle if it is a preview that is shown
-        title = f"[title]FÖRHANDSGRANSKNING: [key]{edited.get('code', '')}{sermon_draft.code}{edited_.get('code', '')}[/key] ─── {edited.get('title', '')}{sermon_draft.title}{edited_.get('title', '')}[/title]"
+        title = f"[title][reverse]FÖRHANDSGRANSKNING:[/reverse] [key]{edited.get('code', '')}{sermon_draft.code}{edited_.get('code', '')}[/key] ─── {edited.get('title', '')}{sermon_draft.title}{edited_.get('title', '')}[/title]"
         subtitle = f"[dim]Tips:[/] Lägg till fler resurser i efterhand med t.ex. [code]sermon add recording[/]"
         #style = 'on gray15'
 
