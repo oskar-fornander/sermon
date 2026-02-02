@@ -40,7 +40,7 @@ def render_info_panel(title: str, content: str='', subtitle: str=''):
     print()
 
 
-def user_input(title, description='', default=None, choices=None, pattern=None, allow_empty=True, blank_line=True):
+def user_input(title, description='', default='', choices=None, pattern=None, allow_empty=True, blank_line=True):
     """Custom function to get user input from terminal via rich.prompt() with some safety functions"""
     if blank_line:
         console.print()
@@ -51,12 +51,12 @@ def user_input(title, description='', default=None, choices=None, pattern=None, 
                 answer = None  # or ''
                 break
             else:
-                console.print(f"[bold red]Värdet av [white dim]{title}[/white dim] får inte vara tomt.[/bold red]")
+                console.print(f"[alert]Värdet av [white dim]{title}[/white dim] får inte vara tomt.[/alert]")
         elif pattern:
             if pattern.match(answer):
                 break
             else:
-                console.print(f"[bold red]Värdet av [white dim]{title}[/white dim] matchar inte formatet.[/bold red]")
+                console.print(f"[alert]Värdet av [white dim]{title}[/white dim] matchar inte formatet.[/alert]")
         else:
             break
     #print(f"--{answer}--")
@@ -79,7 +79,7 @@ def user_choice(title='Ditt val', options = None, default = None):
             #return False  # empty choice
         if options:
             if choice.strip() not in options:
-                console.print(f"[bold red]Välj ett av alternativen ([white dim]{', '.join(options)}[/white dim]).[/bold red]")
+                console.print(f"[alert]Välj ett av alternativen ([white dim]{', '.join(options)}[/white dim]).[/alert]")
                 continue
         return choice
 

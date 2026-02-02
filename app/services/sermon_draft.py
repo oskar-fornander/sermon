@@ -2,6 +2,8 @@
 from dataclasses import dataclass, field
 from typing import Optional, List
 import copy
+from app.utils import get_last_sunday
+
 
 @dataclass
 class SermonDraft:
@@ -63,7 +65,13 @@ def new_sermon_draft(template = None) -> SermonDraft:
             introduction=template['introduction'],
             message=template['message'],
             report=template['report'],
-            notes=template['notes']
+            notes=template['notes'],
+            services=[],
+            manuscripts=[],
+            recordings=[],
+            resources=[],
+            bible_references=[],
+            related_sermons=[]
         )
     else:  # An empty draft
         return SermonDraft(
@@ -71,7 +79,7 @@ def new_sermon_draft(template = None) -> SermonDraft:
             title=''
         )
 
-def new_service_draft(template = None) -> ServiceDraft:
+def new_service_draft(template = None, sermon_code='') -> ServiceDraft:
     if template:
         return ServiceDraft(
             date=template['date'],
@@ -80,11 +88,11 @@ def new_service_draft(template = None) -> ServiceDraft:
         )
     else:
         return ServiceDraft(
-            date='',
-            place=''
+            date=get_last_sunday(),
+            place='–'
         )
 
-def new_manuscript_draft(template = None) -> ManuscriptDraft:
+def new_manuscript_draft(template = None, sermon_code='') -> ManuscriptDraft:
     if template:
         return ManuscriptDraft(
             file_name=template['file_name'],
@@ -94,10 +102,11 @@ def new_manuscript_draft(template = None) -> ManuscriptDraft:
         )
     else:
         return ManuscriptDraft(
-            file_name=''
+            file_name=f"{sermon_code}.pdf",
+            date=get_last_sunday()
         )
 
-def new_recording_draft(template = None) -> RecordingDraft:
+def new_recording_draft(template = None, sermon_code='') -> RecordingDraft:
     if template:
         return RecordingDraft(
             date=template['date'],
@@ -108,11 +117,12 @@ def new_recording_draft(template = None) -> RecordingDraft:
         )
     else:
         return RecordingDraft(
-            date='',
-            type=''
+            date=get_last_sunday(),
+            file_name=f"{get_last_sunday()}_Predikan.mp3",
+            type='audio'
         )
 
-def new_resource_draft(template = None) -> ResourceDraft:
+def new_resource_draft(template = None, sermon_code='') -> ResourceDraft:
     if template:
         return ResourceDraft(
             file_name=template['file_name'],
@@ -121,7 +131,7 @@ def new_resource_draft(template = None) -> ResourceDraft:
         )
     else:
         return ResourceDraft(
-            file_name=''
+            file_name=f"{sermon_code}_resurs.pdf"
         )
 
 

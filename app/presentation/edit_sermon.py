@@ -6,7 +6,7 @@ import tempfile
 import subprocess
 import time
 from app.utils import PATH_MANUSCRIPTS, PATH_RECORDINGS, PATH_RESOURCES, get_file_link, PATTERN
-from app.services.sermon_draft import deep_copy
+from app.services.sermon_draft import deep_copy, new_service_draft, new_manuscript_draft, new_recording_draft, new_resource_draft
 
 
 
@@ -18,7 +18,7 @@ def render_edit_menu(title, options, show_menu_options=False):
         for i in range(len(options)):
             menu += f"[key]{i + 1}.[/key]{NBSP}{options[i]}  "
     else:
-        menu = f"Ange vilket fält du vill redigera. Enter (tomt) behåller värdet, '-' rensar (om tillåtet). I översikten markeras vilka fält som är ändrade. Spara med [key]s[/key] och avsluta med [key]q[/key]."
+        menu = f"Ange vilket fält du vill redigera. Enter (tomt) behåller värdet, '-' rensar (om tillåtet). I översikten markeras vilka fält som är ändrade. Spara med [key]s[/key] och avbryt med [key]q[/key]."
 
     subtitle = f"[bold][key]s[/key]: spara, [key]q[/key]: avbryt[/bold]"
     print()
@@ -81,10 +81,12 @@ def user_edit_short_text_list(sermon_code, title, value, separator=';'):
 def user_edit_short_text(sermon_code, title, value, choices = None, pattern = None):
     """Let user edit a value"""
     subtitle = f"[dim]Enter (tomt) behåller värdet, '-' rensar (om tillåtet).[/dim]"
+    if not value:
+        value = '–'
     print()
     console.print(
         Panel(f"{value}",
-        title=f"[key]Ändra {title}[/key]",
+        title=f"[key]Ändra {title.lower()}[/key]",
         title_align='left', 
         subtitle=subtitle,
         subtitle_align='right',
@@ -97,7 +99,7 @@ def user_edit_short_text(sermon_code, title, value, choices = None, pattern = No
     return new_value
 
 
-def user_edit_generic_complex(sermon_code, title, data, fields, path = None):
+def user_edit_generic_complex(sermon_code, title, data, fields, path = None, new_instance = None):
     """Let user edit services, manuscripts, recordings and resources - all in one generic function."""
 
     original_data = deep_copy(data)
@@ -130,6 +132,10 @@ def user_edit_generic_complex(sermon_code, title, data, fields, path = None):
                     value = f"[edited]{value}[/edited]"
                 row.append(value)  # Get the correct values
             table.add_row(*row)  # Add all rows
+            
+        row = ['+', f"Lägg till ny"]  # Add a + to use function to create a draft for adding a new instance of service, manuscript, recording or resource
+        table.add_row(*row)
+
 
         print()
         console.print(  # Show table in panel
@@ -141,23 +147,17 @@ def user_edit_generic_complex(sermon_code, title, data, fields, path = None):
         )
 
         # Abort if no data to edit
-        if not data:
-            console.print(f"Det finns ingen {title} kopplad till denna predikan att redigera. Lägg till gudstjänst/manus/inspelning/resurs med [code]sermon add ...[/code]")
-            Confirm.ask('Tryck enter för att fortsätta', default = True)
-            return None
+        #if not data:
+            #console.print(f"Det finns ingen {title} kopplad till denna predikan att redigera.")
+            #Confirm.ask('Tryck enter för att fortsätta', default = True)
+            #return None
 
-        # Show the fields possible to edit along with index number to select
-        txt = ''
-        index = 1
-        for field in fields:
-            txt += f"[key]{index}.[/key] {field[1]}  "
-            index += 1
-
+        # Show what to do
         subtitle = f"[bold][key]s[/key]: spara, [key]q[/key]: avbryt[/bold]"
         print()
         console.print(
-            Panel(f"Välj vad du vill redigera. Enter (tomt) behåller värdet, '-' rensar (om tillåtet). Lägg till/ta bort gudstjänst/manus/inspelning/resurs med [code]sermon add/remove ...[/code]",
-                title=f"[title]Redigera {title}[/title]",
+            Panel(f"Välj vad du vill redigera. Enter (tomt) behåller värdet, '-' rensar (om tillåtet). Lägg till {title.lower()} med [key]+[/key]. Du kan också lägga till/ta bort {title.lower()} med kommandot [code]sermon add/remove ...[/code] ",
+                title=f"[title]Redigera {title.lower()}[/title]",
                 title_align='left', 
                 subtitle=subtitle,
                 subtitle_align='right',
@@ -169,18 +169,28 @@ def user_edit_generic_complex(sermon_code, title, data, fields, path = None):
         # User selection of row and item to change
         row = 0
         if len(data) > 1:  # Select row of table if more than one
-            row = user_choice(title='Rad', options='A B C D E F G H '[:2 * len(data)].strip().split(' ') + ['s', 'q'])
+            row = user_choice(title='Rad', options='A B C D E F G H '[:2 * len(data)].strip().split(' ') + ['s', 'q', '+'])
             if row == 's':
                 return data  # Save
             elif row == 'q':
                 return None  # Quit
-            row = 'ABCDEFGH'.index(row)
-        item = user_choice(title='Kolumn', options=[str(x + 1) for x in range(len(fields))] + ['s', 'q'])
-        if item == 's':
+            elif row == '+':  # Add new row
+                pass
+            else:
+                row = 'ABCDEFGH'.index(row)
+        if row != '+':
+            item = user_choice(title='Kolumn', options=[str(x + 1) for x in range(len(fields))] + ['s', 'q', '+'])
+        if row == '+' or item == '+':  # Add new row
+            new_row = new_instance(sermon_code=sermon_code)  # Create a new draft of the correct type
+            data.append(new_row)  # Add this new empty item to the list
+            continue
+        elif item == 's':
             return data  # Save
         elif item == 'q':
             return None  # Quit
         item = int(item)
+        if len(data) == 0:  # Nothing can be edited if no data
+            continue
 
         # Enter new value for selected field
         field_name = fields[item -1][1]
@@ -212,7 +222,7 @@ def user_edit_services(sermon_code, title, value):
     """Let user edit services in interactive mode"""
     #date, place, notes
     fields = [('date', 'Datum'), ('place', 'Plats'), ('notes', 'Kommentar')]
-    return user_edit_generic_complex(sermon_code, title, value, fields)
+    return user_edit_generic_complex(sermon_code, title, value, fields, new_instance=new_service_draft)
 
 
 def user_edit_manuscripts(sermon_code, title, value):
@@ -220,7 +230,7 @@ def user_edit_manuscripts(sermon_code, title, value):
     #file_name, version, date, notes
     fields = [('file_name', 'Filnamn'), ('version', 'Version'), ('date', 'Datum'), ('notes', 'Kommentar')]
     path = PATH_MANUSCRIPTS
-    return user_edit_generic_complex(sermon_code, title, value, fields, path)
+    return user_edit_generic_complex(sermon_code, title, value, fields, path=path, new_instance=new_manuscript_draft)
 
 
 def user_edit_recordings(sermon_code, title, value):
@@ -228,7 +238,7 @@ def user_edit_recordings(sermon_code, title, value):
     #type, date, file_name, external_url, notes
     fields = [('type', 'Typ'), ('date', 'Datum'), ('file_name', 'Filnamn'), ('external_url', 'Extern url'), ('notes', 'Kommentar')]
     path = PATH_RECORDINGS
-    return user_edit_generic_complex(sermon_code, title, value, fields, path)
+    return user_edit_generic_complex(sermon_code, title, value, fields, path=path, new_instance=new_recording_draft)
 
 
 def user_edit_resources(sermon_code, title, value):
@@ -236,7 +246,7 @@ def user_edit_resources(sermon_code, title, value):
     #file_name, title, notes
     fields = [('file_name', 'Filnamn'), ('title', 'Rubrik'), ('notes', 'Kommentar')]
     path = PATH_RESOURCES
-    return user_edit_generic_complex(sermon_code, title, value, fields, path)
+    return user_edit_generic_complex(sermon_code, title, value, fields, path=path, new_instance=new_resource_draft)
 
 
 

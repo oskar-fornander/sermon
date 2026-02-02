@@ -10,9 +10,11 @@ from app.services.edit_sermon import interactive_edit_sermon
 def new_sermon():
     """Skapa en ny predikan"""
 
+    # Enter sermon code and Title and then enter into interactive edit mode to get a good overview of the editing of the new sermon before saving as a new sermon
+
     sermon_draft = new_sermon_draft()  # Save new sermon in a draft before writing to the database
 
-    render_info_panel('Ny predikan', 'För in uppgifter om predikan. Tryck enter för att acceptera default värde eller hoppa över.')
+    render_info_panel('Ny predikan', 'För in uppgifter om ny predikan.') 
 
     # Start with sermon code and make sure it's unique and valid
     used_codes = get_all_sermon_codes()  # A new sermon code must be unique
@@ -20,13 +22,35 @@ def new_sermon():
     while True:
         code = user_input('Predikokod', default=default_code, pattern=PATTERN['code'], allow_empty=False)
         if code in used_codes:
-            console.print(f"[bold red]Det finns redan en predikan med denna kod i databasen.[/bold red]")
+            console.print(f"[alert]Det finns redan en predikan med denna kod i databasen.[/alert]")
         else:
             break
     sermon_draft.code = code
 
     # Title
     sermon_draft.title = user_input('Rubrik', allow_empty=False)
+
+
+    # Enter interactive editing mode to fill in the rest 
+    #show_sermon_draft(sermon_draft)
+    updated_sermon_draft = interactive_edit_sermon(sermon_draft)
+
+    if updated_sermon_draft:
+        create_sermon_from_draft(updated_sermon_draft)
+        console.print(f"Predikan [key]{updated_sermon_draft.code}[/key] är sparad.")
+    else:
+        # Do not save a new sermon
+        console.print(f"Predikan har inte sparats.")
+
+    return
+
+        
+
+    # #### BELOW: Procedural entering of values instead of interactive editing #### #
+
+
+
+
 
     # Context
     sermon_draft.context = user_input('Sammanhang')  # Get last sunday from evangelieboken.se?
@@ -58,7 +82,7 @@ def new_sermon():
         sermons = sermons.split(',')
         for s in sermons:
             related_sermons.append(s.strip())
-    sermon_draft.related = related_sermons
+    sermon_draft.related_sermons = related_sermons
 
     # Notes
     sermon_draft.notes = user_input('Kommentar')
