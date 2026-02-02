@@ -183,6 +183,8 @@ def user_edit_generic_complex(sermon_code, title, data, fields, path = None, new
         if row == '+' or item == '+':  # Add new row
             new_row = new_instance(sermon_code=sermon_code)  # Create a new draft of the correct type
             data.append(new_row)  # Add this new empty item to the list
+            for i in range(len(fields)):  # Mark whole row as edited
+                edited.append((len(data) - 1, fields[i][0]))  # Used to indicate in preview what was just changed
             continue
         elif item == 's':
             return data  # Save
