@@ -20,8 +20,9 @@ custom_theme = Theme ({
     'title': 'bold',
     'sermon_code': 'bold',
     'key': 'bold yellow',
-    'code': 'dim italic',
+    'code': 'honeydew2 bold italic',
     'notes': 'dim',
+    'tip': 'bold dim',
     'alert': 'red bold',
     'edited': 'dark_orange',
     'link_style': 'dim'    # Add this theme to links like this: [link=http...][link_style]link_text[/link_style][/link]

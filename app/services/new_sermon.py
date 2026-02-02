@@ -1,9 +1,10 @@
 
 from app.utils import PATH_MANUSCRIPTS, PATH_RECORDINGS, PATH_RESOURCES, get_last_sunday, PATTERN
 from app.services.sermon_draft import new_sermon_draft, new_service_draft, new_manuscript_draft, new_recording_draft, new_resource_draft
-from app.db import get_last_sermon_code, get_all_sermon_codes, get_last_place
+from app.db import get_last_sermon_code, get_all_sermon_codes, get_last_place, load_sermon_as_draft, create_sermon_from_draft, update_sermon_from_draft
 from app.presentation.common import console, render_info_panel, user_input, user_confirmation
 from app.presentation.new_sermon import  show_sermon_draft
+from app.services.edit_sermon import interactive_edit_sermon
 
 
 def new_sermon():
@@ -32,8 +33,9 @@ def new_sermon():
 
     # Bible references
     bible_references = []
-    references = user_input('Bibelreferenser (separera med semikolon)')
+    references = user_input('Bibelreferenser', description=' (separera med semikolon)')
     if references:
+        # TODO: Validate bible references
         references = references.split(';')
         for ref_text in references:
             bible_references.append(ref_text.strip())
@@ -51,14 +53,12 @@ def new_sermon():
     
     # Related sermon
     related_sermons = []
-    sermons = user_input('Relaterad predikan (separera flera med semikolon)', pattern=PATTERN['related_sermons'])
+    sermons = user_input('Relaterad predikan', description=' (separera flera med kommatecken)', pattern=PATTERN['related_sermons'])
     if sermons:
-        sermons = sermons.split(';')
+        sermons = sermons.split(',')
         for s in sermons:
-            related = {}
-            related['code'] = s.strip()
-            related_sermons.append(related)
-    sermon_draft.related_sermons = ', '.join(related_sermons)
+            related_sermons.append(s.strip())
+    sermon_draft.related = related_sermons
 
     # Notes
     sermon_draft.notes = user_input('Kommentar')
@@ -71,11 +71,11 @@ def new_sermon():
         service_draft = new_service_draft()  # Only a single service can be added here, use sermon attach service to add more
         #default_place = list_sermons(order_by='date')[-1]['place']
         default_place = get_last_place()  # Get the place of the last service
-        service_draft.date = user_input('Datum (ÅÅÅÅ-MM-DD)', pattern=PATTERN['date'], default=default_date, allow_empty=False)
+        service_draft.date = user_input('Datum', description=' (ÅÅÅÅ-MM-DD)', pattern=PATTERN['date'], default=default_date, allow_empty=False)
         default_date = service_draft.date  # Save to reuse later
         service_draft.place = user_input('Plats', default=default_place, allow_empty=False)
         service_draft.notes = user_input('Kommentar')
-    sermon_draft.services.append(service_draft)
+        sermon_draft.services.append(service_draft)
 
     # Manuscript
     manuscript_draft = new_manuscript_draft()
@@ -92,7 +92,7 @@ def new_sermon():
     if add_recording:
         recording_draft = new_recording_draft()  # Only a single recording can be added here, use sermon attach recording to add more
         render_info_panel('Inspelning', content=f"Ange datum för inspelning och typ (audio/video) och antingen extern url till källan eller filnamn till lokal fil. Filer med inspelningar (t.ex. {default_recording}) ska placeras i mappen [link=file://{PATH_RECORDINGS}]{PATH_RECORDINGS}[/link]")
-        recording_draft.date = user_input('Datum (ÅÅÅÅ-MM-DD)', pattern=PATTERN['date'], default=default_date, allow_empty=False, blank_line=False)
+        recording_draft.date = user_input('Datum', description=' (ÅÅÅÅ-MM-DD)', pattern=PATTERN['date'], default=default_date, allow_empty=False, blank_line=False)
         recording_draft.type = user_input('Typ', choices=['audio', 'video'], default='audio', allow_empty=False)
         source = user_input('Fil eller extern url?', choices=['fil', 'url'], default='fil')
         if source == 'fil':
@@ -100,7 +100,7 @@ def new_sermon():
         elif source == 'url':
             recording_draft.external_url = user_input('URL',  pattern=PATTERN['url'], allow_empty=False)
         recording_draft.notes = user_input('Kommentar')
-    sermon_draft.recordings.append(recording_draft)
+        sermon_draft.recordings.append(recording_draft)
 
 
     # Resource?

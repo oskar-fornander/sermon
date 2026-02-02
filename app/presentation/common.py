@@ -40,12 +40,12 @@ def render_info_panel(title: str, content: str='', subtitle: str=''):
     print()
 
 
-def user_input(title, default=None, choices=None, pattern=None, allow_empty=True, blank_line=True):
+def user_input(title, description='', default=None, choices=None, pattern=None, allow_empty=True, blank_line=True):
     """Custom function to get user input from terminal via rich.prompt() with some safety functions"""
     if blank_line:
         console.print()
     while True:
-        answer = Prompt.ask(title, choices=choices, default=default)
+        answer = Prompt.ask(f"{title}{description}", choices=choices, default=default)
         if not answer:
             if allow_empty:
                 answer = None  # or ''

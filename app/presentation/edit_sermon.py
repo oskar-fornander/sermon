@@ -10,12 +10,15 @@ from app.services.sermon_draft import deep_copy
 
 
 
-def render_edit_menu(title, options):
+def render_edit_menu(title, options, show_menu_options=False):
     """Show a menu for interactive editing"""
 
-    menu = ''
-    for i in range(len(options)):
-        menu += f"[key]{i + 1}.[/key]{NBSP}{options[i]}  "
+    if show_menu_options:
+        menu = ''
+        for i in range(len(options)):
+            menu += f"[key]{i + 1}.[/key]{NBSP}{options[i]}  "
+    else:
+        menu = f"Ange vilket fält du vill redigera. Enter (tomt) behåller värdet, '-' rensar (om tillåtet). I översikten markeras vilka fält som är ändrade. Spara med [key]s[/key] och avsluta med [key]q[/key]."
 
     subtitle = f"[bold][key]s[/key]: spara, [key]q[/key]: avbryt[/bold]"
     print()
@@ -108,7 +111,7 @@ def user_edit_generic_complex(sermon_code, title, data, fields, path = None):
         table.add_column('  ', style='key', no_wrap=True)  # Index column
         index = 1
         for field in fields:  # Add column headers from the used fields along with index for selection
-            table.add_column(f"[key]{index}.[/key] {field[1]}", style='title', no_wrap=False)
+            table.add_column(f"[key]{index}.[/key] {field[1]}", style='', no_wrap=False)
             index += 1
 
         for i in range(len(data)):  # Fill table with data
@@ -153,7 +156,7 @@ def user_edit_generic_complex(sermon_code, title, data, fields, path = None):
         subtitle = f"[bold][key]s[/key]: spara, [key]q[/key]: avbryt[/bold]"
         print()
         console.print(
-            Panel(f"Välj vad du vill redigera. Enter (tomt) behåller värdet, '-' rensar (om tillåtet).",
+            Panel(f"Välj vad du vill redigera. Enter (tomt) behåller värdet, '-' rensar (om tillåtet). Lägg till/ta bort gudstjänst/manus/inspelning/resurs med [code]sermon add/remove ...[/code]",
                 title=f"[title]Redigera {title}[/title]",
                 title_align='left', 
                 subtitle=subtitle,

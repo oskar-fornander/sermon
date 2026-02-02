@@ -30,9 +30,9 @@ def render_sermon_list(title, sermons, order_by = 'code'):
         #manuscript = ' '.join([f"[link=file://{PATH_MANUSCRIPTS}/{x.file_name}][link_style]{LIST_MARKER}[/]" for x in sermon.manuscripts])
         #recording = ' '.join([f"[link=file://{PATH_RECORDINGS}/{x.file_name}][link_style]{LIST_MARKER}[/]" for x in sermon.recordings])
         #resource = ' '.join([f"[link=file://{PATH_RESOURCES}/{x.file_name}][link_style]{LIST_MARKER}[/]" for x in sermon.resources])
-        manuscript = ' '.join([get_file_link(PATH_MANUSCRIPTS, x.file_name, title=LIST_MARKER) for x in sermon.manuscripts])
-        recording = ' '.join([get_file_link(PATH_RECORDINGS, x.file_name or x.external_url, title=LIST_MARKER) for x in sermon.recordings])
-        resource = ' '.join([get_file_link(PATH_RESOURCES, x.file_name, title=LIST_MARKER) for x in sermon.resources])
+        manuscript = ' '.join([get_file_link(PATH_MANUSCRIPTS, x.file_name, title=LIST_MARKER, show_title_if_missing=False) for x in sermon.manuscripts])
+        recording = ' '.join([get_file_link(PATH_RECORDINGS, x.file_name or x.external_url, title=LIST_MARKER, show_title_if_missing=False) for x in sermon.recordings])
+        resource = ' '.join([get_file_link(PATH_RESOURCES, x.file_name, title=LIST_MARKER, show_title_if_missing=False) for x in sermon.resources])
 
 
         if order_by == 'date':
@@ -53,7 +53,7 @@ def render_sermon_list(title, sermons, order_by = 'code'):
         Panel(body,
             title = f"[title]Predikoarkiv[/title]",
             title_align = 'left', 
-            subtitle = f"[dim]Tips:[/] [code]sermon show {sermons[-1].code}[/]",
+            subtitle = f"[tip]Tips:[/] [code]sermon show {sermons[-1].code}[/]",
             subtitle_align = 'right',
             box = box.ROUNDED 
         )

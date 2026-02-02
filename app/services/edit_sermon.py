@@ -63,6 +63,7 @@ def interactive_edit_sermon(sermon_draft):
     }
     menu = list(EDIT_FIELDS.keys())  # A list of all menu options based on keys in dict
     edited = []  # Keep track of the edited fields to show in format
+    original_code = sermon_draft.code  # Save original value if it should be changed
 
     while True:  # Loop until user exits edit mode
         clear_screen()  # Clear terminal window
@@ -92,10 +93,16 @@ def interactive_edit_sermon(sermon_draft):
                 new_value = user_edit_short_text(sermon_draft.code, 'Predikokod', current_value, pattern=PATTERN['code'])
                 if not new_value:  # no value no change
                     break
+                if new_value == original_code:  # Ok to change back
+                    break
                 if new_value in used_codes:
                     console.print(f"[bold red]Det finns redan en predikan med denna kod i databasen.[/bold red]")
                 else:
                     break
+        elif option == 'Bibelreferenser':
+            # TODO: Add validation of bible references (regex?)
+            new_value = editor(sermon_draft.code, option, current_value)  # Get new value with the desired editor function
+
         elif option == 'Relaterad predikan':  # Special case: related. Check valid input
             used_codes = get_all_sermon_codes()  # A related sermon must exist
             while True:
@@ -108,11 +115,12 @@ def interactive_edit_sermon(sermon_draft):
                     break
                 all_codes_valid = True
                 for related_code in new_value:
-                    if related_code not in used_codes or related_code == sermon_draft.code:  # No need to check pattern when checking against used codes
+                    if related_code not in used_codes or related_code == original_code:  # No need to check pattern when checking against used codes
                         all_codes_valid = False
                         console.print(f"[bold red]Det finns ingen predikan med kod {related_code}.[/bold red]")
                 if all_codes_valid:
                     new_value = list(set(new_value))  # remove duplicates if any
+                    new_value.sort()
                     break;
         elif option == 'Omdöme':  # Special case: report. Limit options to valid reports
             new_value = user_edit_short_text(sermon_draft.code, 'Omdöme', current_value, choices=['A', 'B', 'C', '-'])
