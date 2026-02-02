@@ -55,6 +55,7 @@ def interactive_edit_sermon(sermon_draft):
         'Budskap': ('message', user_edit_long_text),
         'Kommentar': ('notes', user_edit_short_text),
         'Omdöme': ('report', user_edit_short_text),
+        'Relaterad predikan': ('related', user_edit_short_text_list),
         'Gudstjänst': ('services', user_edit_services),
         'Manus': ('manuscripts', user_edit_manuscripts),
         'Inspelning': ('recordings', user_edit_recordings),
@@ -66,7 +67,7 @@ def interactive_edit_sermon(sermon_draft):
     while True:  # Loop until user exits edit mode
         clear_screen()  # Clear terminal window
         #show_sermon_draft(sermon_draft, edited_fields=edited)  # Show a preview of the draft 
-        render_sermon_card(sermon_draft, preview=True, edited_fields=edited)  # Show a preview of the draft 
+        render_sermon_card(sermon_draft, preview=True, menu=menu, edited_fields=edited)  # Show a preview of the draft 
         render_edit_menu(title='Redigera predikan', options=menu)  # Show a menu for interactive editing
         choice = user_choice(title='Ditt val', options = [str(x + 1) for x in range(len(menu))] + ['s', 'q'], default = None)
 
@@ -95,6 +96,24 @@ def interactive_edit_sermon(sermon_draft):
                     console.print(f"[bold red]Det finns redan en predikan med denna kod i databasen.[/bold red]")
                 else:
                     break
+        elif option == 'Relaterad predikan':  # Special case: related. Check valid input
+            used_codes = get_all_sermon_codes()  # A related sermon must exist
+            while True:
+                new_value = editor(sermon_draft.code, option, current_value, separator=',')
+                if not new_value:  # no value no change
+                    new_value = None
+                    break
+                if new_value[0].strip() == '-':  # leave empty
+                    new_value = '-'
+                    break
+                all_codes_valid = True
+                for related_code in new_value:
+                    if related_code not in used_codes or related_code == sermon_draft.code:  # No need to check pattern when checking against used codes
+                        all_codes_valid = False
+                        console.print(f"[bold red]Det finns ingen predikan med kod {related_code}.[/bold red]")
+                if all_codes_valid:
+                    new_value = list(set(new_value))  # remove duplicates if any
+                    break;
         elif option == 'Omdöme':  # Special case: report. Limit options to valid reports
             new_value = user_edit_short_text(sermon_draft.code, 'Omdöme', current_value, choices=['A', 'B', 'C', '-'])
         else:  # All other fields than sermon code
@@ -104,16 +123,17 @@ def interactive_edit_sermon(sermon_draft):
         # Update value
         if new_value:
             if new_value == '-':  # Leave field empty (if allowed)
-                if field_name in ['context', 'bible_references', 'introduction', 'message', 'notes', 'report']:  # Only these fields may be empty
+                if field_name in ['context', 'bible_references', 'introduction', 'message', 'notes', 'report', 'related']:  # Only these fields may be empty
                     setattr(sermon_draft, field_name, '')  # Clear value in sermon draft
                 else:
                     console.print('Detta fält får inte vara tomt')
+                    time.sleep(1)
             else:
                 setattr(sermon_draft, field_name, new_value)  # Update value in sermon draft
                 edited.append(field_name)
                 console.print('Uppdaterat')
         else:
             console.print('Ej uppdaterat')
-        time.sleep(1)
+        #time.sleep(1)
 
 

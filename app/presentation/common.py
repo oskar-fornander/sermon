@@ -9,6 +9,7 @@ from rich.align import Align
 from rich.style import Style
 from rich.table import Table
 from rich.columns import Columns
+from rich.padding import Padding
 from rich import box
 from rich.color import Color
 from rich.prompt import Prompt, Confirm

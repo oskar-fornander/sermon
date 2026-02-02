@@ -66,11 +66,11 @@ def user_edit_long_text(sermon_code, title, value):
 
 
 
-def user_edit_short_text_list(sermon_code, title, value):
+def user_edit_short_text_list(sermon_code, title, value, separator=';'):
     """Conver list to string before edit"""
-    str = user_edit_short_text(sermon_code, title, '; '.join(value))
+    str = user_edit_short_text(sermon_code, title, f"{separator} ".join(value))
     if str:
-        str = str.split(';')
+        str = str.split(separator)
         return [s.strip() for s in str]
     return None
 
