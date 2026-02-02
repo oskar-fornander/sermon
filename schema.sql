@@ -24,8 +24,7 @@ CREATE TABLE manuscript (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     sermon_id INTEGER NOT NULL,
     file_name TEXT NOT NULL,
-    version INTEGER,
-    date TEXT,
+    date TEXT NOT NULL,
     notes TEXT,
     FOREIGN KEY (sermon_id) REFERENCES sermon(id),
     UNIQUE (sermon_id, file_name)

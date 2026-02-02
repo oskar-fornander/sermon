@@ -7,6 +7,7 @@ from app.utils import get_last_sunday
 
 @dataclass
 class SermonDraft:
+    id: int  # Database id for saving
     code: str
     title: str
     context: Optional[str] = None
@@ -59,6 +60,7 @@ class ResourceDraft:
 def new_sermon_draft(template = None) -> SermonDraft:
     if template:  # A draft with data from a template
         return SermonDraft(
+            id=template['id'],
             code=template['code'],
             title=template['title'],
             context=template['context'],
@@ -75,6 +77,7 @@ def new_sermon_draft(template = None) -> SermonDraft:
         )
     else:  # An empty draft
         return SermonDraft(
+            id = None,
             code='',
             title=''
         )

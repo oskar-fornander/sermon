@@ -230,7 +230,7 @@ def user_edit_services(sermon_code, title, value):
 def user_edit_manuscripts(sermon_code, title, value):
     """Let user edit manuscripts in interactive mode"""
     #file_name, version, date, notes
-    fields = [('file_name', 'Filnamn'), ('version', 'Version'), ('date', 'Datum'), ('notes', 'Kommentar')]
+    fields = [('file_name', 'Filnamn'), ('date', 'Datum'), ('notes', 'Kommentar')]
     path = PATH_MANUSCRIPTS
     return user_edit_generic_complex(sermon_code, title, value, fields, path=path, new_instance=new_manuscript_draft)
 

@@ -48,12 +48,13 @@ def render_sermon_list(title, sermons, order_by = 'code'):
 
 
     body = Group(f"[info]{title}[/info]", table)
+    last_sermon = sermons[-1].code if len(sermons) > 0 else 'P000'
     print()
     console.print(
         Panel(body,
             title = f"[title]Predikoarkiv[/title]",
             title_align = 'left', 
-            subtitle = f"[tip]Tips:[/] [code]sermon show {sermons[-1].code}[/]",
+            subtitle = f"[tip]Tips:[/] [code]sermon show {last_sermon}[/]",
             subtitle_align = 'right',
             box = box.ROUNDED 
         )

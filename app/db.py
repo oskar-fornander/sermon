@@ -188,7 +188,7 @@ def get_manuscripts_for_sermon(code: str):
         SELECT manuscript.* FROM manuscript 
         JOIN sermon ON manuscript.sermon_id = sermon.id 
         WHERE sermon.code = ?
-        ORDER BY manuscript.version
+        ORDER BY manuscript.date
         """,
         (code,)
     )
