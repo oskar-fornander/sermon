@@ -18,7 +18,7 @@ def new_sermon():
 
     # Start with sermon code and make sure it's unique and valid
     used_codes = get_all_sermon_codes()  # A new sermon code must be unique
-    default_code = 'P' + str(int(get_last_sermon_code()[1:]) + 1)  # Default code for new sermon: last code + 1
+    default_code = 'P' + f"{int(get_last_sermon_code()[1:]) + 1:03d}"  # Default code for new sermon: last code + 1, as three digits with leading zeros
     while True:
         code = user_input('Predikokod', default=default_code, pattern=PATTERN['code'], allow_empty=False)
         if code in used_codes:
