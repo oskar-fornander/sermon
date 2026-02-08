@@ -274,6 +274,7 @@ def update_sermon_from_draft(draft: sermonDraft):
     conn = get_connection()
     cur = conn.cursor()
 
+    # Update all properties for this row in the sermon table
     cur.execute(
         """
         UPDATE sermon 
@@ -302,6 +303,23 @@ def update_sermon_from_draft(draft: sermonDraft):
     console.print('Updating sermon id:', draft.id)
     console.print('Rows affected:', cur.rowcount)
     conn.commit()
+
+    # services
+
+    # manuscripts
+
+    # recordings
+
+    # resources
+
+    # bible_references
+
+    # related_sermons
+
+
+
+
+
     conn.close()
     return
 
