@@ -271,6 +271,8 @@ def update_sermon_from_draft(draft: sermonDraft):
     """Uppdatera en befintlig predikan i databasen baserat på data i draft."""
     # sermon is UPDATED in database
     # other tables (manuscripts, recordings, etc.) are DELETED and RECREATED in database
+    sermon_id = draft.id  # internal database id for this sermon
+
     conn = get_connection()
     cur = conn.cursor()
 
@@ -305,6 +307,16 @@ def update_sermon_from_draft(draft: sermonDraft):
     conn.commit()
 
     # services
+    cur.execute(  # Remove all services connected to this sermon
+        """
+        DELETE FROM service
+        WHERE sermon_id = ?
+        """,
+        (sermon_id,)
+    )
+    for service in draft.services:  # ServiceDraft  # Add new services
+        pass
+
 
     # manuscripts
 
