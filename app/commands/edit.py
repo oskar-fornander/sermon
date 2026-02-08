@@ -1,6 +1,6 @@
 import typer
 from app.services.edit_sermon import interactive_edit_sermon, update_sermon_code, update_sermon_title, update_sermon_context, update_sermon_introduction, update_sermon_message, update_sermon_report, update_sermon_notes
-from app.db import load_sermon_as_draft, create_sermon_from_draft, update_sermon_from_draft
+from app.db import load_sermon_as_draft, create_sermon_from_draft, update_sermon_from_draft, sermon_exists
 from app.presentation.common import clear_screen
 from app.services.sermon_draft import deep_copy
 from app.presentation.common import console
@@ -15,6 +15,11 @@ app = typer.Typer(help='Redigera predikan')
 @app.callback(invoke_without_command=True)  # Default (interaktiv edit): sermon edit P371
 def edit(ctx: typer.Context, sermon_code: str):
     """Interaktiv redigering av en predikan"""
+
+    if not sermon_exists(sermon_code):
+        print(f"Predikan med kod {sermon_code} finns inte.")
+        return
+
     ctx.obj = {'sermon_code': sermon_code}  # Make sermon_code available for all sub commands
     if ctx.invoked_subcommand is None:
         clear_screen()

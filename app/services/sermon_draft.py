@@ -26,6 +26,7 @@ class SermonDraft:
 
 @dataclass
 class ServiceDraft:
+    id: int  # Database id for saving
     date: str
     place: str
     notes: Optional[str] = None
@@ -33,13 +34,14 @@ class ServiceDraft:
 
 @dataclass
 class ManuscriptDraft:
+    id: int  # Database id for saving
     file_name: str
     date: Optional[str] = None
-    version: Optional[int] = None
     notes: Optional[str] = None
 
 @dataclass
 class RecordingDraft:
+    id: int  # Database id for saving
     date: str
     type: str
     file_name: Optional[str] = None
@@ -48,6 +50,7 @@ class RecordingDraft:
 
 @dataclass
 class ResourceDraft:
+    id: int  # Database id for saving
     file_name: str
     title: Optional[str] = None
     notes: Optional[str] = None
@@ -85,12 +88,14 @@ def new_sermon_draft(template = None) -> SermonDraft:
 def new_service_draft(template = None, sermon_code='') -> ServiceDraft:
     if template:
         return ServiceDraft(
+            id=template['id'],
             date=template['date'],
             place=template['place'],
             notes=template['notes']
         )
     else:
         return ServiceDraft(
+            id = None,
             date=get_last_sunday(),
             place='–'
         )
@@ -98,13 +103,14 @@ def new_service_draft(template = None, sermon_code='') -> ServiceDraft:
 def new_manuscript_draft(template = None, sermon_code='') -> ManuscriptDraft:
     if template:
         return ManuscriptDraft(
+            id=template['id'],
             file_name=template['file_name'],
             date=template['date'],
-            version=template['version'],
             notes=template['notes']
         )
     else:
         return ManuscriptDraft(
+            id = None,
             file_name=f"{sermon_code}.pdf",
             date=get_last_sunday()
         )
@@ -112,6 +118,7 @@ def new_manuscript_draft(template = None, sermon_code='') -> ManuscriptDraft:
 def new_recording_draft(template = None, sermon_code='') -> RecordingDraft:
     if template:
         return RecordingDraft(
+            id=template['id'],
             date=template['date'],
             type=template['type'],
             file_name=template['file_name'],
@@ -120,6 +127,7 @@ def new_recording_draft(template = None, sermon_code='') -> RecordingDraft:
         )
     else:
         return RecordingDraft(
+            id = None,
             date=get_last_sunday(),
             file_name=f"{get_last_sunday()}_Predikan.mp3",
             type='audio'
@@ -128,12 +136,14 @@ def new_recording_draft(template = None, sermon_code='') -> RecordingDraft:
 def new_resource_draft(template = None, sermon_code='') -> ResourceDraft:
     if template:
         return ResourceDraft(
+            id=template['id'],
             file_name=template['file_name'],
             title=template['title'],
             notes=template['notes'],
         )
     else:
         return ResourceDraft(
+            id = None,
             file_name=f"{sermon_code}_resurs.pdf"
         )
 
