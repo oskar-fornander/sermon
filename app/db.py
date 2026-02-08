@@ -4,6 +4,7 @@ import sqlite3
 from pathlib import Path
 import yaml
 from app.services.sermon_draft import new_sermon_draft, new_service_draft, new_manuscript_draft, new_recording_draft, new_resource_draft
+from app.presentation.common import console
 
 from app.utils import DB_PATH
 
@@ -81,40 +82,6 @@ def list_service_dates():
     conn.close()
     return row
 
-
-#def list_sermons(order_by: str = 'code'):
-#    """List sermons by code or date"""
-#    conn = get_connection()
-#    cur = conn.cursor()
-#    if order_by == 'date':
-#        cur.execute(
-#            """
-#            SELECT 
-#                service.date, 
-#                service.place, 
-#                service.notes AS service_notes, 
-#                sermon.code, 
-#                sermon.title,
-#                sermon.report
-#            FROM service
-#            JOIN sermon ON sermon.id = service.sermon_id
-#            ORDER BY service.date
-#            """
-#        )
-#    else: #'code'
-#        cur.execute(
-#            """
-#            SELECT 
-#                sermon.code, 
-#                sermon.title,
-#                sermon.report
-#            FROM sermon
-#            ORDER BY sermon.code
-#            """
-#        )
-#    row = cur.fetchall()
-#    conn.close()
-#    return row
 
 def get_last_sermon_code():
     """Get the code of the last sermon in the database."""
@@ -302,7 +269,46 @@ def create_sermon_from_draft(draft: sermonDraft):
 
 def update_sermon_from_draft(draft: sermonDraft):
     """Uppdatera en befintlig predikan i databasen baserat på data i draft."""
-    pass
+    # sermon is UPDATED in database
+    # other tables (manuscripts, recordings, etc.) are DELETED and RECREATED in database
+    conn = get_connection()
+    cur = conn.cursor()
+
+    cur.execute(
+        """
+        UPDATE sermon 
+        SET 
+        code = ?,
+        title = ?,
+        context = ?,
+        introduction = ?,
+        message = ?,
+        report = ?,
+        notes = ?
+        WHERE id = ?
+        """,
+        (
+            draft.code, 
+            draft.title, 
+            draft.context, 
+            draft.introduction, 
+            draft.message, 
+            draft.report, 
+            draft.notes, 
+            draft.id
+         )
+    )
+
+    console.print('Updating sermon id:', draft.id)
+    console.print('Rows affected:', cur.rowcount)
+    conn.commit()
+    conn.close()
+    return
+
+    
+
+
+
 
 
 
