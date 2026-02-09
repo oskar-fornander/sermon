@@ -17,7 +17,6 @@ def show(sermon_code: str):
     clear_screen()
     sermon_draft = load_sermon_as_draft(sermon_code)
 
-
     render_sermon_card(sermon_draft)
 
 

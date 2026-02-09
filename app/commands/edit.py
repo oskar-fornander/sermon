@@ -25,7 +25,7 @@ def edit(ctx: typer.Context, sermon_code: str):
         clear_screen()
         print(f"interactive edit: {sermon_code}")
         sermon_draft = load_sermon_as_draft(sermon_code)
-        print(sermon_draft)
+        #print(sermon_draft)
         original_sermon_draft = deep_copy(sermon_draft)  # original sermon draft without changes
         sermon_draft = interactive_edit_sermon(sermon_draft)  # Launch interactive editor
         #console.print(sermon_draft)

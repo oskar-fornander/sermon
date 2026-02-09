@@ -133,7 +133,9 @@ def user_edit_generic_complex(sermon_code, title, data, fields, path = None, new
                 row.append(value)  # Get the correct values
             table.add_row(*row)  # Add all rows
             
-        row = ['+', f"Lägg till ny"]  # Add a + to use function to create a draft for adding a new instance of service, manuscript, recording or resource
+        row = ['+', f"Lägg till ny {title.lower()}"]  # Add a + to use function to create a draft for adding a new instance of service, manuscript, recording or resource
+        table.add_row(*row)
+        row = ['-', f"Radera {title.lower()}"]  # Add a + to use function to create a draft for adding a new instance of service, manuscript, recording or resource
         table.add_row(*row)
 
 

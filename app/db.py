@@ -288,8 +288,8 @@ def load_sermon_as_draft(sermon_code: str) -> sermonDraft:
     sermon_draft.resources = [new_resource_draft(r) for r in resources]
     #sermon_draft.bible = '; '.join([b['reference_text'] for b in bible_references])  # text
     #sermon_draft.related = ', '.join([s['code'] for s in related_sermons])
-    sermon_draft.bible = [b['reference_text'] for b in bible_references]  # list
-    sermon_draft.related = [s['code'] for s in related_sermons]
+    sermon_draft.bible_references = [b['reference_text'] for b in bible_references]  # list
+    sermon_draft.related_sermons = [s['code'] for s in related_sermons]
 
     return sermon_draft
 
