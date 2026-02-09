@@ -321,8 +321,8 @@ def update_sermon_from_draft(draft: sermonDraft):
         update_manuscripts(conn, sermon_id, draft.manuscripts, delete_missing=True)
         update_recordings(conn, sermon_id, draft.recordings, delete_missing=True)
         update_resources(conn, sermon_id, draft.resources, delete_missing=True)
-        update_bible_references(conn, sermon_id, draft.bible_references, delete_missing=True)
-        update_related_sermons(conn, sermon_id, draft.related_sermons, delete_missing=True)
+        update_bible_references(conn, sermon_id, draft.bible_references)
+        update_related_sermons(conn, sermon_id, draft.related_sermons)
 
         conn.commit()
     except Exception: 
@@ -573,14 +573,57 @@ def update_resources(conn, sermon_id, resources: List[ResourceDraft], delete_mis
             )
 
 
-def update_bible_references(conn, sermon_id, resources: List[str], delete_missing=False):
-    """Uppdatera bibelreferenser för angiven sermon_id utifrån angiven lista. Radera poster databasen som saknas i argumentets lista om True, annars lägg bara till. Om satt till False kan denna funktion användas för att lägga till ny post, skickad som lista."""
-    console.print('Implement update_bible_references() in db.py')
+def update_bible_references(conn, sermon_id, bible_references: List[str]):
+    """Uppdatera bibelreferenser för angiven sermon_id utifrån angiven lista. Alla raderas och ersätts på nytt."""
+    cur = conn.cursor()
+    # Delete all posts in database with sermon_id
+    cur.execute(
+        """
+        DELETE FROM bible_reference
+        WHERE sermon_id = ?
+        """,
+        (sermon_id,)
+    )
+    # Add all bible references as new posts
+    for bible_reference in bible_references:
+        cur.execute(
+            """
+            INSERT INTO bible_reference
+            (sermon_id, reference_text)
+            VALUES(?, ?)
+            """,
+            (
+                sermon_id, 
+                bible_reference
+            )
+        )
 
 
-def update_related_sermons(conn, sermon_id, resources: List[str], delete_missing=False):
-    """Uppdatera relaterade predikningar för angiven sermon_id utifrån angiven lista. Radera poster databasen som saknas i argumentets lista om True, annars lägg bara till. Om satt till False kan denna funktion användas för att lägga till ny post, skickad som lista."""
-    console.print('Implement update_related_sermons() in db.py')
+def update_related_sermons(conn, sermon_id, related_sermon_codes: List[str]):
+    """Uppdatera relaterade predikningar för angiven sermon_id utifrån angiven lista. Alla raderas och ersätts på nytt."""
+    cur = conn.cursor()
+    # Delete all posts in database with sermon_id
+    cur.execute(
+        """
+        DELETE FROM sermon_relation
+        WHERE sermon_id = ?
+        """,
+        (sermon_id,)
+    )
+    # Add all bible references as new posts
+    for related_sermon_code in related_sermon_codes:
+        related_sermon_id = get_sermon_id(related_sermon_code)
+        cur.execute(
+            """
+            INSERT INTO sermon_relation
+            (sermon_id, related_sermon_id)
+            VALUES(?, ?)
+            """,
+            (
+                sermon_id, 
+                related_sermon_id
+            )
+        )
 
 
 

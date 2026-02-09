@@ -1,5 +1,5 @@
 
-from dataclasses import dataclass, field
+from dataclasses import dataclass, field, asdict
 from typing import Optional, List
 import copy
 from app.utils import get_last_sunday
@@ -151,6 +151,16 @@ def new_resource_draft(template = None, sermon_code='') -> ResourceDraft:
 def deep_copy(draft: sermonDraft):
     """Make a deep copy of a sermon draft."""
     return copy.deepcopy(draft)
+
+
+def equal_drafts(draft1: sermonDraft, draft2: sermonDraft):
+    """Compare if the two drafts are equal or not"""
+    d1 = asdict(draft1)
+    d2 = asdict(draft2)
+    return d1 == d2
+
+
+
 
 
 

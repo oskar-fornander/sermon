@@ -2,7 +2,7 @@ import typer
 from app.services.edit_sermon import interactive_edit_sermon, update_sermon_code, update_sermon_title, update_sermon_context, update_sermon_introduction, update_sermon_message, update_sermon_report, update_sermon_notes
 from app.db import load_sermon_as_draft, create_sermon_from_draft, update_sermon_from_draft, sermon_exists
 from app.presentation.common import clear_screen
-from app.services.sermon_draft import deep_copy
+from app.services.sermon_draft import deep_copy, equal_drafts
 from app.presentation.common import console
 
 
@@ -28,12 +28,10 @@ def edit(ctx: typer.Context, sermon_code: str):
         print(sermon_draft)
         original_sermon_draft = deep_copy(sermon_draft)  # original sermon draft without changes
         sermon_draft = interactive_edit_sermon(sermon_draft)  # Launch interactive editor
-        if sermon_draft:
-            if sermon_draft == original_sermon_draft:  # No need to write to database if no changes were made
-                console.print(f"Inga förändringar i predikan [key]{sermon_code}[/key].")
-            else:
-                update_sermon_from_draft(sermon_draft)
-                console.print(f"Predikan [key]{sermon_code}[/key] är uppdaterad.")
+        #console.print(sermon_draft)
+        if sermon_draft:  # Write to database even if no changes were made
+            update_sermon_from_draft(sermon_draft)
+            console.print(f"Predikan [key]{sermon_code}[/key] är uppdaterad.")
         else:  # None indicates exit edit mode without saving
             console.print(f"Inga ändringar sparade för predikan [key]{sermon_code}[/key].")
 

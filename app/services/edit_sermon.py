@@ -55,7 +55,7 @@ def interactive_edit_sermon(sermon_draft):
         'Budskap': ('message', user_edit_long_text),
         'Kommentar': ('notes', user_edit_short_text),
         'Omdöme': ('report', user_edit_short_text),
-        'Relaterad predikan': ('related', user_edit_short_text_list),
+        'Relaterad predikan': ('related_sermons', user_edit_short_text_list),
         'Gudstjänst': ('services', user_edit_services),
         'Manus': ('manuscripts', user_edit_manuscripts),
         'Inspelning': ('recordings', user_edit_recordings),
@@ -126,7 +126,6 @@ def interactive_edit_sermon(sermon_draft):
             new_value = user_edit_short_text(sermon_draft.code, 'Omdöme', current_value, choices=['A', 'B', 'C', '-'])
         else:  # All other fields than sermon code
             new_value = editor(sermon_draft.code, option, current_value)  # Get new value with the desired editor function
-
 
         # Update value
         if new_value:
