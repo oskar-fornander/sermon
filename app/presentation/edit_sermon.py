@@ -115,6 +115,7 @@ def user_edit_generic_complex(sermon_code, title, data, fields, path = None, new
         for field in fields:  # Add column headers from the used fields along with index for selection
             table.add_column(f"[key]{index}.[/key] {field[1]}", style='', no_wrap=False)
             index += 1
+        table.add_column(f"[key]x.[/key] Radera", style='', no_wrap=False)
 
         for i in range(len(data)):  # Fill table with data
             item = data[i]
@@ -131,17 +132,14 @@ def user_edit_generic_complex(sermon_code, title, data, fields, path = None, new
                 if (i, field[0]) in edited:  # Mark the edited values
                     value = f"[edited]{value}[/edited]"
                 row.append(value)  # Get the correct values
+            row.append('[key]x[/key]')  # Delete row
             table.add_row(*row)  # Add all rows
-            
-        row = ['+', f"Lägg till ny {title.lower()}"]  # Add a + to use function to create a draft for adding a new instance of service, manuscript, recording or resource
-        table.add_row(*row)
-        row = ['-', f"Radera {title.lower()}"]  # Add a + to use function to create a draft for adding a new instance of service, manuscript, recording or resource
-        table.add_row(*row)
+        #table.add_row('')
 
-
+        content = Group(table, f" [key]+[/key] Lägg till {title.lower()}")
         print()
         console.print(  # Show table in panel
-            Panel(table,
+            Panel(content,
             title=f"[key]{sermon_code}: {title}[/key]",
             title_align='left', 
             box=box.ROUNDED 
@@ -158,7 +156,7 @@ def user_edit_generic_complex(sermon_code, title, data, fields, path = None, new
         subtitle = f"[bold][key]s[/key]: spara, [key]q[/key]: avbryt[/bold]"
         print()
         console.print(
-            Panel(f"Välj vad du vill redigera. Enter (tomt) behåller värdet, '-' rensar (om tillåtet). Lägg till {title.lower()} med [key]+[/key]. Du kan också lägga till/ta bort {title.lower()} med kommandot [code]sermon add/remove ...[/code] ",
+            Panel(f"Välj vad du vill redigera. Enter (tomt) behåller värdet, '-' rensar (om tillåtet). Lägg till {title.lower()} med [key]+[/key] och radera vald {title.lower()} med [key]x[/key]. Du kan också lägga till/ta bort {title.lower()} med kommandot [code]sermon add/remove ...[/code] ",
                 title=f"[title]Redigera {title.lower()}[/title]",
                 title_align='left', 
                 subtitle=subtitle,
@@ -170,7 +168,13 @@ def user_edit_generic_complex(sermon_code, title, data, fields, path = None, new
 
         # User selection of row and item to change
         row = 0
-        if len(data) > 1:  # Select row of table if more than one
+        if len(data) == 0:  # Add a row or quit are the only options if no row exists
+            row = user_choice(title='Val', options=['s', 'q', '+'])
+            if row == 's':
+                return data  # Save
+            elif row == 'q':
+                return None  # Quit
+        elif len(data) > 1:  # Select row of table if more than one
             row = user_choice(title='Rad', options='A B C D E F G H '[:2 * len(data)].strip().split(' ') + ['s', 'q', '+'])
             if row == 's':
                 return data  # Save
@@ -181,7 +185,7 @@ def user_edit_generic_complex(sermon_code, title, data, fields, path = None, new
             else:
                 row = 'ABCDEFGH'.index(row)
         if row != '+':
-            item = user_choice(title='Kolumn', options=[str(x + 1) for x in range(len(fields))] + ['s', 'q', '+'])
+            item = user_choice(title='Kolumn', options=[str(x + 1) for x in range(len(fields))] + ['s', 'q', '+', 'x'])
         if row == '+' or item == '+':  # Add new row
             new_row = new_instance(sermon_code=sermon_code)  # Create a new draft of the correct type
             data.append(new_row)  # Add this new empty item to the list
