@@ -105,12 +105,12 @@ def user_edit_generic_complex(sermon_code, title, data, fields, path = None, new
     original_data = deep_copy(data)
     edited = []  # Save the edited posts as (row, field) to highlight them
 
-    while True:  # Edit until escape edit mode
-        clear_screen()
 
-        # Build a table to show the data
+    def show_edit_screen(selected_row = None, selected_column = None):
+        """Build a table to show the data"""
+        clear_screen()
         table = Table(title=None, box=box.SIMPLE, expand=False) # A table inside the panel
-        table.add_column('  ', style='key', no_wrap=True)  # Index column
+        table.add_column('  ', style='key', justify='right', no_wrap=True)  # Index column
         index = 1
         for field in fields:  # Add column headers from the used fields along with index for selection
             table.add_column(f"[key]{index}.[/key] {field[1]}", style='', no_wrap=False)
@@ -119,10 +119,12 @@ def user_edit_generic_complex(sermon_code, title, data, fields, path = None, new
 
         for i in range(len(data)):  # Fill table with data
             item = data[i]
-            row = ['']
+            row = ['  ']
+            if i == selected_row:
+                row = ['▶ ']  # Mark the selected row
             if len(data) > 1:
                 index = 'ABCDEFGH'[i]  # Index for each row, only if more than one row
-                row = [index]
+                row[0] += index
             for field in fields:
                 value = str(getattr(item, field[0]))
                 if value == 'None':
@@ -131,8 +133,12 @@ def user_edit_generic_complex(sermon_code, title, data, fields, path = None, new
                     value = get_file_link(path, value)
                 if (i, field[0]) in edited:  # Mark the edited values
                     value = f"[edited]{value}[/edited]"
+                if i == selected_row and selected_column and field[1] == fields[selected_column - 1][1]:  # Mark cell as selected
+                    value = f"[selected]{value}[/selected]"
                 row.append(value)  # Get the correct values
             row.append('[key]x[/key]')  # Delete row
+            if selected_row is not None and i != selected_row:
+                row = [f"[not_selected]{x}[/not_selected]" for x in row]  # Mark all non selected rows as not selected
             table.add_row(*row)  # Add all rows
         #table.add_row('')
 
@@ -145,12 +151,6 @@ def user_edit_generic_complex(sermon_code, title, data, fields, path = None, new
             box=box.ROUNDED 
             )
         )
-
-        # Abort if no data to edit
-        #if not data:
-            #console.print(f"Det finns ingen {title} kopplad till denna predikan att redigera.")
-            #Confirm.ask('Tryck enter för att fortsätta', default = True)
-            #return None
 
         # Show what to do
         subtitle = f"[bold][key]s[/key]: spara, [key]q[/key]: avbryt[/bold]"
@@ -166,42 +166,70 @@ def user_edit_generic_complex(sermon_code, title, data, fields, path = None, new
         )
         print()
 
-        # User selection of row and item to change
-        row = 0
-        if len(data) == 0:  # Add a row or quit are the only options if no row exists
+    def add_row():
+        """Add new row"""
+        new_row = new_instance(sermon_code=sermon_code)  # Create a new draft of the correct type
+        data.append(new_row)  # Add this new empty item to the list
+        for i in range(len(fields)):  # Mark whole row as edited
+            edited.append((len(data) - 1, fields[i][0]))  # Used to indicate in preview what was just changed
+
+
+    row = None
+    item = None
+
+    while True:  # Edit until escape edit mode
+        rows = len(data)
+
+        ## A. SELECT ROW
+        # 1. no rows -> Add a row or quit are the only ptions if no row exists
+        if rows == 0:
+            show_edit_screen(selected_row = None)
             row = user_choice(title='Val', options=['s', 'q', '+'])
-            if row == 's':
-                return data  # Save
-            elif row == 'q':
-                return None  # Quit
-        elif len(data) > 1:  # Select row of table if more than one
+
+        # 2. single row -> The only row is already chosen, continue with item
+        elif rows == 1:
+            show_edit_screen(selected_row=0)  # Mark the only row as selected
+
+        # 3. multiple rows -> Select row of table if more than one, or quit or save
+        elif rows > 1:
+            show_edit_screen(selected_row = None)
             row = user_choice(title='Rad', options='A B C D E F G H '[:2 * len(data)].strip().split(' ') + ['s', 'q', '+'])
-            if row == 's':
-                return data  # Save
-            elif row == 'q':
-                return None  # Quit
-            elif row == '+':  # Add new row
-                pass
-            else:
-                row = 'ABCDEFGH'.index(row)
-        if row != '+':
-            item = user_choice(title='Kolumn', options=[str(x + 1) for x in range(len(fields))] + ['s', 'q', '+', 'x'])
-        if row == '+' or item == '+':  # Add new row
-            new_row = new_instance(sermon_code=sermon_code)  # Create a new draft of the correct type
-            data.append(new_row)  # Add this new empty item to the list
-            for i in range(len(fields)):  # Mark whole row as edited
-                edited.append((len(data) - 1, fields[i][0]))  # Used to indicate in preview what was just changed
+
+        if row is None:  # Continue: only single row, already selected
+            row = 0  # Select the only existing row
+        elif row == 's':
+            return data  # Save
+        elif row == 'q':
+            return None  # Quit
+        elif row == '+':  # Add new row
+            add_row()
             continue
-        elif item == 's':
+        else:
+            row = 'ABCDEFGH'.index(row)  # A row is selected
+
+        ## B. SELECT ITEM/COLUMN
+        show_edit_screen(selected_row=row)  # Show with selected row marked
+        item = user_choice(title='Kolumn', options=[str(x + 1) for x in range(len(fields))] + ['s', 'q', '+', 'x'])
+
+        if item == 's':
             return data  # Save
         elif item == 'q':
             return None  # Quit
-        item = int(item)
-        if len(data) == 0:  # Nothing can be edited if no data
+        elif item == '+':  # Add new row
+#            add_row()
+            pass
             continue
+        elif item == 'x':
+            console.print('remove row ...')
+            continue
+        else:
+            item = int(item)  # selected column
 
-        # Enter new value for selected field
-        field_name = fields[item -1][1]
+        show_edit_screen(selected_row=row, selected_column=item)
+
+
+        ## C. ENTER NEW VALUE FOR SELECTED FIELD
+        field_name = fields[item - 1][1]
         pattern = None  # Special patterns for some fields
         choices = None  # Defined choices for some
         if field_name.lower() == 'datum':
@@ -212,7 +240,10 @@ def user_edit_generic_complex(sermon_code, title, data, fields, path = None, new
             pattern = PATTERN['url']
         elif field_name.lower() == 'typ':
             choices = ['audio', 'video']
+
+        console.print(f"[dim]{field_name}: {getattr(data[row], fields[item - 1][0])}[/dim]")
         new_value = user_input(f"{field_name}", pattern=pattern, choices=choices, default=None, allow_empty=True, blank_line=True)
+
         if new_value:  # No change if empty: keep value
             if new_value == '-':  # Clear field if allowed
                 if field_name.lower() in ['rubrik', 'kommentar']:  # Only these fields can be empty
