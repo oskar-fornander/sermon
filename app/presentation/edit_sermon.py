@@ -125,6 +125,10 @@ def user_edit_generic_complex(sermon_code, title, data, fields, path = None, new
             if len(data) > 1:
                 index = 'ABCDEFGH'[i]  # Index for each row, only if more than one row
                 row[0] += index
+            if item is None:  # Add empty place holder for delted row
+                row.extend([''] * len(fields))
+                table.add_row(*row)
+                continue
             for field in fields:
                 value = str(getattr(item, field[0]))
                 if value == 'None':
@@ -142,7 +146,10 @@ def user_edit_generic_complex(sermon_code, title, data, fields, path = None, new
             table.add_row(*row)  # Add all rows
         #table.add_row('')
 
-        content = Group(table, f" [key]+[/key] Lägg till {title.lower()}")
+        text_add_row = ''
+        if selected_row is None:
+            text_add_row = f" [key]+[/key] Lägg till {title.lower()}"  # Show only if row is not selected
+        content = Group(table, text_add_row)
         print()
         console.print(  # Show table in panel
             Panel(content,
@@ -156,7 +163,7 @@ def user_edit_generic_complex(sermon_code, title, data, fields, path = None, new
         subtitle = f"[bold][key]s[/key]: spara, [key]q[/key]: avbryt[/bold]"
         print()
         console.print(
-            Panel(f"Välj vad du vill redigera. Enter (tomt) behåller värdet, '-' rensar (om tillåtet). Lägg till {title.lower()} med [key]+[/key] och radera vald {title.lower()} med [key]x[/key]. Du kan också lägga till/ta bort {title.lower()} med kommandot [code]sermon add/remove ...[/code] ",
+            Panel(f"Välj vad du vill redigera. Enter (tomt) behåller värdet, '-' rensar (om tillåtet). Lägg till {title.lower()} med [key]+[/key] och radera vald rad med [key]x[/key]. Du kan också lägga till/ta bort {title.lower()} med kommandot [code]sermon add/remove ...[/code] ",
                 title=f"[title]Redigera {title.lower()}[/title]",
                 title_align='left', 
                 subtitle=subtitle,
@@ -172,6 +179,12 @@ def user_edit_generic_complex(sermon_code, title, data, fields, path = None, new
         data.append(new_row)  # Add this new empty item to the list
         for i in range(len(fields)):  # Mark whole row as edited
             edited.append((len(data) - 1, fields[i][0]))  # Used to indicate in preview what was just changed
+
+    def delete_row():
+        if Confirm.ask(f"Är du säker på att du vill radera {title} {'ABCDEFGH'[row]}?", default = False):
+            #data.pop(row)  # Remove from data
+            data[row] = None  # Remove data but keep a place holder
+
 
 
     row = None
@@ -198,7 +211,7 @@ def user_edit_generic_complex(sermon_code, title, data, fields, path = None, new
         if row is None:  # Continue: only single row, already selected
             row = 0  # Select the only existing row
         elif row == 's':
-            return data  # Save
+            return [d for d in data if d is not None]  # Save  Return all data but the None placeholders for deleted posts
         elif row == 'q':
             return None  # Quit
         elif row == '+':  # Add new row
@@ -206,21 +219,19 @@ def user_edit_generic_complex(sermon_code, title, data, fields, path = None, new
             continue
         else:
             row = 'ABCDEFGH'.index(row)  # A row is selected
+            if data[row] is None:  # An empty placeholder (deleted row) is selected
+                continue
 
         ## B. SELECT ITEM/COLUMN
         show_edit_screen(selected_row=row)  # Show with selected row marked
-        item = user_choice(title='Kolumn', options=[str(x + 1) for x in range(len(fields))] + ['s', 'q', '+', 'x'])
+        item = user_choice(title='Kolumn', options=[str(x + 1) for x in range(len(fields))] + ['s', 'q', 'x'])
 
         if item == 's':
-            return data  # Save
+            return [d for d in data if d is not None]  # Save
         elif item == 'q':
             return None  # Quit
-        elif item == '+':  # Add new row
-#            add_row()
-            pass
-            continue
         elif item == 'x':
-            console.print('remove row ...')
+            delete_row()
             continue
         else:
             item = int(item)  # selected column
