@@ -106,6 +106,12 @@ def user_edit_generic_complex(sermon_code, title, data, fields, path = None, new
     edited = []  # Save the edited posts as (row, field) to highlight them
 
 
+    def row_index(i):
+        """Get a letter/number index for the row"""
+        if isinstance(i, int) or i.isdigit():
+            return 'ABCDEFGH'[i]  # return a letter: A, B, C, ...
+        return 'ABCDEFGH'.index(i)  # return a digit: 1, 2, 3, ...
+
     def show_edit_screen(selected_row = None, selected_column = None):
         """Build a table to show the data"""
         clear_screen()
@@ -122,9 +128,8 @@ def user_edit_generic_complex(sermon_code, title, data, fields, path = None, new
             row = ['  ']
             if i == selected_row:
                 row = ['▶ ']  # Mark the selected row
-            if len(data) > 1:
-                index = 'ABCDEFGH'[i]  # Index for each row, only if more than one row
-                row[0] += index
+            index = row_index(i)  # Index for each row
+            row[0] += index
             if item is None:  # Add empty place holder for delted row
                 row.extend([''] * len(fields))
                 table.add_row(*row)
@@ -181,17 +186,16 @@ def user_edit_generic_complex(sermon_code, title, data, fields, path = None, new
             edited.append((len(data) - 1, fields[i][0]))  # Used to indicate in preview what was just changed
 
     def delete_row():
-        if Confirm.ask(f"Är du säker på att du vill radera {title} {'ABCDEFGH'[row]}?", default = False):
+        if Confirm.ask(f"Är du säker på att du vill radera {title.lower()} {row_index(row)}?", default = False):
             #data.pop(row)  # Remove from data
-            data[row] = None  # Remove data but keep a place holder
+            data[row] = None  # Remove data but keep a place holder - a better user experience
 
 
-
-    row = None
-    item = None
 
     while True:  # Edit until escape edit mode
         rows = len(data)
+        row = None
+        item = None
 
         ## A. SELECT ROW
         # 1. no rows -> Add a row or quit are the only ptions if no row exists
@@ -199,18 +203,12 @@ def user_edit_generic_complex(sermon_code, title, data, fields, path = None, new
             show_edit_screen(selected_row = None)
             row = user_choice(title='Val', options=['s', 'q', '+'])
 
-        # 2. single row -> The only row is already chosen, continue with item
-        elif rows == 1:
-            show_edit_screen(selected_row=0)  # Mark the only row as selected
-
-        # 3. multiple rows -> Select row of table if more than one, or quit or save
-        elif rows > 1:
+        # 2. one or more rows -> Select row of table if one or more, or quit or save
+        elif rows >= 1:
             show_edit_screen(selected_row = None)
             row = user_choice(title='Rad', options='A B C D E F G H '[:2 * len(data)].strip().split(' ') + ['s', 'q', '+'])
 
-        if row is None:  # Continue: only single row, already selected
-            row = 0  # Select the only existing row
-        elif row == 's':
+        if row == 's':
             return [d for d in data if d is not None]  # Save  Return all data but the None placeholders for deleted posts
         elif row == 'q':
             return None  # Quit
@@ -218,13 +216,13 @@ def user_edit_generic_complex(sermon_code, title, data, fields, path = None, new
             add_row()
             continue
         else:
-            row = 'ABCDEFGH'.index(row)  # A row is selected
+            row = row_index(row)  # A row is selected
             if data[row] is None:  # An empty placeholder (deleted row) is selected
                 continue
 
         ## B. SELECT ITEM/COLUMN
         show_edit_screen(selected_row=row)  # Show with selected row marked
-        item = user_choice(title='Kolumn', options=[str(x + 1) for x in range(len(fields))] + ['s', 'q', 'x'])
+        item = user_choice(title='Kolumn', options=[str(x + 1) for x in range(len(fields))] + ['x', 's', 'q'])
 
         if item == 's':
             return [d for d in data if d is not None]  # Save
@@ -252,7 +250,7 @@ def user_edit_generic_complex(sermon_code, title, data, fields, path = None, new
         elif field_name.lower() == 'typ':
             choices = ['audio', 'video']
 
-        console.print(f"[dim]{field_name}: {getattr(data[row], fields[item - 1][0])}[/dim]")
+        console.print(f"[dim]{field_name}: {getattr(data[row], fields[item - 1][0]) or ''}[/dim]")
         new_value = user_input(f"{field_name}", pattern=pattern, choices=choices, default=None, allow_empty=True, blank_line=True)
 
         if new_value:  # No change if empty: keep value

@@ -491,7 +491,7 @@ def update_recordings(conn, sermon_id, recordings: List[RecordingDraft], delete_
                 type = ?,
                 date = ?,
                 file_name = ?,
-                external_url ?,
+                external_url = ?,
                 notes = ?
                 WHERE id = ?
                 """,
@@ -509,7 +509,7 @@ def update_recordings(conn, sermon_id, recordings: List[RecordingDraft], delete_
                 """
                 INSERT INTO recording
                 (sermon_id, type, date, file_name, external_url, notes)
-                VALUES(?, ?, ?, ?)
+                VALUES(?, ?, ?, ?, ?, ?)
                 """,
                 (
                     sermon_id, 
