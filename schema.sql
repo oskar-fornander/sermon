@@ -7,7 +7,7 @@ CREATE TABLE sermon (
     context TEXT,
     introduction TEXT,
     message TEXT,
-    report TEXT CHECK (report IN ('A', 'B', 'C')),
+    report TEXT CHECK (report IN ('A','B','C') OR report IS NULL),
     notes TEXT
 );
 

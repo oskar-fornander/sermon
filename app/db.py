@@ -263,7 +263,7 @@ def get_related_sermons_for_sermon(code: str):
 
 
 # --------------------
-# Load and write to database with sermonDraft
+# Load from database with sermonDraft
 # --------------------
 
 def load_sermon_as_draft(sermon_code: str) -> sermonDraft:
@@ -294,11 +294,65 @@ def load_sermon_as_draft(sermon_code: str) -> sermonDraft:
     return sermon_draft
 
 
+# --------------------
+# Write to database from sermonDraft
+# --------------------
 def create_sermon_from_draft(draft: sermonDraft):
     """Skapa en ny predikan i databasen baserat på data i draft."""
-    pass
+    # Data is inserted into sermon and all other relevant tables
+    # No sermon id exists before insertion in database
+
+    conn = get_connection()
+
+    try:
+        # 1. Insert sermon
+        sermon_id = insert_sermon_row(conn, draft)  # Insert new row in sermon table
+        draft.id = sermon_id  # Update sermon draft with the correct sermon id
+        console.print('sermon id: ', sermon_id)
+
+        # 2. Insert other resources for this sermon (using update functions below)
+        update_services(conn, sermon_id, draft.services, delete_missing=False)  # Insert new services using update function (ok since delete_missing is False and there is no service.id)
+        update_manuscripts(conn, sermon_id, draft.manuscripts, delete_missing=False)
+        update_recordings(conn, sermon_id, draft.recordings, delete_missing=False)
+        update_resources(conn, sermon_id, draft.resources, delete_missing=False)
+        update_bible_references(conn, sermon_id, draft.bible_references)
+        update_related_sermons(conn, sermon_id, draft.related_sermons)
+
+        conn.commit()
+    except Exception: 
+        conn.rollback()
+        raise
+    finally:
+        conn.close()
 
 
+def insert_sermon_row(conn, draft):  # Update sermon table
+    """Skriv ny rad till huvudtabellen sermon"""
+    cur = conn.cursor()
+    cur.execute(  # Insert all properties for this row in the sermon table
+        """
+        INSERT INTO sermon
+        (code, title, context, introduction, message, report, notes)
+        VALUES(?, ?, ?, ?, ?, ?, ?)
+        """,
+        (
+            draft.code, 
+            draft.title, 
+            draft.context, 
+            draft.introduction, 
+            draft.message, 
+            draft.report,
+            draft.notes 
+         )
+    )
+    console.print('Rows affected:', cur.rowcount)
+    return cur.lastrowid  # Return the new sermon id for this particular sermon
+
+
+
+# --------------------
+# Update database from sermonDraft
+# --------------------
 def update_sermon_from_draft(draft: sermonDraft):
     """Uppdatera en befintlig predikan i databasen baserat på data i draft."""
     # sermon is UPDATED in database

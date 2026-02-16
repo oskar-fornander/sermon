@@ -37,7 +37,7 @@ def new_sermon():
 
     if updated_sermon_draft:
         create_sermon_from_draft(updated_sermon_draft)
-        console.print(f"Predikan [key]{updated_sermon_draft.code}[/key] är sparad.")
+        console.print(f"Predikan [key]{updated_sermon_draft.code}[/key] är sparad. visa med [code]sermon show {updated_sermon_draft.code}[/code]")
     else:
         # Do not save a new sermon
         console.print(f"Predikan har inte sparats.")
@@ -45,8 +45,8 @@ def new_sermon():
     return
 
         
-
-    # #### BELOW: Procedural entering of values instead of interactive editing #### #
+    # ############################################## #
+    # #### BELOW: Old version with procedural entering of values instead of interactive editing #### #
 
 
 
