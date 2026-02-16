@@ -10,6 +10,7 @@ description = "Predikoarkiv – CLI"
 dependencies = [
     "typer[all]",
     "pyyaml",
+    "send2trash",
 ]
 
 [project.scripts]
