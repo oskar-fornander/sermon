@@ -131,7 +131,7 @@ def interactive_edit_sermon(sermon_draft):
         if new_value:
             if new_value == '-':  # Leave field empty (if allowed)
                 if field_name in ['context', 'bible_references', 'introduction', 'message', 'notes', 'report', 'related']:  # Only these fields may be empty
-                    setattr(sermon_draft, field_name, '')  # Clear value in sermon draft
+                    setattr(sermon_draft, field_name, None)  # Clear value in sermon draft
                 else:
                     console.print('Detta fält får inte vara tomt')
                     time.sleep(1)

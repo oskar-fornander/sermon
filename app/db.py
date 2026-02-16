@@ -354,7 +354,7 @@ def update_sermon_row(conn, draft):  # Update sermon table
             draft.context, 
             draft.introduction, 
             draft.message, 
-            draft.report, 
+            draft.report,
             draft.notes, 
             draft.id
          )
