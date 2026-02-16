@@ -17,7 +17,9 @@ CREATE TABLE service (
     date TEXT NOT NULL,
     place TEXT NOT NULL,
     notes TEXT,
-    FOREIGN KEY (sermon_id) REFERENCES sermon(id)
+    FOREIGN KEY (sermon_id) 
+        REFERENCES sermon(id) 
+        ON DELETE CASCADE
 );
 
 CREATE TABLE manuscript (
@@ -26,7 +28,9 @@ CREATE TABLE manuscript (
     file_name TEXT NOT NULL,
     date TEXT NOT NULL,
     notes TEXT,
-    FOREIGN KEY (sermon_id) REFERENCES sermon(id),
+    FOREIGN KEY (sermon_id) 
+        REFERENCES sermon(id) 
+        ON DELETE CASCADE
     UNIQUE (sermon_id, file_name)
 );
 
@@ -38,7 +42,9 @@ CREATE TABLE recording (
     file_name TEXT,
     external_url TEXT,
     notes TEXT,
-    FOREIGN KEY (sermon_id) REFERENCES sermon(id)
+    FOREIGN KEY (sermon_id) 
+        REFERENCES sermon(id) 
+        ON DELETE CASCADE
 );
 
 CREATE TABLE resource (
@@ -47,21 +53,27 @@ CREATE TABLE resource (
     file_name TEXT NOT NULL,
     title TEXT,
     notes TEXT,
-    FOREIGN KEY (sermon_id) REFERENCES sermon(id)
+    FOREIGN KEY (sermon_id) 
+        REFERENCES sermon(id) 
+        ON DELETE CASCADE
 );
 
 CREATE TABLE bible_reference (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     sermon_id INTEGER NOT NULL,
     reference_text TEXT NOT NULL,
-    FOREIGN KEY (sermon_id) REFERENCES sermon(id)
+    FOREIGN KEY (sermon_id) 
+        REFERENCES sermon(id) 
+        ON DELETE CASCADE
 );
 
 CREATE TABLE sermon_relation (
     sermon_id INTEGER NOT NULL,
     related_sermon_id INTEGER NOT NULL,
     PRIMARY KEY (sermon_id, related_sermon_id),
-    FOREIGN KEY (sermon_id) REFERENCES sermon(id),
+    FOREIGN KEY (sermon_id) 
+        REFERENCES sermon(id) 
+        ON DELETE CASCADE
     FOREIGN KEY (related_sermon_id) REFERENCES sermon(id)
 );
 

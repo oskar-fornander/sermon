@@ -45,7 +45,7 @@ def user_input(title, description='', default='', choices=None, pattern=None, al
     if blank_line:
         console.print()
     while True:
-        answer = Prompt.ask(f"{title}{description}", choices=choices, default=default)
+        answer = Prompt.ask(prompt=f"{title}{description}", console=console, choices=choices, default=default)
         if not answer:
             if allow_empty:
                 answer = None  # or ''
@@ -66,14 +66,14 @@ def user_confirmation(q, default=True, blank_line=True):
     """Prompt user for confirmation before moving on."""
     if blank_line:
         console.print()
-    answer = Confirm.ask(q, default=default)
+    answer = Confirm.ask(prompt=q, console=console, default=default)
     return answer
 
 def user_choice(title='Ditt val', options = None, default = None):
     """Wait for user to make a choice (from a list of options)"""
     
     while True:
-        choice = Prompt.ask(title, default=default)
+        choice = Prompt.ask(prompt=title, console=console, default=default)
         if not choice:
             continue  # empty choice is not an option
             #return False  # empty choice

@@ -16,6 +16,7 @@ from app.commands.show import show
 from app.commands.search import search
 from app.commands.new import new
 #from app.commands.edit import edit
+from app.commands.delete import delete
 
 
 
@@ -35,6 +36,7 @@ app.command()(show)
 app.command()(search)
 app.command()(new)
 #app.command()(edit)
+app.command()(delete)
 
 
 

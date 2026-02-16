@@ -115,6 +115,8 @@ def list_service_dates():
 def get_last_sermon_code():
     """Get the code of the last sermon in the database."""
     sermons = list_sermon_codes()
+    if len(sermons) == 0:
+        return 'P000'  # special case for first sermon if empty database
     last_sermon = sermons[-1]
     return last_sermon['code']
 
@@ -301,9 +303,7 @@ def create_sermon_from_draft(draft: sermonDraft):
     """Skapa en ny predikan i databasen baserat på data i draft."""
     # Data is inserted into sermon and all other relevant tables
     # No sermon id exists before insertion in database
-
     conn = get_connection()
-
     try:
         # 1. Insert sermon
         sermon_id = insert_sermon_row(conn, draft)  # Insert new row in sermon table
@@ -680,7 +680,29 @@ def update_related_sermons(conn, sermon_id, related_sermon_codes: List[str]):
         )
 
 
-
+# --------------------
+# Delete from database
+# --------------------
+def delete_sermon_from_database(sermon_id: int):
+    """Radera en predikan ur databasen, och alla tillhörande filer"""
+    # Data is removed from the database with cascading
+    conn = get_connection()
+    conn.execute("PRAGMA foreign_keys = ON")
+    cur = conn.cursor()
+    try:
+        cur.execute(
+            """
+            DELETE FROM sermon
+            WHERE id = ?
+            """,
+            (sermon_id,)
+        )
+        conn.commit()
+    except Exception: 
+        conn.rollback()
+        raise
+    finally:
+        conn.close()
 
 
 
