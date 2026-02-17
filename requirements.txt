@@ -1,3 +1,4 @@
 
-typer>=0.21
-send2trash>=2.1
+typer>=0.9
+PyYAML>=6.0
+send2trash>=1.8
