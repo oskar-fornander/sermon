@@ -9,7 +9,7 @@ import time
 
 
 # ---------- Interactive edit ---------- #
-def interactive_edit_sermon(sermon_draft):
+def interactive_edit_sermon(sermon_draft, pending_file_deletions = None):
     """Interaktiv redigering av predikan"""
 
     EDIT_FIELDS = {
@@ -30,6 +30,7 @@ def interactive_edit_sermon(sermon_draft):
     menu = list(EDIT_FIELDS.keys())  # A list of all menu options based on keys in dict
     edited = []  # Keep track of the edited fields to show in format
     original_code = sermon_draft.code  # Save original value if it should be changed
+
 
     while True:  # Loop until user exits edit mode
         clear_screen()  # Clear terminal window
@@ -90,11 +91,13 @@ def interactive_edit_sermon(sermon_draft):
                     break;
         elif option == 'Omdöme':  # Special case: report. Limit options to valid reports
             new_value = user_edit_short_text(sermon_draft.code, 'Omdöme', current_value, choices=['A', 'B', 'C', '-'])
+        elif option in ['Manus', 'Inspelning', 'Resurs']:  # These editors can delete files
+            new_value = editor(sermon_draft.code, option, current_value, pending_file_deletions)  # Get new value with the desired editor function
         else:  # All other fields than sermon code
             new_value = editor(sermon_draft.code, option, current_value)  # Get new value with the desired editor function
 
         # Update value
-        if new_value:
+        if new_value is not None:  # Must test if equal to None since an empty list will evaluate to False/None if not tested explicitly. But removing the last resource will result in an empty list.
             if new_value == '-':  # Leave field empty (if allowed)
                 if field_name in ['context', 'bible_references', 'introduction', 'message', 'notes', 'report', 'related']:  # Only these fields may be empty
                     setattr(sermon_draft, field_name, None)  # Clear value in sermon draft

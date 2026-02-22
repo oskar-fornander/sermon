@@ -61,3 +61,30 @@ def delete_sermon(sermon_code: str):
             return
     console.print(f"Predikan [key]{sermon_code}[/key] har [italic]inte[/italic] raderats.")
 
+
+
+
+class PendingFileDeletions:
+    def __init__(self):
+        self._paths = []
+
+    def add(self, path: Path):
+        self._paths.append(path)
+
+    def execute(self):
+        files_deleted = []
+        files_not_deleted = []
+        from send2trash import send2trash
+        for path in self._paths:
+            if path.exists():
+                send2trash(str(path))
+                console.print(f"Fil raderad: {str(path)[str(path).rfind('/') + 1:]}")
+            else:
+                console.print(f"Fil existerar inte: {str(path)[str(path).rfind('/') + 1:]}")
+
+
+    def clear(self):
+        self._paths.clear()
+
+
+

@@ -9,7 +9,6 @@ from app.utils import PATH_MANUSCRIPTS, PATH_RECORDINGS, PATH_RESOURCES, get_fil
 from app.services.sermon_draft import deep_copy, new_service_draft, new_manuscript_draft, new_recording_draft, new_resource_draft
 
 
-
 def render_edit_menu(title, options, show_menu_options=False):
     """Show a menu for interactive editing"""
 
@@ -99,11 +98,12 @@ def user_edit_short_text(sermon_code, title, value, choices = None, pattern = No
     return new_value
 
 
-def user_edit_generic_complex(sermon_code, title, data, fields, path = None, new_instance = None):
+def user_edit_generic_complex(sermon_code, title, data, fields, path = None, new_instance = None, pending_file_deletions=None):
     """Let user edit services, manuscripts, recordings and resources - all in one generic function."""
 
     original_data = deep_copy(data)
     edited = []  # Save the edited posts as (row, field) to highlight them
+    files_to_delete = []  # Save files for deletion
 
 
     def row_index(i):
@@ -187,6 +187,12 @@ def user_edit_generic_complex(sermon_code, title, data, fields, path = None, new
 
     def delete_row():
         if Confirm.ask(f"Är du säker på att du vill radera {title.lower()} {row_index(row)}?", default = False):
+            if hasattr(data[row], 'file_name'):  # If there is a file to remove
+                file_name = data[row].file_name
+                if file_name:
+                    if Confirm.ask(f"Radera filen {file_name}?", default = True):
+                        file = path / file_name
+                        files_to_delete.append(file)  # Add file for deletion after edit
             #data.pop(row)  # Remove from data
             data[row] = None  # Remove data but keep a place holder - a better user experience
 
@@ -209,6 +215,8 @@ def user_edit_generic_complex(sermon_code, title, data, fields, path = None, new
             row = user_choice(title='Rad', options='A B C D E F G H '[:2 * len(data)].strip().split(' ') + ['s', 'q', '+'])
 
         if row == 's':
+            for file in files_to_delete:  # Save files for pending deletion only when saving
+                pending_file_deletions.add(file) 
             return [d for d in data if d is not None]  # Save  Return all data but the None placeholders for deleted posts
         elif row == 'q':
             return None  # Quit
@@ -225,6 +233,8 @@ def user_edit_generic_complex(sermon_code, title, data, fields, path = None, new
         item = user_choice(title='Kolumn', options=[str(x + 1) for x in range(len(fields))] + ['x', 's', 'q'])
 
         if item == 's':
+            for file in files_to_delete:  # Save files for pending deletion only when saving
+                pending_file_deletions.add(file) 
             return [d for d in data if d is not None]  # Save
         elif item == 'q':
             return None  # Quit
@@ -266,35 +276,35 @@ def user_edit_generic_complex(sermon_code, title, data, fields, path = None, new
 
 
 
-def user_edit_services(sermon_code, title, value):
+def user_edit_services(sermon_code, title, value, pending_file_deletions):
     """Let user edit services in interactive mode"""
     #date, place, notes
     fields = [('date', 'Datum'), ('place', 'Plats'), ('notes', 'Kommentar')]
     return user_edit_generic_complex(sermon_code, title, value, fields, new_instance=new_service_draft)
 
 
-def user_edit_manuscripts(sermon_code, title, value):
+def user_edit_manuscripts(sermon_code, title, value, pending_file_deletions):
     """Let user edit manuscripts in interactive mode"""
     #file_name, version, date, notes
     fields = [('file_name', 'Filnamn'), ('date', 'Datum'), ('notes', 'Kommentar')]
     path = PATH_MANUSCRIPTS
-    return user_edit_generic_complex(sermon_code, title, value, fields, path=path, new_instance=new_manuscript_draft)
+    return user_edit_generic_complex(sermon_code, title, value, fields, path=path, new_instance=new_manuscript_draft, pending_file_deletions=pending_file_deletions)
 
 
-def user_edit_recordings(sermon_code, title, value):
+def user_edit_recordings(sermon_code, title, value, pending_file_deletions):
     """Let user edit recordings in interactive mode"""
     #type, date, file_name, external_url, notes
     fields = [('type', 'Typ'), ('date', 'Datum'), ('file_name', 'Filnamn'), ('external_url', 'Extern url'), ('notes', 'Kommentar')]
     path = PATH_RECORDINGS
-    return user_edit_generic_complex(sermon_code, title, value, fields, path=path, new_instance=new_recording_draft)
+    return user_edit_generic_complex(sermon_code, title, value, fields, path=path, new_instance=new_recording_draft, pending_file_deletions=pending_file_deletions)
 
 
-def user_edit_resources(sermon_code, title, value):
+def user_edit_resources(sermon_code, title, value, pending_file_deletions):
     """Let user edit resources in interactive mode"""
     #file_name, title, notes
     fields = [('file_name', 'Filnamn'), ('title', 'Rubrik'), ('notes', 'Kommentar')]
     path = PATH_RESOURCES
-    return user_edit_generic_complex(sermon_code, title, value, fields, path=path, new_instance=new_resource_draft)
+    return user_edit_generic_complex(sermon_code, title, value, fields, path=path, new_instance=new_resource_draft, pending_file_deletions=pending_file_deletions)
 
 
 
