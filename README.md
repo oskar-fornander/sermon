@@ -10,6 +10,8 @@ Privat predikoregister för mina predikningar.
 - funktion för backup?
 - sökfunktion
 - podcast-funktion?
+- skapa databas ifall ingen finns vid start?
+- ...
 - 
 
 
