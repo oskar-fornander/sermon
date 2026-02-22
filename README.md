@@ -11,6 +11,7 @@ Privat predikoregister för mina predikningar.
 - sökfunktion
 - podcast-funktion?
 - skapa databas ifall ingen finns vid start?
+- radera filer i edit-mode
 - ...
 - 
 
