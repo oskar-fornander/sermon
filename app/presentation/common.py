@@ -40,25 +40,33 @@ def render_info_panel(title: str, content: str='', subtitle: str=''):
     print()
 
 
-def user_input(title, description='', default='', choices=None, pattern=None, allow_empty=True, blank_line=True):
+def user_input(title, description='', default='', choices=None, pattern=None, allow_empty=True, invalid_choices=[], blank_line=True):
     """Custom function to get user input from terminal via rich.prompt() with some safety functions"""
     if blank_line:
         console.print()
     while True:
         answer = Prompt.ask(prompt=f"{title}{description}", console=console, choices=choices, default=default)
-        if not answer:
+        if not answer:  # Check if empty
             if allow_empty:
                 answer = None  # or ''
                 break
             else:
                 console.print(f"[alert]Värdet av [white dim]{title}[/white dim] får inte vara tomt.[/alert]")
-        elif pattern:
+                continue
+
+        if invalid_choices:  # Check if invalid answer
+            if answer in invalid_choices:
+                console.print(f"[alert]Följande värden av [white dim]{title}[/white dim] är inte tillåtna: {', '.join(invalid_choices)}.[/alert]")
+                continue
+
+        if pattern:  # Check against pattern
             if pattern.match(answer):
                 break
             else:
                 console.print(f"[alert]Värdet av [white dim]{title}[/white dim] matchar inte formatet.[/alert]")
-        else:
-            break
+                continue
+
+        break
     #print(f"--{answer}--")
     return answer
 
