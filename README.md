@@ -11,7 +11,6 @@ Privat predikoregister för mina predikningar.
 - sökfunktion
 - podcast-funktion?
 - skapa databas ifall ingen finns vid start?
-- radera filer i edit-mode
 - Snygg och säker felhantering
 - ...
 - 
@@ -31,22 +30,37 @@ predikan/                   # överordnad mapp
 │   ├── app/                # Alla python-filer
 │   │   ├── cli.py          
 │   │   ├── db.py
-│   │   ├── models.py
-│   │   └── commands/       # Varje CLI-kommando har en egen fil
-│   │       ├── show.py
-│   │       ├── list.py
-│   │       ├── search.py
-│   │       ├── new.py
-│   │       ├── attach.py
-│   │       ├── edit.py
-│   │       └── export.py
+│   │   ├── utils.py
+│   │   ├── commands/       # Varje CLI-kommando har en egen fil
+│   │   │   ├── delete.py
+│   │   │   ├── edit.py
+│   │   │   ├── export.py
+│   │   │   ├── list.py
+│   │   │   ├── new.py
+│   │   │   ├── open.py
+│   │   │   ├── search.py
+│   │   │   └── show.py
+│   │   ├── presentation/
+│   │   │   ├── common.py
+│   │   │   ├── edit_sermon.py
+│   │   │   ├── new_sermon.py
+│   │   │   ├── sermon_card.py
+│   │   │   ├── sermon_list.py
+│   │   │   └── theme.py
+│   │   ├── services/
+│   │   │   ├── delete_sermon.py
+│   │   │   ├── edit_sermon.py
+│   │   │   ├── list_sermons.py
+│   │   │   ├── new_sermon.py
+│   │   │   └── sermon_draft.py
+│   │   └──tools/
+│   │       └── import_xml.py     # engångsskript för import från gammalt system
 │   │
-│   ├── tools/
-│   │   └── import_xml.py     # engångsskript för import från gammalt system
-│   │
+│   ├── .gitignore
 │   ├── schema.sql            # Schema för databasen
 │   ├── config.yaml           # Konfigurationsfil
 │   ├── requirements.txt      
+│   ├── pyproject.toml
 │   └── README.md
 │
 └── archive/                  # filer (molntjänst)
