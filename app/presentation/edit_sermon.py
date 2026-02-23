@@ -197,6 +197,25 @@ def user_edit_generic_complex(sermon_code, title, data, fields, path = None, new
             #data.pop(row)  # Remove from data
             data[row] = None  # Remove data but keep a place holder - a better user experience
 
+    def save():
+        # Save all changes and return to main edit view
+        # First, make sure all file names are unique: manuscript, recording and resource
+        file_names = [getattr(data[r], 'file_name', None) for r in range(rows)]
+        file_names = [f for f in file_names if f]  # Remove empty strings
+        external_urls = [getattr(data[r], 'external_url', None) for r in range(rows)]
+        external_urls = [f for f in external_urls if f]
+        if len(file_names) != len(set(file_names)):
+            user_confirmation(f"Kan inte spara: filnamn måste vara unika. Ändra och försök spara igen.")
+            return None  # Do not save and exit
+        if len(external_urls) != len(set(external_urls)):
+            user_confirmation(f"Kan inte spara: externa url:er måste vara unika. Ändra och försök spara igen.")
+            return None  # Do not save and exit
+
+        # Save:
+        for file in files_to_delete:  # Save files for pending deletion only when saving
+            pending_file_deletions.add(file) 
+        return [d for d in data if d is not None]  # Return all data but the None placeholders for deleted posts
+
 
 
     while True:  # Edit until escape edit mode
@@ -216,9 +235,10 @@ def user_edit_generic_complex(sermon_code, title, data, fields, path = None, new
             row = user_choice(title='Rad', options='A B C D E F G H '[:2 * len(data)].strip().split(' ') + ['s', 'q', '+'])
 
         if row == 's':  # Save
-            for file in files_to_delete:  # Save files for pending deletion only when saving
-                pending_file_deletions.add(file) 
-            return [d for d in data if d is not None]  # Return all data but the None placeholders for deleted posts
+            save_value = save()
+            if save_value is not None:
+                return save_value
+            continue
         elif row == 'q':  # Quit without saving
             return None  
         elif row == '+':  # Add new row
@@ -234,9 +254,10 @@ def user_edit_generic_complex(sermon_code, title, data, fields, path = None, new
         item = user_choice(title='Kolumn', options=[str(x + 1) for x in range(len(fields))] + ['x', 's', 'q'])
 
         if item == 's':
-            for file in files_to_delete:  # Save files for pending deletion only when saving
-                pending_file_deletions.add(file) 
-            return [d for d in data if d is not None]  # Save
+            save_value = save()
+            if save_value is not None:
+                return save_value
+            continue
         elif item == 'q':
             return None  # Quit
         elif item == 'x':
@@ -265,7 +286,6 @@ def user_edit_generic_complex(sermon_code, title, data, fields, path = None, new
         if field_name.lower() in ('filnamn', 'extern url'):  # Avoid invalid filenames like duplicates for manuscripts, recordings and resources, and external urls for recordings
             invalid_choices = [getattr(data[r], fields[item - 1][0], '') for r in range(rows) if r != row]
             invalid_choices = [choice for choice in invalid_choices if choice is not None]
-        
 
         console.print(f"[dim]{field_name}: {getattr(data[row], fields[item - 1][0]) or ''}[/dim]")
         new_value = user_input(f"{field_name}", pattern=pattern, choices=choices, default=None, allow_empty=True, invalid_choices=invalid_choices, blank_line=True)
