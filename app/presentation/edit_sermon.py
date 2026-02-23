@@ -131,7 +131,8 @@ def user_edit_generic_complex(sermon_code, title, data, fields, path = None, new
             index = row_index(i)  # Index for each row
             row[0] += index
             if item is None:  # Add empty place holder for delted row
-                row.extend([''] * len(fields))
+                row.append('[deleted][RADERAD][/deleted]')
+                row.extend([''] * (len(fields) - 1))
                 table.add_row(*row)
                 continue
             for field in fields:
@@ -168,7 +169,7 @@ def user_edit_generic_complex(sermon_code, title, data, fields, path = None, new
         subtitle = f"[bold][key]s[/key]: spara, [key]q[/key]: avbryt[/bold]"
         print()
         console.print(
-            Panel(f"Välj vad du vill redigera. Enter (tomt) behåller värdet, '-' rensar (om tillåtet). Lägg till {title.lower()} med [key]+[/key] och radera vald rad med [key]x[/key]. Du kan också lägga till/ta bort {title.lower()} med kommandot [code]sermon add/remove ...[/code] ",
+            Panel(f"Välj vad du vill redigera. Enter (tomt) behåller värdet, '-' rensar (om tillåtet). Lägg till {title.lower()} med [key]+[/key] och radera vald rad med [key]x[/key].",
                 title=f"[title]Redigera {title.lower()}[/title]",
                 title_align='left', 
                 subtitle=subtitle,
@@ -214,12 +215,12 @@ def user_edit_generic_complex(sermon_code, title, data, fields, path = None, new
             show_edit_screen(selected_row = None)
             row = user_choice(title='Rad', options='A B C D E F G H '[:2 * len(data)].strip().split(' ') + ['s', 'q', '+'])
 
-        if row == 's':
+        if row == 's':  # Save
             for file in files_to_delete:  # Save files for pending deletion only when saving
                 pending_file_deletions.add(file) 
-            return [d for d in data if d is not None]  # Save  Return all data but the None placeholders for deleted posts
-        elif row == 'q':
-            return None  # Quit
+            return [d for d in data if d is not None]  # Return all data but the None placeholders for deleted posts
+        elif row == 'q':  # Quit without saving
+            return None  
         elif row == '+':  # Add new row
             add_row()
             continue
@@ -260,12 +261,19 @@ def user_edit_generic_complex(sermon_code, title, data, fields, path = None, new
         elif field_name.lower() == 'typ':
             choices = ['audio', 'video']
 
+        invalid_choices = []  # None of these values are valid
+        if field_name.lower() in ('filnamn', 'extern url'):  # Avoid invalid filenames like duplicates for manuscripts, recordings and resources, and external urls for recordings
+            invalid_choices = [getattr(data[r], fields[item - 1][0], '') for r in range(rows) if r != row]
+            invalid_choices = [choice for choice in invalid_choices if choice is not None]
+        
+
         console.print(f"[dim]{field_name}: {getattr(data[row], fields[item - 1][0]) or ''}[/dim]")
-        new_value = user_input(f"{field_name}", pattern=pattern, choices=choices, default=None, allow_empty=True, blank_line=True)
+        new_value = user_input(f"{field_name}", pattern=pattern, choices=choices, default=None, allow_empty=True, invalid_choices=invalid_choices, blank_line=True)
+
 
         if new_value:  # No change if empty: keep value
             if new_value == '-':  # Clear field if allowed
-                if field_name.lower() in ['rubrik', 'kommentar']:  # Only these fields can be empty
+                if field_name.lower() in ['rubrik', 'kommentar', 'extern url'] or (field_name.lower() == 'filnamn' and title.lower() == 'inspelning'):  # Only these fields can be empty: title, comment and external url, and file name but only if for recording
                     setattr(data[row], fields[item - 1][0], '')
                 else:
                     console.print('Detta fält får inte vara tomt')
@@ -276,7 +284,7 @@ def user_edit_generic_complex(sermon_code, title, data, fields, path = None, new
 
 
 
-def user_edit_services(sermon_code, title, value, pending_file_deletions):
+def user_edit_services(sermon_code, title, value):
     """Let user edit services in interactive mode"""
     #date, place, notes
     fields = [('date', 'Datum'), ('place', 'Plats'), ('notes', 'Kommentar')]

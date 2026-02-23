@@ -25,20 +25,25 @@ def edit(sermon_code: str):
     original_sermon_draft = deep_copy(sermon_draft)  # original sermon draft without changes
     sermon_draft = interactive_edit_sermon(sermon_draft, pending_file_deletions)  # Launch interactive editor
     #console.print(sermon_draft)
-    if sermon_draft:  # Write to database even if no changes were made
+    if sermon_draft:  # Edit mode exited with saving: write to database even if no changes were made
+        # Update database:
         try:
             update_sermon_from_draft(sermon_draft)
             console.print(f"Predikan [key]{sermon_code}[/key] är uppdaterad.")
         except Exception as e:
-            console.print(f"Något gick fel vid uppdatering av predikan i databasen ... {e}")
+            console.print(f"Något gick fel vid uppdatering av predikan i databasen: {e}")
 
+        # Delete files pending for deletion:
         try:
-            pending_file_deletions.execute()  # Now is the time to delete files the user deleted
+            msg = pending_file_deletions.execute()  # Now is the time to delete files the user deleted
+            console.print(msg)
         except Exception as e:
-            console.print(f"Något gick fel vid radering av filer ... {e}")
+            console.print(f"Något gick fel vid radering av filer: {e}")
 
     else:  # None indicates exit edit mode without saving
         console.print(f"Inga ändringar sparade för predikan [key]{sermon_code}[/key].")
+        msg = pending_file_deletions.clear()
+        console.print(msg)
 
 
 

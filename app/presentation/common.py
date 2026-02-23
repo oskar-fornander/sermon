@@ -62,6 +62,8 @@ def user_input(title, description='', default='', choices=None, pattern=None, al
         if pattern:  # Check against pattern
             if pattern.match(answer):
                 break
+            elif answer == '-':
+                break
             else:
                 console.print(f"[alert]Värdet av [white dim]{title}[/white dim] matchar inte formatet.[/alert]")
                 continue

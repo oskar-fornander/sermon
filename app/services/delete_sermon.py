@@ -72,19 +72,20 @@ class PendingFileDeletions:
         self._paths.append(path)
 
     def execute(self):
-        files_deleted = []
-        files_not_deleted = []
+        msg = ''
         from send2trash import send2trash
         for path in self._paths:
             if path.exists():
                 send2trash(str(path))
-                console.print(f"Fil raderad: {str(path)[str(path).rfind('/') + 1:]}")
+                msg += f"Fil raderad: {str(path)[str(path).rfind('/') + 1:]}\n"
             else:
-                console.print(f"Fil existerar inte: {str(path)[str(path).rfind('/') + 1:]}")
-
+                msg += f"Fil saknas: {str(path)[str(path).rfind('/') + 1:]}\n"
+        return msg
 
     def clear(self):
+        msg = f"Inte raderad: {', '.join([str(f)[str(f).rfind('/') + 1:] for f in self._paths])}"
         self._paths.clear()
+        return msg
 
 
 
