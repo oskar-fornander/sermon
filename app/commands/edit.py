@@ -1,6 +1,7 @@
 import typer
 from app.services.edit_sermon import interactive_edit_sermon
-from app.db import load_sermon_as_draft, create_sermon_from_draft, update_sermon_from_draft, sermon_exists
+from app.services.sermon_draft import load_sermon_as_draft
+from app.db import update_sermon_from_draft, sermon_exists, create_sermon_from_draft
 from app.presentation.common import clear_screen
 from app.services.sermon_draft import deep_copy, equal_drafts
 from app.presentation.common import console

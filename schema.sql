@@ -1,6 +1,6 @@
 -- schema.sql for sermon.db
 
-CREATE TABLE sermon (
+CREATE TABLE IF NOT EXISTS sermon (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     code TEXT UNIQUE NOT NULL,
     title TEXT NOT NULL,
@@ -11,7 +11,7 @@ CREATE TABLE sermon (
     notes TEXT
 );
 
-CREATE TABLE service (
+CREATE TABLE IF NOT EXISTS service (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     sermon_id INTEGER NOT NULL,
     date TEXT NOT NULL,
@@ -22,7 +22,7 @@ CREATE TABLE service (
         ON DELETE CASCADE
 );
 
-CREATE TABLE manuscript (
+CREATE TABLE IF NOT EXISTS manuscript (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     sermon_id INTEGER NOT NULL,
     file_name TEXT NOT NULL,
@@ -34,7 +34,7 @@ CREATE TABLE manuscript (
     UNIQUE (sermon_id, file_name)
 );
 
-CREATE TABLE recording (
+CREATE TABLE IF NOT EXISTS recording (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     sermon_id INTEGER NOT NULL,
     type TEXT NOT NULL,
@@ -47,7 +47,7 @@ CREATE TABLE recording (
         ON DELETE CASCADE
 );
 
-CREATE TABLE resource (
+CREATE TABLE IF NOT EXISTS resource (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     sermon_id INTEGER NOT NULL,
     file_name TEXT NOT NULL,
@@ -58,7 +58,7 @@ CREATE TABLE resource (
         ON DELETE CASCADE
 );
 
-CREATE TABLE bible_reference (
+CREATE TABLE IF NOT EXISTS bible_reference (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     sermon_id INTEGER NOT NULL,
     reference_text TEXT NOT NULL,
@@ -67,7 +67,7 @@ CREATE TABLE bible_reference (
         ON DELETE CASCADE
 );
 
-CREATE TABLE sermon_relation (
+CREATE TABLE IF NOT EXISTS sermon_relation (
     sermon_id INTEGER NOT NULL,
     related_sermon_id INTEGER NOT NULL,
     PRIMARY KEY (sermon_id, related_sermon_id),

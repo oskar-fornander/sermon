@@ -1,16 +1,15 @@
+# config.yaml - configurations for sermon
 
-archive:
-  root: ../archive
+root: ~/Oskar/predikan/archive  # Absolute path to sermon archive. See README.md for file structure.
 
-database:
-  path: ../archive/data/
-  filename: sermons.db
-
-export:
-  html_index: index.html
+database: sermon.db  # SQLite database file
 
 paths:
+  database: data
+  backup: data/backup
   manuscripts: files/manuscripts
-  recordings:  files/recordings
+  recordings: files/recordings
   resources: files/resources
+  html: html
+
 

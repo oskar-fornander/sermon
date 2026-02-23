@@ -1,5 +1,6 @@
 
-from app.utils import PATH_MANUSCRIPTS, PATH_RECORDINGS, PATH_RESOURCES, get_file_link
+from app.config import PATH_MANUSCRIPTS, PATH_RECORDINGS, PATH_RESOURCES
+from app.utils import get_file_link
 from app.presentation.common import *
 
 

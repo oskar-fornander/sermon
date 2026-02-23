@@ -5,7 +5,8 @@ import shutil
 import tempfile
 import subprocess
 import time
-from app.utils import PATH_MANUSCRIPTS, PATH_RECORDINGS, PATH_RESOURCES, get_file_link, PATTERN
+from app.config import PATH_MANUSCRIPTS, PATH_RECORDINGS, PATH_RESOURCES
+from app.utils import get_file_link, PATTERN
 from app.services.sermon_draft import deep_copy, new_service_draft, new_manuscript_draft, new_recording_draft, new_resource_draft
 
 

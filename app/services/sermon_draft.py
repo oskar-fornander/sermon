@@ -3,6 +3,7 @@ from dataclasses import dataclass, field, asdict
 from typing import Optional, List
 import copy
 from app.utils import get_last_sunday
+from app.db import get_sermon_by_code, get_services_for_sermon, get_manuscripts_for_sermon, get_recordings_for_sermon, get_resources_for_sermon, get_bible_references_for_sermon, get_related_sermons_for_sermon
 
 
 @dataclass
@@ -146,6 +147,37 @@ def new_resource_draft(template = None, sermon_code='') -> ResourceDraft:
             id = None,
             file_name=f"{sermon_code}_resurs.pdf"
         )
+
+
+def load_sermon_as_draft(sermon_code: str) -> sermonDraft:
+    """Hämta data om en predikan och returnera som ett draft."""
+
+    # Get data from the database
+    sermon = get_sermon_by_code(sermon_code)
+    if not sermon:
+        return None
+    services = get_services_for_sermon(sermon_code)
+    manuscripts = get_manuscripts_for_sermon(sermon_code)
+    recordings = get_recordings_for_sermon(sermon_code)
+    resources = get_resources_for_sermon(sermon_code)
+    bible_references = get_bible_references_for_sermon(sermon_code)
+    related_sermons = get_related_sermons_for_sermon(sermon_code)
+
+    # Convert that data into a sermonDraft
+    sermon_draft = new_sermon_draft(sermon)  # Create a new sermonDraft with data from the given sermon
+    sermon_draft.services = [new_service_draft(s) for s in services]  # The same for all sub tables (some may be more than one element in a list)
+    sermon_draft.manuscripts = [new_manuscript_draft(m) for m in manuscripts]
+    sermon_draft.recordings = [new_recording_draft(r) for r in recordings]
+    sermon_draft.resources = [new_resource_draft(r) for r in resources]
+    #sermon_draft.bible = '; '.join([b['reference_text'] for b in bible_references])  # text
+    #sermon_draft.related = ', '.join([s['code'] for s in related_sermons])
+    sermon_draft.bible_references = [b['reference_text'] for b in bible_references]  # list
+    sermon_draft.related_sermons = [s['code'] for s in related_sermons]
+
+    return sermon_draft
+
+
+
 
 
 def deep_copy(draft: sermonDraft):

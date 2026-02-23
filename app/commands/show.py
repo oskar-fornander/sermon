@@ -1,9 +1,9 @@
 import typer
-from app.utils import CONFIG, ARCHIVE_ROOT
 from pathlib import Path
 from app.presentation.common import clear_screen
 from app.presentation.sermon_card import render_sermon_card
-from app.db import load_sermon_as_draft, sermon_exists
+from app.services.sermon_draft import load_sermon_as_draft
+from app.db import sermon_exists
 
 
 def show(sermon_code: str):

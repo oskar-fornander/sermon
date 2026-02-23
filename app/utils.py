@@ -1,12 +1,7 @@
 from pathlib import Path
-import yaml
 from datetime import date, timedelta
 import re
-from app.presentation.common import ICON
-
-CONFIG = None
-BASE_DIR, DB_PATH, ARCHIVE_ROOT = None, None, None  
-PATH_MANUSCRIPTS, PATH_RECORDINGS, PATH_RESOURCES = None, None, None
+from app.presentation.common import ICON, console
 
 
 PATTERN = {}  # Patterns to check validity of user inputs when creating and editing a sermon
@@ -18,26 +13,6 @@ PATTERN['recording'] = re.compile(r'^20\d{2}-(0[1-9]|1[0-2])-(0[1-9]|[12][0-9]|3
 PATTERN['file_name'] = re.compile(r'^.+\..{3}$')  # Generic file name
 PATTERN['url'] = re.compile(r'^https?\:\/\/')  # URL http(s)://...
 
-
-def load_config():
-    """Load config file"""
-    global CONFIG
-    config_path = BASE_DIR / 'config.yaml'
-    with open(config_path, 'r') as f:
-        CONFIG = yaml.safe_load(f)
-
-def define_paths():
-    """Define some file paths"""
-    global BASE_DIR, CONFIG, DB_PATH, ARCHIVE_ROOT, PATH_MANUSCRIPTS, PATH_RECORDINGS, PATH_RESOURCES 
-    BASE_DIR = Path(__file__).resolve().parent.parent
-    if not CONFIG:
-        load_config()
-
-    DB_PATH = Path(CONFIG['database']['path'] + CONFIG['database']['filename'])
-    ARCHIVE_ROOT = (BASE_DIR / CONFIG['archive']['root']).resolve()
-    PATH_MANUSCRIPTS = (ARCHIVE_ROOT / CONFIG['paths']['manuscripts']).resolve()
-    PATH_RECORDINGS = (ARCHIVE_ROOT / CONFIG['paths']['recordings']).resolve()
-    PATH_RESOURCES = (ARCHIVE_ROOT / CONFIG['paths']['resources']).resolve()
 
 
 def get_last_sunday():
@@ -66,4 +41,17 @@ def get_file_link(path, file_name, title = None, show_missing_file = True, show_
             else:
                 return f"[link=file://{file_path}]{marker}[/link]"  # ✘
     return f"[link=file://{file_path}]{title}[/link]"
+
+
+def backup_database():
+    """Save a copy of the database file under new name."""
+
+    today = date.today()
+    # PATH_DATABASE, DB_FILE, PATH_BACKUP
+    # copy file to new name ...
+
+    return False
+    return True
+
+
 

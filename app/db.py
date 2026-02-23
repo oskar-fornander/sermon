@@ -4,22 +4,18 @@ import sqlite3
 from typing import List
 from pathlib import Path
 import yaml
-from app.services.sermon_draft import new_sermon_draft, new_service_draft, new_manuscript_draft, new_recording_draft, new_resource_draft
 from app.presentation.common import console
-
-from app.utils import DB_PATH
-
-# --------------------
-# Configuration
-# --------------------
-
+from app.config import DB_FILE
 
 # --------------------
-# Connection
+# Configuration and Connection
 # --------------------
+
+# functions ensure_database() and create_schema() are in app/config.py
+
 
 def get_connection():
-    conn = sqlite3.connect(DB_PATH)
+    conn = sqlite3.connect(DB_FILE)
     conn.row_factory = sqlite3.Row #Access via column names instead of indices
     conn.execute('PRAGMA foreign_keys = ON')
     return conn
@@ -268,33 +264,7 @@ def get_related_sermons_for_sermon(code: str):
 # Load from database with sermonDraft
 # --------------------
 
-def load_sermon_as_draft(sermon_code: str) -> sermonDraft:
-    """Hämta data om en predikan och returnera som ett draft."""
-
-    # Get data from the database
-    sermon = get_sermon_by_code(sermon_code)
-    if not sermon:
-        return None
-    services = get_services_for_sermon(sermon_code)
-    manuscripts = get_manuscripts_for_sermon(sermon_code)
-    recordings = get_recordings_for_sermon(sermon_code)
-    resources = get_resources_for_sermon(sermon_code)
-    bible_references = get_bible_references_for_sermon(sermon_code)
-    related_sermons = get_related_sermons_for_sermon(sermon_code)
-
-    # Convert that data into a sermonDraft
-    sermon_draft = new_sermon_draft(sermon)  # Create a new sermonDraft with data from the given sermon
-    sermon_draft.services = [new_service_draft(s) for s in services]  # The same for all sub tables (some may be more than one element in a list)
-    sermon_draft.manuscripts = [new_manuscript_draft(m) for m in manuscripts]
-    sermon_draft.recordings = [new_recording_draft(r) for r in recordings]
-    sermon_draft.resources = [new_resource_draft(r) for r in resources]
-    #sermon_draft.bible = '; '.join([b['reference_text'] for b in bible_references])  # text
-    #sermon_draft.related = ', '.join([s['code'] for s in related_sermons])
-    sermon_draft.bible_references = [b['reference_text'] for b in bible_references]  # list
-    sermon_draft.related_sermons = [s['code'] for s in related_sermons]
-
-    return sermon_draft
-
+# load_sermon_as_draft() is in services/sermon_draft.py
 
 # --------------------
 # Write to database from sermonDraft

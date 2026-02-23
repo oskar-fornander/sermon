@@ -1,5 +1,6 @@
 
-from app.utils import PATH_MANUSCRIPTS, PATH_RECORDINGS, PATH_RESOURCES, get_last_sunday, PATTERN
+from app.config import PATH_MANUSCRIPTS, PATH_RECORDINGS, PATH_RESOURCES
+from app.utils import get_last_sunday, PATTERN
 from app.db import get_last_sermon_code, get_all_sermon_codes
 from app.presentation.common import console, clear_screen, render_info_panel, user_input, user_confirmation, user_choice
 from app.presentation.sermon_card import render_sermon_card

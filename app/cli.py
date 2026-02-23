@@ -1,9 +1,9 @@
 
-from app.utils import CONFIG, BASE_DIR, DB_PATH, ARCHIVE_ROOT, load_config, define_paths
-define_paths()
-load_config()
+from app.config import CONFIG, DB_FILE
+from app.config import init_environment
 import typer
 
+init_environment()
 
 from app.commands import list as list_commands
 from app.commands import export as export_commands
@@ -14,9 +14,7 @@ from app.commands.show import show
 from app.commands.search import search
 from app.commands.new import new
 from app.commands.delete import delete
-
-
-
+from app.commands.backup import backup
 
 app = typer.Typer(help = 'Predikoarkiv')
 
@@ -31,22 +29,7 @@ app.command()(search)
 app.command()(new)
 app.command()(edit)
 app.command()(delete)
-
-
-
-# CLI commands:
-# 
-# sermon list
-# sermon show
-# sermon open manuscript|recording|resource
-# sermon search
-# sermon new
-# sermon edit
-# sermon add service|manuscript|recording|resource|bible-reference
-# sermon remove service|manuscript|recording|resource|bible-reference
-# sermon export html|podcast
-# 
-
+app.command()(backup)
 
 
 

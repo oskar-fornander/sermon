@@ -1,5 +1,6 @@
 
-from app.db import list_sermon_codes, list_service_dates, load_sermon_as_draft, get_sermon_code_by_service_date
+from app.db import list_sermon_codes, list_service_dates, get_sermon_code_by_service_date
+from app.services.sermon_draft import load_sermon_as_draft
 from app.presentation.sermon_list import render_sermon_list
 
 

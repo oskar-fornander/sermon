@@ -29,6 +29,7 @@ predikan/                   # överordnad mapp
 ├── sermon/                 # CLI-projekt (GitHub)
 │   ├── app/                # Alla python-filer
 │   │   ├── cli.py          
+│   │   ├── config.py
 │   │   ├── db.py
 │   │   ├── utils.py
 │   │   ├── commands/       # Varje CLI-kommando har en egen fil

@@ -1,7 +1,8 @@
 
-from app.utils import PATH_MANUSCRIPTS, PATH_RECORDINGS, PATH_RESOURCES, get_last_sunday, PATTERN
+from app.config import PATH_MANUSCRIPTS, PATH_RECORDINGS, PATH_RESOURCES
+from app.utils import get_last_sunday, PATTERN
 from app.services.sermon_draft import new_sermon_draft, new_service_draft, new_manuscript_draft, new_recording_draft, new_resource_draft
-from app.db import get_last_sermon_code, get_all_sermon_codes, get_last_place, load_sermon_as_draft, create_sermon_from_draft, update_sermon_from_draft
+from app.db import get_last_sermon_code, get_all_sermon_codes, get_last_place, create_sermon_from_draft, update_sermon_from_draft
 from app.presentation.common import console, render_info_panel, user_input, user_confirmation
 from app.presentation.new_sermon import  show_sermon_draft
 from app.services.edit_sermon import interactive_edit_sermon

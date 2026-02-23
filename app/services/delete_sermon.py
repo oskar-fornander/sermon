@@ -3,8 +3,9 @@ from pathlib import Path
 from dataclasses import asdict
 from send2trash import send2trash
 from datetime import datetime
-from app.utils import PATH_MANUSCRIPTS, PATH_RECORDINGS, PATH_RESOURCES
-from app.db import delete_sermon_from_database, load_sermon_as_draft
+from app.config import PATH_MANUSCRIPTS, PATH_RECORDINGS, PATH_RESOURCES
+from app.db import delete_sermon_from_database
+from app.services.sermon_draft import load_sermon_as_draft
 from app.presentation.common import console, clear_screen, render_info_panel, user_input, user_confirmation, user_choice
 
 
