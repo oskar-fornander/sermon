@@ -70,19 +70,19 @@ CREATE TABLE IF NOT EXISTS bible_reference (
 CREATE TABLE IF NOT EXISTS sermon_relation (
     sermon_id INTEGER NOT NULL,
     related_sermon_id INTEGER NOT NULL,
-    PRIMARY KEY (sermon_id, related_sermon_id),
-    FOREIGN KEY (sermon_id) 
-        REFERENCES sermon(id) 
-        ON DELETE CASCADE
-    FOREIGN KEY (related_sermon_id) REFERENCES sermon(id)
+    FOREIGN KEY (sermon_id) REFERENCES sermon(id) ON DELETE CASCADE,
+    FOREIGN KEY (related_sermon_id) REFERENCES sermon(id) ON DELETE CASCADE,
+    CHECK (sermon_id < related_sermon_id),
+    CHECK (sermon_id != related_sermon_id),
+    UNIQUE (sermon_id, related_sermon_id)
 );
 
-CREATE INDEX idx_service_sermon ON service(sermon_id);
-CREATE INDEX idx_manuscript_sermon ON manuscript(sermon_id);
-CREATE INDEX idx_recording_sermon ON recording(sermon_id);
-CREATE INDEX idx_resource_sermon ON resource(sermon_id);
-CREATE INDEX idx_bible_sermon ON bible_reference(sermon_id);
+CREATE INDEX IF NOT EXISTS idx_service_sermon ON service(sermon_id);
+CREATE INDEX IF NOT EXISTS idx_manuscript_sermon ON manuscript(sermon_id);
+CREATE INDEX IF NOT EXISTS idx_recording_sermon ON recording(sermon_id);
+CREATE INDEX IF NOT EXISTS idx_resource_sermon ON resource(sermon_id);
+CREATE INDEX IF NOT EXISTS idx_bible_sermon ON bible_reference(sermon_id);
 
-CREATE INDEX idx_relation_sermon ON sermon_relation(sermon_id);
-CREATE INDEX idx_relation_related ON sermon_relation(related_sermon_id);
+CREATE INDEX IF NOT EXISTS idx_relation_sermon ON sermon_relation(sermon_id);
+CREATE INDEX IF NOT EXISTS idx_relation_related ON sermon_relation(related_sermon_id);
 

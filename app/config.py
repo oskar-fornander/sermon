@@ -94,16 +94,14 @@ def define_paths():
 
 def ensure_database():
     """Create database file if non-existing"""
-    db_exists = DB_FILE.exists()
     conn = sqlite3.connect(DB_FILE)
     conn.execute("PRAGMA foreign_keys = ON")
-    if not db_exists:
-        create_schema(conn)
+    create_schema(conn)
     conn.close()
 
 
 def create_schema(conn):
-    schema_path = Path(__file__).parent / 'schema.sql'
+    schema_path = Path(__file__).parent.parent / 'schema.sql'
     with open(schema_path, 'r', encoding='utf-8') as f:
         schema_sql = f.read()
     conn.executescript(schema_sql)

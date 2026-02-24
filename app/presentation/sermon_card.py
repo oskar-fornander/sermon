@@ -38,8 +38,8 @@ def render_sermon_card(sermon_draft, preview=False, menu=[], edited_fields=[]):
     #if report:
     elements.append(f"[title]{get_menu_index('Omdöme')}{edited.get('report', '')}Omdöme:{edited_.get('report', '')}[/title] {report or '–'}")
     related_sermons = sermon_draft.related_sermons
-    #if related_sermons:
-    related_sermons = ', '.join(related_sermons)  # show list as a string
+    if related_sermons:
+        related_sermons = ', '.join(related_sermons)  # show list as a string
     elements.append(f"[title]{get_menu_index('Relaterad predikan')}{edited.get('related', '')}Relaterad predikan:{edited_.get('related', '')}[/title] {related_sermons or '–'}")
 
     # Add services

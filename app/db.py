@@ -244,16 +244,26 @@ def get_bible_references_for_sermon(code: str):
 
 def get_related_sermons_for_sermon(code: str):
     """Get all related sermons connected to this sermon"""
+    id = get_sermon_id(code)
     conn = get_connection()
     cur = conn.cursor()
     cur.execute(
         """
-        SELECT s2.code, s2.title FROM sermon_relation r
-        JOIN sermon s1 ON s1.id = r.sermon_id
-        JOIN sermon s2 ON s2.id = r.related_sermon_id
-        WHERE s1.code = ?
+        SELECT s.code, s.title
+        FROM sermon_relation r
+        JOIN sermon s
+        ON s.id = r.related_sermon_id
+        WHERE r.sermon_id = ?
+
+        UNION
+
+        SELECT s.code, s.title
+        FROM sermon_relation r
+        JOIN sermon s
+        ON s.id = r.sermon_id
+        WHERE r.related_sermon_id = ?
         """,
-        (code,)
+        (id, id)
     )
     row = cur.fetchall()
     conn.close()
@@ -630,13 +640,14 @@ def update_related_sermons(conn, sermon_id, related_sermon_codes: List[str]):
     cur.execute(
         """
         DELETE FROM sermon_relation
-        WHERE sermon_id = ?
+        WHERE sermon_id = ? OR related_sermon_id = ?
         """,
-        (sermon_id,)
+        (sermon_id, sermon_id)
     )
-    # Add all bible references as new posts
+    # Add all related sermons as new posts
     for related_sermon_code in related_sermon_codes:
         related_sermon_id = get_sermon_id(related_sermon_code)
+        id1, id2 = sorted([sermon_id, related_sermon_id])
         cur.execute(
             """
             INSERT INTO sermon_relation
@@ -644,8 +655,8 @@ def update_related_sermons(conn, sermon_id, related_sermon_codes: List[str]):
             VALUES(?, ?)
             """,
             (
-                sermon_id, 
-                related_sermon_id
+                id1, 
+                id2
             )
         )
 
