@@ -12,7 +12,7 @@ CONFIG_FILE = CONFIG_DIR / "config.yaml"
 
 CONFIG = None
 ARCHIVE_ROOT, PATH_DATABASE, DB_FILE  = None, None, None
-PATH_MANUSCRIPTS, PATH_RECORDINGS, PATH_RESOURCES = None, None, None
+PATH_BACKUP, PATH_MANUSCRIPTS, PATH_RECORDINGS, PATH_RESOURCES, PATH_HTML = None, None, None, None, None
 
 DEFAULT_CONFIG = {
     "root": str(Path.home() / "predikan" / "archive"),
@@ -63,7 +63,7 @@ def load_config():
 
 def define_paths():
     """Define some file paths"""
-    global DB_FILE, BASE_DIR, PATH_DATABASE, ARCHIVE_ROOT, PATH_MANUSCRIPTS, PATH_RECORDINGS, PATH_RESOURCES, PATH_HTML
+    global DB_FILE, BASE_DIR, PATH_DATABASE, PATH_BACKUP, ARCHIVE_ROOT, PATH_MANUSCRIPTS, PATH_RECORDINGS, PATH_RESOURCES, PATH_HTML
     if not CONFIG:
         load_config()
 

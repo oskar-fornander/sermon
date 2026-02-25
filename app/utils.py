@@ -1,5 +1,8 @@
 from pathlib import Path
-from datetime import date, timedelta
+#import shutil
+import sqlite3
+from app.config import DB_FILE, PATH_BACKUP
+from datetime import datetime, date, timedelta
 import re
 from app.presentation.common import ICON, console
 
@@ -46,12 +49,18 @@ def get_file_link(path, file_name, title = None, show_missing_file = True, show_
 def backup_database():
     """Save a copy of the database file under new name."""
 
-    today = date.today()
-    # PATH_DATABASE, DB_FILE, PATH_BACKUP
-    # copy file to new name ...
+    backup_dir = PATH_BACKUP
+    backup_dir.mkdir(exist_ok=True)
 
-    return False
-    return True
+    timestamp = datetime.now().strftime("%Y-%m-%d")
+    backup_file = backup_dir / f"sermon_{timestamp}.db"
 
+    #shutil.copy2(DB_FILE, backup_file)
+
+    with sqlite3.connect(DB_FILE) as source:
+        with sqlite3.connect(backup_file) as target:
+            source.backup(target)
+
+    return backup_file
 
 

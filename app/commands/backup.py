@@ -9,10 +9,8 @@ from app.utils import backup_database
 def backup():
     """Gör en backup av aktuell databas"""
 
-    if backup_database():
-        console.print(f"Databasen är säkerhetskopierad.")
-    else:
-        console.print(f"Ett fel uppstod vid säkerhetskopiering av databasen.")
+    backup_file = backup_database()
+    console.print(f"Databasen är säkerhetskopierad: {backup_file}")
 
 
 
