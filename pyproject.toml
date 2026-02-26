@@ -14,4 +14,4 @@ dependencies = [
 ]
 
 [project.scripts]
-sermon = "app.cli:app"
+sermon = "app.cli:run"

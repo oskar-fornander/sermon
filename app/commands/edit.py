@@ -1,4 +1,5 @@
 import typer
+from app.errors import *
 from app.services.edit_sermon import interactive_edit_sermon
 from app.services.sermon_draft import load_sermon_as_draft
 from app.db import update_sermon_from_draft, sermon_exists, create_sermon_from_draft
@@ -15,8 +16,7 @@ def edit(sermon_code: str):
     """Interaktiv redigering av en predikan"""
 
     if not sermon_exists(sermon_code):
-        print(f"Predikan med kod {sermon_code} finns inte.")
-        return
+        raise NotFoundError(f"Predikan {sermon_code} finns inte")
 
     clear_screen()
     print(f"interactive edit: {sermon_code}")

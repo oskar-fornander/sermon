@@ -1,6 +1,10 @@
+#app/cli.py
 
+import sys
+from app.errors import SermonError
 from app.config import CONFIG, DB_FILE
 from app.config import init_environment
+from app.presentation.common import render_info_panel
 import typer
 
 init_environment()
@@ -32,12 +36,18 @@ app.command()(delete)
 app.command()(backup)
 
 
-
-
-
+def run():
+    try:
+        app()
+    except SermonError as e:
+        render_info_panel(title='[red]Fel[/red]', content=f"{e}")
+        sys.exit(1)
+    except Exception as e:
+        render_info_panel(title='[red]Fel[/red]', content=f"Ett oväntat fel inträffade: {e}")
+        sys.exit(1)
 
 
 
 if __name__ == '__main__':
-    app()
+    run()
 

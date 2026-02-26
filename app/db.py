@@ -1,6 +1,7 @@
 # app/db.py
 
 import sqlite3
+from app.errors import DatabaseError, NotFoundError
 from typing import List
 from pathlib import Path
 import yaml
@@ -29,33 +30,44 @@ def get_sermon_by_code(code: str):
     """Get a sermon by its code (e.g. 'P371')"""
     conn = get_connection()
     cur = conn.cursor()
-    cur.execute(
-        "SELECT * FROM sermon WHERE code = ?",
-        (code,)
-    )
-    row = cur.fetchone()
-    conn.close()
-    return row
+    try:
+        cur.execute(
+            "SELECT * FROM sermon WHERE code = ?",
+            (code,)
+        )
+        row = cur.fetchone()
+
+        if row is None:
+            raise NotFoundError(f"Predikan {code} finns inte.")
+        
+        conn.close()
+        return row
+
+    except sqlite3.Error as e:
+        raise DatabaseError(f"Databasfel: {e}")
 
 
 def get_sermon_by_id(id: int):
     """Get a sermon by its internal database id"""
     conn = get_connection()
     cur = conn.cursor()
-    cur.execute(
-        "SELECT * FROM sermon WHERE id = ?",
-        (id,)
-    )
-    row = cur.fetchone()
-    conn.close()
-    return row
+    try:
+        cur.execute(
+            "SELECT * FROM sermon WHERE id = ?",
+            (id,)
+        )
+        row = cur.fetchone()
+        conn.close()
+        return row
+    except sqlite3.Error as e:
+        raise DatabaseError(f"Databasfel: {e}")
 
 
 def get_sermon_id(code: str) -> int:
     """Get the sermon id (internal for database) based on its code (e.g. 'P371')"""
     row = get_sermon_by_code(code)
     if row is None:
-        raise ValueError(f'Predikan med kod {code} finns inte')
+        raise NotFoundError(f"Predikan med kod {code} finns inte")
     return row['id']
 
 
@@ -63,49 +75,74 @@ def get_sermon_code(id: int) -> str:
     """Get the sermon code (P001) based on its internal database id"""
     row = get_sermon_by_id(id)
     if row is None:
-        raise ValueError(f'Predikan med id {id} finns inte')
+        raise NotFoundError(f"Predikan med internt databas-id {id} finns inte")
     return row['code']
 
 
 def sermon_exists(code: str) -> True|False:
     """Test if a certain sermon code exist in database or not"""
-    if not get_sermon_by_code(code):
-        return False
-    return True
+    #if not get_sermon_by_code(code):
+        #return False
+    #return True
+    conn = get_connection()
+    cur = conn.cursor()
+    try:
+        cur.execute(
+            "SELECT * FROM sermon WHERE code = ?",
+            (code,)
+        )
+        row = cur.fetchone()
+        conn.close()
+
+        if row is None:
+            return False
+        
+        return True
+
+    except sqlite3.Error as e:
+        raise DatabaseError(f"Databasfel: {e}")
+
 
 
 def list_sermon_codes():
     """List sermon codes by code"""
     conn = get_connection()
     cur = conn.cursor()
-    cur.execute(
-        """
-        SELECT 
-            sermon.code 
-        FROM sermon
-        ORDER BY sermon.code
-        """
-    )
-    row = cur.fetchall()
-    conn.close()
-    return row
+    try:
+        cur.execute(
+            """
+            SELECT 
+                sermon.code 
+            FROM sermon
+            ORDER BY sermon.code
+            """
+        )
+        row = cur.fetchall()
+        conn.close()
+        return row
+    except sqlite3.Error as e:
+        raise DatabaseError(f"Databasfel: {e}")
+
 
 def list_service_dates():
     """List sermons by service date"""
     conn = get_connection()
     cur = conn.cursor()
-    cur.execute(
-        """
-        SELECT 
-            service.date 
-        FROM service
-        JOIN sermon ON sermon.id = service.sermon_id
-        ORDER BY service.date
-        """
-    )
-    row = cur.fetchall()
-    conn.close()
-    return row
+    try:
+        cur.execute(
+            """
+            SELECT 
+                service.date 
+            FROM service
+            JOIN sermon ON sermon.id = service.sermon_id
+            ORDER BY service.date
+            """
+        )
+        row = cur.fetchall()
+        conn.close()
+        return row
+    except sqlite3.Error as e:
+        raise DatabaseError(f"Databasfel: {e}")
 
 
 def get_last_sermon_code():
@@ -126,148 +163,174 @@ def get_sermon_code_by_service_date(date: str):
     """Get code for a sermon based on the given service date"""
     conn = get_connection()
     cur = conn.cursor()
-    cur.execute(
-        """
-        SELECT sermon.code
-        FROM service
-        JOIN sermon ON service.sermon_id = sermon.id
-        WHERE service.date = ?
-        """,
-        (date,)
-    )
-    row = cur.fetchone()
-    conn.close()
-    return row
+    try:
+        cur.execute(
+            """
+            SELECT sermon.code
+            FROM service
+            JOIN sermon ON service.sermon_id = sermon.id
+            WHERE service.date = ?
+            """,
+            (date,)
+        )
+        row = cur.fetchone()
+        conn.close()
+        if row is None:
+            raise NotFoundError(f"Sermon for date {date} not found.")
+        return row
+    except sqlite3.Error as e:
+        raise DatabaseError(f"Databasfel: {e}")
 
 def get_last_place():
     """Get the place for the last service"""
     conn = get_connection()
     cur = conn.cursor()
-    cur.execute(
-        """
-        SELECT place
-        FROM service
-        ORDER BY date
-        """
-    )
-    row = cur.fetchone()
-    conn.close()
-    return row
-
+    try:
+        cur.execute(
+            """
+            SELECT place
+            FROM service
+            ORDER BY date
+            """
+        )
+        row = cur.fetchone()
+        conn.close()
+        if row is None:
+            raise NotFoundError(f"No service found")
+        return row
+    except sqlite3.Error as e:
+        raise DatabaseError(f"Databasfel: {e}")
 
 def get_services_for_sermon(code: str):
     """Get all services connected to this sermon"""
     conn = get_connection()
     cur = conn.cursor()
-    cur.execute(
-        """
-        SELECT service.* FROM service
-        JOIN sermon ON service.sermon_id = sermon.id
-        WHERE sermon.code = ?
-        ORDER BY service.date
-        """,
-        (code,)
-    )
-    row = cur.fetchall()
-    conn.close()
-    return row
-
+    try:
+        cur.execute(
+            """
+            SELECT service.* FROM service
+            JOIN sermon ON service.sermon_id = sermon.id
+            WHERE sermon.code = ?
+            ORDER BY service.date
+            """,
+            (code,)
+        )
+        row = cur.fetchall()
+        conn.close()
+        return row
+    except sqlite3.Error as e:
+        raise DatabaseError(f"Databasfel: {e}")
 
 def get_manuscripts_for_sermon(code: str):
     """Get all manuscripts connected to this sermon, ordered by version"""
     conn = get_connection()
     cur = conn.cursor()
-    cur.execute(
-        """
-        SELECT manuscript.* FROM manuscript 
-        JOIN sermon ON manuscript.sermon_id = sermon.id 
-        WHERE sermon.code = ?
-        ORDER BY manuscript.date, manuscript.file_name
-        """,
-        (code,)
-    )
-    row = cur.fetchall()
-    conn.close()
-    return row
+    try:
+        cur.execute(
+            """
+            SELECT manuscript.* FROM manuscript 
+            JOIN sermon ON manuscript.sermon_id = sermon.id 
+            WHERE sermon.code = ?
+            ORDER BY manuscript.date, manuscript.file_name
+            """,
+            (code,)
+        )
+        row = cur.fetchall()
+        conn.close()
+        return row
+    except sqlite3.Error as e:
+        raise DatabaseError(f"Databasfel: {e}")
 
 def get_recordings_for_sermon(code: str):
     """Get all recordings connected to this sermon"""
     conn = get_connection()
     cur = conn.cursor()
-    cur.execute(
-        """
-        SELECT recording.* FROM recording 
-        JOIN sermon ON recording.sermon_id = sermon.id 
-        WHERE sermon.code = ?
-        ORDER BY recording.date, recording.type
-        """,
-        (code,)
-    )
-    row = cur.fetchall()
-    conn.close()
-    return row
+    try:
+        cur.execute(
+            """
+            SELECT recording.* FROM recording 
+            JOIN sermon ON recording.sermon_id = sermon.id 
+            WHERE sermon.code = ?
+            ORDER BY recording.date, recording.type
+            """,
+            (code,)
+        )
+        row = cur.fetchall()
+        conn.close()
+        return row
+    except sqlite3.Error as e:
+        raise DatabaseError(f"Databasfel: {e}")
 
 def get_resources_for_sermon(code: str):
     """Get all resources connected to this sermon"""
     conn = get_connection()
     cur = conn.cursor()
-    cur.execute(
-        """
-        SELECT resource.* FROM resource 
-        JOIN sermon ON resource.sermon_id = sermon.id 
-        WHERE sermon.code = ?
-        ORDER BY resource.title, resource.file_name
-        """,
-        (code,)
-    )
-    row = cur.fetchall()
-    conn.close()
-    return row
+    try:
+        cur.execute(
+            """
+            SELECT resource.* FROM resource 
+            JOIN sermon ON resource.sermon_id = sermon.id 
+            WHERE sermon.code = ?
+            ORDER BY resource.title, resource.file_name
+            """,
+            (code,)
+        )
+        row = cur.fetchall()
+        conn.close()
+        return row
+    except sqlite3.Error as e:
+        raise DatabaseError(f"Databasfel: {e}")
 
 
 def get_bible_references_for_sermon(code: str):
     """Get all bible references connected to this sermon"""
     conn = get_connection()
     cur = conn.cursor()
-    cur.execute(
-        """
-        SELECT bible_reference.* FROM bible_reference 
-        JOIN sermon ON bible_reference.sermon_id = sermon.id 
-        WHERE sermon.code = ?
-        ORDER BY bible_reference.reference_text
-        """,
-        (code,)
-    )
-    row = cur.fetchall()
-    conn.close()
-    return row
+    try:
+        cur.execute(
+            """
+            SELECT bible_reference.* FROM bible_reference 
+            JOIN sermon ON bible_reference.sermon_id = sermon.id 
+            WHERE sermon.code = ?
+            ORDER BY bible_reference.reference_text
+            """,
+            (code,)
+        )
+        row = cur.fetchall()
+        conn.close()
+        return row
+    except sqlite3.Error as e:
+        raise DatabaseError(f"Databasfel: {e}")
 
 def get_related_sermons_for_sermon(code: str):
     """Get all related sermons connected to this sermon"""
     id = get_sermon_id(code)
     conn = get_connection()
     cur = conn.cursor()
-    cur.execute(
-        """
-        SELECT s.code, s.title
-        FROM sermon_relation r
-        JOIN sermon s
-        ON s.id = r.related_sermon_id
-        WHERE r.sermon_id = ?
+    try:
+        cur.execute(
+            """
+            SELECT s.code, s.title
+            FROM sermon_relation r
+            JOIN sermon s
+            ON s.id = r.related_sermon_id
+            WHERE r.sermon_id = ?
 
-        UNION
+            UNION
 
-        SELECT s.code, s.title
-        FROM sermon_relation r
-        JOIN sermon s
-        ON s.id = r.sermon_id
-        WHERE r.related_sermon_id = ?
-        """,
-        (id, id)
-    )
-    row = cur.fetchall()
-    conn.close()
-    return row
+            SELECT s.code, s.title
+            FROM sermon_relation r
+            JOIN sermon s
+            ON s.id = r.sermon_id
+            WHERE r.related_sermon_id = ?
+            """,
+            (id, id)
+        )
+        row = cur.fetchall()
+        conn.close()
+        return row
+    except sqlite3.Error as e:
+        raise DatabaseError(f"Databasfel: {e}")
 
 
 # --------------------
