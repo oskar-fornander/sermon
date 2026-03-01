@@ -150,7 +150,7 @@ def new_resource_draft(template = None, sermon_code='') -> ResourceDraft:
 
 
 def load_sermon_as_draft(sermon_code: str) -> sermonDraft:
-    """Hämta data om en predikan och returnera som ett draft."""
+    """Fetch a sermon and return as a draft."""
 
     # Get data from the database
     sermon = get_sermon_by_code(sermon_code)

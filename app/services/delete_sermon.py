@@ -15,11 +15,12 @@ from app.presentation.common import console, clear_screen, render_info_panel, us
 def delete_sermon(sermon_code: str):
     """Delete sermon"""
 
+    draft = load_sermon_as_draft(sermon_code)  # Load draft before user confirmations - this will throw an error if the sermon does not exist
+    sermon_id = draft.id  # internal database id for this sermon
+
     # Double user confirmations before deleting
     if user_confirmation(f"Predikan [key]{sermon_code}[/key] och alla tillhörande filer kommer att raderas. Är du säker på att du vill fortsätta?", default = False):
         if user_confirmation(f"Denna åtgärd går inte att ångra; all data för [key]{sermon_code}[/key] kommer att försvinna. Radera?", default = False):
-            draft = load_sermon_as_draft(sermon_code)
-            sermon_id = draft.id  # internal database id for this sermon
 
             # 1. Save sermon draft temporarily in a file and erase it
             trash_dir = Path.home() / ".sermon_cli" / "trash"

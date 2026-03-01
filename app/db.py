@@ -36,15 +36,14 @@ def get_sermon_by_code(code: str):
             (code,)
         )
         row = cur.fetchone()
-
         if row is None:
             raise NotFoundError(f"Predikan {code} finns inte.")
-        
         conn.close()
         return row
-
     except sqlite3.Error as e:
         raise DatabaseError(f"Databasfel: {e}")
+    finally:
+        conn.close()
 
 
 def get_sermon_by_id(id: int):
@@ -57,30 +56,31 @@ def get_sermon_by_id(id: int):
             (id,)
         )
         row = cur.fetchone()
+        if row is None:
+            raise NotFoundError(f"Predikan {code} finns inte.")
         conn.close()
         return row
     except sqlite3.Error as e:
         raise DatabaseError(f"Databasfel: {e}")
+    finally:
+        conn.close()
 
 
 def get_sermon_id(code: str) -> int:
     """Get the sermon id (internal for database) based on its code (e.g. 'P371')"""
     row = get_sermon_by_code(code)
-    if row is None:
-        raise NotFoundError(f"Predikan med kod {code} finns inte")
     return row['id']
 
 
 def get_sermon_code(id: int) -> str:
     """Get the sermon code (P001) based on its internal database id"""
     row = get_sermon_by_id(id)
-    if row is None:
-        raise NotFoundError(f"Predikan med internt databas-id {id} finns inte")
     return row['code']
 
 
 def sermon_exists(code: str) -> True|False:
     """Test if a certain sermon code exist in database or not"""
+    # This function might not be used, instead used database functions throw errors
     #if not get_sermon_by_code(code):
         #return False
     #return True
@@ -96,9 +96,7 @@ def sermon_exists(code: str) -> True|False:
 
         if row is None:
             return False
-        
         return True
-
     except sqlite3.Error as e:
         raise DatabaseError(f"Databasfel: {e}")
 
@@ -348,23 +346,23 @@ def create_sermon_from_draft(draft: sermonDraft):
     # No sermon id exists before insertion in database
     conn = get_connection()
     try:
-        # 1. Insert sermon
-        sermon_id = insert_sermon_row(conn, draft)  # Insert new row in sermon table
-        draft.id = sermon_id  # Update sermon draft with the correct sermon id
-        console.print('sermon id: ', sermon_id)
+        with conn:
+            # 1. Insert sermon
+            sermon_id = insert_sermon_row(conn, draft)  # Insert new row in sermon table
+            draft.id = sermon_id  # Update sermon draft with the correct sermon id
+            #console.print('sermon id: ', sermon_id)
 
-        # 2. Insert other resources for this sermon (using update functions below)
-        update_services(conn, sermon_id, draft.services, delete_missing=False)  # Insert new services using update function (ok since delete_missing is False and there is no service.id)
-        update_manuscripts(conn, sermon_id, draft.manuscripts, delete_missing=False)
-        update_recordings(conn, sermon_id, draft.recordings, delete_missing=False)
-        update_resources(conn, sermon_id, draft.resources, delete_missing=False)
-        update_bible_references(conn, sermon_id, draft.bible_references)
-        update_related_sermons(conn, sermon_id, draft.related_sermons)
-
-        conn.commit()
-    except Exception: 
-        conn.rollback()
-        raise
+            # 2. Insert other resources for this sermon (using update functions below)
+            update_services(conn, sermon_id, draft.services, delete_missing=False)  # Insert new services using update function (ok since delete_missing is False and there is no service.id)
+            update_manuscripts(conn, sermon_id, draft.manuscripts, delete_missing=False)
+            update_recordings(conn, sermon_id, draft.recordings, delete_missing=False)
+            update_resources(conn, sermon_id, draft.resources, delete_missing=False)
+            update_bible_references(conn, sermon_id, draft.bible_references)
+            update_related_sermons(conn, sermon_id, draft.related_sermons)
+        #conn.commit()  # conn.commit() and conn.rollback() are executed automatically when using with conn.
+    except sqlite3.Error as e:
+        #conn.rollback()
+        raise DatabaseError(f"Databasfel: {e}")
     finally:
         conn.close()
 
@@ -388,7 +386,7 @@ def insert_sermon_row(conn, draft):  # Update sermon table
             draft.notes 
          )
     )
-    console.print('Rows affected:', cur.rowcount)
+    #console.print('Rows affected:', cur.rowcount)
     return cur.lastrowid  # Return the new sermon id for this particular sermon
 
 
@@ -413,18 +411,16 @@ def update_sermon_from_draft(draft: sermonDraft):
     conn = get_connection()
 
     try:
-        update_sermon_row(conn, draft)  # Update sermon table
-        update_services(conn, sermon_id, draft.services, delete_missing=True)  # Update services: UPDATE if id exists, INSERT if id is missing, DELETE if id is removed
-        update_manuscripts(conn, sermon_id, draft.manuscripts, delete_missing=True)
-        update_recordings(conn, sermon_id, draft.recordings, delete_missing=True)
-        update_resources(conn, sermon_id, draft.resources, delete_missing=True)
-        update_bible_references(conn, sermon_id, draft.bible_references)
-        update_related_sermons(conn, sermon_id, draft.related_sermons)
-
-        conn.commit()
+        with conn:
+            update_sermon_row(conn, draft)  # Update sermon table
+            update_services(conn, sermon_id, draft.services, delete_missing=True)  # Update services: UPDATE if id exists, INSERT if id is missing, DELETE if id is removed
+            update_manuscripts(conn, sermon_id, draft.manuscripts, delete_missing=True)
+            update_recordings(conn, sermon_id, draft.recordings, delete_missing=True)
+            update_resources(conn, sermon_id, draft.resources, delete_missing=True)
+            update_bible_references(conn, sermon_id, draft.bible_references)
+            update_related_sermons(conn, sermon_id, draft.related_sermons)
     except Exception: 
-        conn.rollback()
-        raise
+        raise DatabaseError(f"Databasfel: {e}")
     finally:
         conn.close()
 
@@ -456,8 +452,8 @@ def update_sermon_row(conn, draft):  # Update sermon table
             draft.id
          )
     )
-    console.print('Updating sermon id:', draft.id)
-    console.print('Rows affected:', cur.rowcount)
+    #console.print('Updating sermon id:', draft.id)
+    #console.print('Rows affected:', cur.rowcount)
 
 
 def update_services(conn, sermon_id, services: List[ServiceDraft], delete_missing=False):
@@ -731,20 +727,18 @@ def delete_sermon_from_database(sermon_id: int):
     """Radera en predikan ur databasen, och alla tillhörande filer"""
     # Data is removed from the database with cascading
     conn = get_connection()
-    conn.execute("PRAGMA foreign_keys = ON")
     cur = conn.cursor()
     try:
-        cur.execute(
-            """
-            DELETE FROM sermon
-            WHERE id = ?
-            """,
-            (sermon_id,)
-        )
-        conn.commit()
+        with conn:
+            cur.execute(
+                """
+                DELETE FROM sermon
+                WHERE id = ?
+                """,
+                (sermon_id,)
+            )
     except Exception: 
-        conn.rollback()
-        raise
+        raise DatabaseError(f"Databasfel: {e}")
     finally:
         conn.close()
 

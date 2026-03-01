@@ -14,5 +14,9 @@ class ValidationError(SermonError):
     pass
 
 
+class ConflictError(SermonError):
+    pass
+
+
 class DatabaseError(SermonError):
     pass

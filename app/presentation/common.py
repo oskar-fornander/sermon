@@ -46,7 +46,7 @@ def user_input(title, description='', default='', choices=None, pattern=None, al
         console.print()
     while True:
         answer = Prompt.ask(prompt=f"{title}{description}", console=console, choices=choices, default=default)
-        if not answer:  # Check if empty
+        if not answer.strip():  # Check if empty
             if allow_empty:
                 answer = None  # or ''
                 break

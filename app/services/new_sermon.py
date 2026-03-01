@@ -29,7 +29,7 @@ def new_sermon():
     sermon_draft.code = code
 
     # Title
-    sermon_draft.title = user_input('Rubrik', allow_empty=False)
+    sermon_draft.title = user_input('Rubrik', allow_empty=False).strip()
 
 
     # Enter interactive editing mode to fill in the rest 

@@ -2,7 +2,7 @@ import typer
 from app.errors import *
 from app.services.edit_sermon import interactive_edit_sermon
 from app.services.sermon_draft import load_sermon_as_draft
-from app.db import update_sermon_from_draft, sermon_exists, create_sermon_from_draft
+from app.db import update_sermon_from_draft, create_sermon_from_draft
 from app.presentation.common import clear_screen
 from app.services.sermon_draft import deep_copy, equal_drafts
 from app.presentation.common import console
@@ -14,12 +14,8 @@ from app.services.delete_sermon import PendingFileDeletions
 
 def edit(sermon_code: str):
     """Interaktiv redigering av en predikan"""
-
-    if not sermon_exists(sermon_code):
-        raise NotFoundError(f"Predikan {sermon_code} finns inte")
-
     clear_screen()
-    print(f"interactive edit: {sermon_code}")
+    #console.print(f"interactive edit: {sermon_code}")
     sermon_draft = load_sermon_as_draft(sermon_code)
     pending_file_deletions = PendingFileDeletions()  # Files waiting for deletion after edit
     #print(sermon_draft)

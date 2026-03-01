@@ -9,6 +9,7 @@ from app.utils import backup_database
 def backup():
     """Gör en backup av aktuell databas"""
 
+    clear_screen()
     backup_file = backup_database()
     console.print(f"Databasen är säkerhetskopierad: {backup_file}")
 
