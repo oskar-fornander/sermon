@@ -43,7 +43,9 @@ def run():
         render_info_panel(title='[error]Fel[/error]', content=f"{e}")
         sys.exit(1)
     except Exception as e:
-        render_info_panel(title='[error]Fel[/error]', content=f"Ett oväntat fel inträffade: {e}")
+        msg = f"Ett oväntat fel inträffade: {e}\n"
+        render_info_panel(title='[error]Fel[/error]', content=msg)
+        traceback.print_exec()  # file and row number
         sys.exit(1)
 
 

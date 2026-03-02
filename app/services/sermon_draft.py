@@ -4,7 +4,7 @@ from typing import Optional, List
 import copy, re
 from app.utils import get_last_sunday, PATTERN
 from app.db import get_sermon_by_code, get_services_for_sermon, get_manuscripts_for_sermon, get_recordings_for_sermon, get_resources_for_sermon, get_bible_references_for_sermon, get_related_sermons_for_sermon, create_sermon_in_database
-from app.errors import ValidationError
+from app.errors import ValidationError, ConflictError
 
 
 
@@ -228,7 +228,7 @@ def validate_sermon_draft(draft: SermonDraft):
             raise ValidationError(f"Filnamnet för en resurs är felaktigt. ([error]{resource.file_name}[/error])")
 
     if draft.code in draft.related_sermons:
-        raise ValidationError('Predikan kan inte relateras till sig själv.')
+        raise ConflictError('Predikan kan inte relateras till sig själv.')
 
 
 

@@ -49,18 +49,21 @@ def get_file_link(path, file_name, title = None, show_missing_file = True, show_
 def backup_database():
     """Save a copy of the database file under new name."""
 
-    backup_dir = PATH_BACKUP
-    backup_dir.mkdir(exist_ok=True)
+    try:
+        backup_dir = PATH_BACKUP
+        backup_dir.mkdir(exist_ok=True)
 
-    timestamp = datetime.now().strftime("%Y-%m-%d")
-    backup_file = backup_dir / f"sermon_{timestamp}.db"
+        timestamp = datetime.now().strftime("%Y-%m-%d")
+        backup_file = backup_dir / f"sermon_{timestamp}.db"
 
-    #shutil.copy2(DB_FILE, backup_file)
+        #shutil.copy2(DB_FILE, backup_file)
 
-    with sqlite3.connect(DB_FILE) as source:
-        with sqlite3.connect(backup_file) as target:
-            source.backup(target)
+        with sqlite3.connect(DB_FILE) as source:
+            with sqlite3.connect(backup_file) as target:
+                source.backup(target)
 
-    return backup_file
+        return backup_file
+    except Exception:
+        raise DatabaseError('Fel vid säkerhetskopiering av databasen')
 
 

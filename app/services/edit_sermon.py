@@ -22,18 +22,12 @@ def edit_sermon(sermon_code: str):
     #console.print(sermon_draft)
     if sermon_draft:  # Edit mode exited with saving: write to database even if no changes were made
         # Update database:
-        try:
-            update_sermon_from_draft(sermon_draft)
-            console.print(f"Predikan [key]{sermon_code}[/key] är uppdaterad.")
-        except Exception as e:
-            console.print(f"Något gick fel vid uppdatering av predikan i databasen: {e}")
+        update_sermon_from_draft(sermon_draft)
+        console.print(f"Predikan [key]{sermon_code}[/key] är uppdaterad.")
 
         # Delete files pending for deletion:
-        try:
-            msg = pending_file_deletions.execute()  # Now is the time to delete files the user deleted
-            console.print(msg)
-        except Exception as e:
-            console.print(f"Något gick fel vid radering av filer: {e}")
+        msg = pending_file_deletions.execute()  # Now is the time to delete files the user deleted
+        console.print(msg)
 
     else:  # None indicates exit edit mode without saving
         console.print(f"Inga ändringar sparade för predikan [key]{sermon_code}[/key].")

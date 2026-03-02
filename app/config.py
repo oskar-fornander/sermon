@@ -34,8 +34,7 @@ def init_environment():
     try:
         define_paths()  # Define paths for all files and folders
     except Exception as error:
-        console.print(error)
-        console.print('Programmet avslutas.')
+        raise RuntimeError(f"Ett fel uppstod i uppstarten: {error}")
         sys.exit(1)
 
     ensure_database()  # Create database file if it does not exist
@@ -94,10 +93,13 @@ def define_paths():
 
 def ensure_database():
     """Create database file if non-existing"""
-    conn = sqlite3.connect(DB_FILE)
-    conn.execute("PRAGMA foreign_keys = ON")
-    create_schema(conn)
-    conn.close()
+    try:
+        conn = sqlite3.connect(DB_FILE)
+        conn.execute("PRAGMA foreign_keys = ON")
+        create_schema(conn)
+        conn.close()
+    except Exception:
+        raise DatabaseError('Fel vid skapande av SQLite databasfil.')
 
 
 def create_schema(conn):

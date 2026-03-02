@@ -114,43 +114,5 @@ def render_sermon_card(sermon_draft, preview=False, menu=[], edited_fields=[]):
     )
     print()
 
-#sermon:
-# x code
-# x title
-# x context
-# x introduction
-# x message
-# x report
-# x notes
-
-# Bible reference:
-# x reference_text
-
-#service:
-# x date
-# x place
-# x notes
-
-#manuscript:
-# x file_name
-#   (version)
-# x date
-# x notes
-
-# recording:
-# x type
-# x date
-# x file_name
-# x external_url
-# x notes
-
-#resource:
-# x file_name
-# x title
-# x notes
-
-#related_sermons:
-# x related_sermon_id
-
 
 
