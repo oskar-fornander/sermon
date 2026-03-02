@@ -67,6 +67,7 @@ def delete_sermon(sermon_code: str):
 
 
 class PendingFileDeletions:
+    """Files to delete"""
     def __init__(self):
         self._paths = []
 
@@ -74,6 +75,7 @@ class PendingFileDeletions:
         self._paths.append(path)
 
     def execute(self):
+        """Delete files"""
         msg = ''
         from send2trash import send2trash
         for path in self._paths:
@@ -85,7 +87,10 @@ class PendingFileDeletions:
         return msg
 
     def clear(self):
-        msg = f"Inte raderad: {', '.join([str(f)[str(f).rfind('/') + 1:] for f in self._paths])}"
+        """Do not delete files"""
+        msg = None
+        if len(self._paths) > 0:
+            msg = f"Inte raderad: {', '.join([str(f)[str(f).rfind('/') + 1:] for f in self._paths])}"
         self._paths.clear()
         return msg
 
