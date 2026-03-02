@@ -20,3 +20,7 @@ class ConflictError(SermonError):
 
 class DatabaseError(SermonError):
     pass
+
+
+class FileError(SermonError):
+    pass
