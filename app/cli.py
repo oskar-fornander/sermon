@@ -40,10 +40,10 @@ def run():
     try:
         app()
     except SermonError as e:
-        render_info_panel(title='[red]Fel[/red]', content=f"{e}")
+        render_info_panel(title='[error]Fel[/error]', content=f"{e}")
         sys.exit(1)
     except Exception as e:
-        render_info_panel(title='[red]Fel[/red]', content=f"Ett oväntat fel inträffade: {e}")
+        render_info_panel(title='[error]Fel[/error]', content=f"Ett oväntat fel inträffade: {e}")
         sys.exit(1)
 
 

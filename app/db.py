@@ -340,8 +340,8 @@ def get_related_sermons_for_sermon(code: str):
 # --------------------
 # Write to database from sermonDraft
 # --------------------
-def create_sermon_from_draft(draft: sermonDraft):
-    """Skapa en ny predikan i databasen baserat på data i draft."""
+def create_sermon_in_database(draft: sermonDraft):
+    """Create a new sermon in the database based on data in the draft. Validation is already made in create_sermon_from_draft in services/sermon_draft.py"""
     # Data is inserted into sermon and all other relevant tables
     # No sermon id exists before insertion in database
     conn = get_connection()

@@ -1,9 +1,11 @@
 
 from dataclasses import dataclass, field, asdict
 from typing import Optional, List
-import copy
-from app.utils import get_last_sunday
-from app.db import get_sermon_by_code, get_services_for_sermon, get_manuscripts_for_sermon, get_recordings_for_sermon, get_resources_for_sermon, get_bible_references_for_sermon, get_related_sermons_for_sermon
+import copy, re
+from app.utils import get_last_sunday, PATTERN
+from app.db import get_sermon_by_code, get_services_for_sermon, get_manuscripts_for_sermon, get_recordings_for_sermon, get_resources_for_sermon, get_bible_references_for_sermon, get_related_sermons_for_sermon, create_sermon_in_database
+from app.errors import ValidationError
+
 
 
 @dataclass
@@ -176,6 +178,57 @@ def load_sermon_as_draft(sermon_code: str) -> sermonDraft:
 
     return sermon_draft
 
+
+def create_sermon_from_draft(draft: SermonDraft):
+    """Create a sermon in the database from the draft."""
+    validate_sermon_draft(draft)  # This validation function throws errors if something is wrong in the draft
+    create_sermon_in_database(draft)  # Insert this sermon in the database
+
+
+def validate_sermon_draft(draft: SermonDraft):
+    """Throw an error if something is wrong in the sermon draft."""
+
+    if not PATTERN['code'].match(draft.code):
+        raise ValidationError(f"Predikokod måste vara i formatet [key]P001[/key]. ([error]{draft.code}[/error])")
+
+    if not draft.title or not draft.title.strip():
+        raise ValidationError('Titel får inte vara tom.')
+
+    if draft.report not in ('A', 'B', 'C', '', None):
+        raise ValidationError(f"Omdöme måste vara [key]A[/key], [key]B[/key], [key]C[/key], eller tomt. ([error]{draft.report}[/error])")
+
+    for service in draft.services:
+        if not PATTERN['date'].match(service.date):
+            raise ValidationError(f"Datum för gudstjänst är ogiltigt. ([error]{service.date}[/error])")
+        if not service.place or not service.place.strip():
+            raise ValidationError('Plats för gudstjänst får inte vara tom.')
+
+    for manuscript in draft.manuscripts:
+        if not PATTERN['manuscript'].match(manuscript.file_name):
+            raise ValidationError(f"Filnamnet för manus är felaktigt. ([error]{manuscript.file_name}[/error])")
+
+    for recording in draft.recordings:
+        if not PATTERN['date'].match(recording.date):
+            raise ValidationError(f"Datum för inspelning är ogiltigt. ([error]{recording.date}[/error])")
+        if recording.type not in ('audio', 'video'):
+            raise ValidationError('Typ för inspelning måste vara [key]audio[/key] eller [key]video[/key].')
+        if not (recording.file_name or recording.external_url):
+            raise ValidationError('Filnamn eller extern url måste anges för inspelning.')
+        if recording.file_name and recording.external_url:
+            raise ValidationError('Både filnamn och url har angetts för inspelning, endast en kan anges per inspelning.')
+        if recording.file_name:
+            if not PATTERN['recording'].match(recording.file_name):
+                raise ValidationError(f"Ange filnamn för inspelning enligt standardformatet: [key]{get_last_sunday()}_Predikan.mp3[/key] ([error]{recording.file_name}[/error])")
+        if recording.external_url:
+            if not PATTERN['url'].match(recording.external_url):
+                raise ValidationError(f"Extern url för inspelning förefaller inte vara en giltig url. ([error]{recording.external_url}[/error])")
+
+    for resource in draft.resources:
+        if not PATTERN['file_name'].match(resource.file_name):
+            raise ValidationError(f"Filnamnet för en resurs är felaktigt. ([error]{resource.file_name}[/error])")
+
+    if draft.code in draft.related_sermons:
+        raise ValidationError('Predikan kan inte relateras till sig själv.')
 
 
 
