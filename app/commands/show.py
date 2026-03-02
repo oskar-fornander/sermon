@@ -1,8 +1,7 @@
 import typer
 from pathlib import Path
 from app.presentation.common import clear_screen
-from app.presentation.sermon_card import render_sermon_card
-from app.services.sermon_draft import load_sermon_as_draft
+from app.services.show_sermon import show_sermon
 
 
 def show(sermon_code: str):
@@ -10,8 +9,7 @@ def show(sermon_code: str):
     #print(f"Visa predikan {sermon_code}")
 
     clear_screen()
-    sermon_draft = load_sermon_as_draft(sermon_code)
+    show_sermon(sermon_code)
 
-    render_sermon_card(sermon_draft)
 
 
