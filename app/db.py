@@ -37,7 +37,7 @@ def get_sermon_by_code(code: str):
         )
         row = cur.fetchone()
         if row is None:
-            raise NotFoundError(f"Predikan {code} finns inte.")
+            raise NotFoundError(f"Predikan [key]{code}[/key] finns inte. (Ange predikokoden i formatet P001.)")
         conn.close()
         return row
     except sqlite3.Error as e:
@@ -57,7 +57,7 @@ def get_sermon_by_id(id: int):
         )
         row = cur.fetchone()
         if row is None:
-            raise NotFoundError(f"Predikan {code} finns inte.")
+            raise NotFoundError(f"Predikan [key]{code}[/key] finns inte.")
         conn.close()
         return row
     except sqlite3.Error as e:

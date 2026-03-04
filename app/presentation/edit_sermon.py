@@ -63,7 +63,10 @@ def user_edit_long_text(sermon_code, title, value):
     try:
         subprocess.run(editor_cmd + [path], check=True)
         with open(path, 'r') as f:
-            return f.read().strip() or None
+            new_value = f.read().strip()
+            if new_value == value:  # No changes
+                return None
+            return new_value
     finally:
         os.unlink(path)
 

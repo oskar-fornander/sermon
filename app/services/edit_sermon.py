@@ -138,9 +138,9 @@ def interactive_edit_sermon(sermon_draft, pending_file_deletions = None):
             else:
                 setattr(sermon_draft, field_name, new_value)  # Update value in sermon draft
                 edited.append(field_name)
-                console.print('Uppdaterat')
+                console.print(f"Updated: {field_name}")
         else:
-            console.print('Ej uppdaterat')
+            console.print(f"Not updated: {field_name}")
         #time.sleep(1)
 
 

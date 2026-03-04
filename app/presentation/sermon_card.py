@@ -40,7 +40,7 @@ def render_sermon_card(sermon_draft, preview=False, menu=[], edited_fields=[]):
     related_sermons = sermon_draft.related_sermons
     if related_sermons:
         related_sermons = ', '.join(related_sermons)  # show list as a string
-    elements.append(f"[title]{get_menu_index('Relaterad predikan')}{edited.get('related', '')}Relaterad predikan:{edited_.get('related', '')}[/title] {related_sermons or '–'}")
+    elements.append(f"[title]{get_menu_index('Relaterad predikan')}{edited.get('related_sermons', '')}Relaterad predikan:{edited_.get('related_sermons', '')}[/title] {related_sermons or '–'}")
 
     # Add services
     elements.append(f"[title]{get_menu_index('Gudstjänst')}{edited.get('services', '')}Gudstjänst:[/]")

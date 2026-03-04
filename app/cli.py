@@ -1,6 +1,7 @@
 #app/cli.py
 
 import sys
+import traceback
 from app.errors import SermonError
 from app.config import CONFIG, DB_FILE
 from app.config import init_environment
@@ -45,7 +46,7 @@ def run():
     except Exception as e:
         msg = f"Ett oväntat fel inträffade: {e}\n"
         render_info_panel(title='[error]Fel[/error]', content=msg)
-        traceback.print_exec()  # file and row number
+        traceback.print_exc()  # file and row number
         sys.exit(1)
 
 
