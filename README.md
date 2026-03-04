@@ -7,10 +7,8 @@ Privat predikoregister för mina predikningar.
 ## TODO
 
 - importera befintlig databas i nya systemet
-- funktion för backup?
 - sökfunktion
 - podcast-funktion?
-- skapa databas ifall ingen finns vid start?
 - Snygg och säker felhantering
 - ...
 - 
@@ -31,8 +29,10 @@ predikan/                   # överordnad mapp
 │   │   ├── cli.py          
 │   │   ├── config.py
 │   │   ├── db.py
+│   │   ├── errors.py
 │   │   ├── utils.py
 │   │   ├── commands/       # Varje CLI-kommando har en egen fil
+│   │   │   ├── backup.py
 │   │   │   ├── delete.py
 │   │   │   ├── edit.py
 │   │   │   ├── export.py
@@ -53,7 +53,8 @@ predikan/                   # överordnad mapp
 │   │   │   ├── edit_sermon.py
 │   │   │   ├── list_sermons.py
 │   │   │   ├── new_sermon.py
-│   │   │   └── sermon_draft.py
+│   │   │   ├── sermon_draft.py
+│   │   │   └── show_sermon.py
 │   │   └──tools/
 │   │       └── import_xml.py     # engångsskript för import från gammalt system
 │   │
@@ -71,7 +72,8 @@ predikan/                   # överordnad mapp
     ├── files/
     │   ├── manuscripts/      # PDF
     │   ├── recordings/       # MP3
-    │   └── resources/        # PDF etc.
+    │   ├── resources/        # PDF etc.
+    │   └── originals/        # Diverse originalfiler etc. som inte kopplas till databasen
     │
     └── html/
         └── index.html        # Mobil översikt
