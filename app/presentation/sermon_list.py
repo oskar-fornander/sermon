@@ -7,16 +7,16 @@ from app.presentation.common import *
 def render_sermon_list(title, sermons, order_by = 'code'):
     """Render a presentation of a list of sermons, sorted by code or date."""
 
-    table = Table(title=None, box=box.SIMPLE, expand=False) #A table inside the panel
+    table = Table(title=None, box=box.SIMPLE, expand=False, row_styles=['', 'on black']) #A table inside the panel
 
     if order_by == 'date': #Set headers based on ordered by code or date
         table.add_column('Kod', style='sermon_code', no_wrap=True, min_width=4)
-        table.add_column('[key]Datum[/]', style='key',  width=10)
-        table.add_column('Plats', no_wrap=True, min_width=4, overflow='ellipsis')
+        table.add_column('[key]Datum[/]', style='key', width=14, overflow='ellipsis')
+        table.add_column('Plats', no_wrap=True, min_width=4, max_width=30, overflow='ellipsis')
         table.add_column('Titel', no_wrap=True, min_width=4, overflow='ellipsis')
     else:
-        table.add_column('[key]Kod[/]', style='key', no_wrap=True)
-        table.add_column('Titel', no_wrap=True, min_width=4, overflow='ellipsis')
+        table.add_column('[key]Kod[/]', style='key', no_wrap=True, min_width=4)
+        table.add_column('Titel', no_wrap=True, min_width=4, max_width=40, overflow='ellipsis')
         table.add_column('Datum',  min_width=10, no_wrap=True)
         #Setting min_width, no_wrap and overflow does not seem to work properly
     table.add_column(ICON['manuscript']) # table.add_column('Manus')

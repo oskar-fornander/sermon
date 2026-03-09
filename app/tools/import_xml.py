@@ -220,7 +220,7 @@ def import_related_sermons(conn, draft):
 
     try:
         sermon_id = get_sermon_id(draft.code, conn)
-        #update_related_sermons(conn, sermon_id, draft.related_sermons)  # Add related sermons
+        update_related_sermons(conn, sermon_id, draft.related_sermons)  # Add related sermons
     except Exception as e:
         console.print(f"Fel när relaterade predikningar skulle läggas till för {draft.code}: \n  {e}")
 
