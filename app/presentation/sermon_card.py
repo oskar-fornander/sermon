@@ -1,4 +1,4 @@
-from app.config import PATH_MANUSCRIPTS, PATH_RECORDINGS, PATH_RESOURCES
+import app.config as config
 from app.presentation.common import *
 from app.utils import get_file_link
 
@@ -58,7 +58,7 @@ def render_sermon_card(sermon_draft, preview=False, menu=[], edited_fields=[]):
     if not manuscripts:
         elements[-1] += ' – '  # Add at end of line if no data to show
     for manuscript in manuscripts:
-        link = get_file_link(PATH_MANUSCRIPTS, manuscript.file_name)
+        link = get_file_link(config.PATH_MANUSCRIPTS, manuscript.file_name)
         elements.append(f"{TAB_}[notes]{manuscript.date}[/notes]  {link}")
         if manuscript.notes:
             elements[-1] += f"{TAB_}[notes]• {manuscript.notes}[/notes]"  # Add notes at end of the same line
@@ -71,7 +71,7 @@ def render_sermon_card(sermon_draft, preview=False, menu=[], edited_fields=[]):
         elements[-1] += ' – '  # Add at end of line if no data to show
     for recording in recordings:
         if recording.file_name:
-            link = get_file_link(PATH_RECORDINGS, recording.file_name)
+            link = get_file_link(config.PATH_RECORDINGS, recording.file_name)
             elements.append(f"{TAB_}[notes]{recording.date}[/notes]  {link}")
         elif recording.external_url: # Either a local file OR an external link for each recording
             link_title = 'extern url'
@@ -86,7 +86,7 @@ def render_sermon_card(sermon_draft, preview=False, menu=[], edited_fields=[]):
         elements[-1] += ' – '  # Add at end of line if no data to show
     for resource in resources:
         resource_title = resource.title or resource.file_name  # Use file name if no title exists
-        link = get_file_link(PATH_RESOURCES, resource.file_name, title=resource_title)
+        link = get_file_link(config.PATH_RESOURCES, resource.file_name, title=resource_title)
         elements.append(f"{TAB_ + 12 * ' '}{link}")
         if resource.notes:
             elements[-1] += f"{TAB_}[notes]• {resource.notes}[/notes]"  # Add notes at end of the same line

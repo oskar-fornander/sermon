@@ -6,10 +6,10 @@ Privat predikoregister för mina predikningar.
 
 ## TODO
 
-- importera befintlig databas i nya systemet
 - sökfunktion
 - podcast-funktion?
 - Snygg och säker felhantering
+- Sök filer som saknas eller är överflödiga
 - ...
 - 
 
@@ -56,7 +56,7 @@ predikan/                   # överordnad mapp
 │   │   │   ├── sermon_draft.py
 │   │   │   └── show_sermon.py
 │   │   └──tools/
-│   │       └── import_xml.py     # engångsskript för import från gammalt system
+│   │       └── import_xml.py     # Engångsskript för import från gammalt system, kör så här: python -m app.tools.import_xml.py sermons.xml Skapar ny databasfil.
 │   │
 │   ├── .gitignore
 │   ├── schema.sql            # Schema för databasen

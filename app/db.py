@@ -6,7 +6,8 @@ from typing import List
 from pathlib import Path
 import yaml
 from app.presentation.common import console
-from app.config import DB_FILE
+#from app.config import DB_FILE
+import app.config as config
 
 # --------------------
 # Configuration and Connection
@@ -16,7 +17,7 @@ from app.config import DB_FILE
 
 
 def get_connection():
-    conn = sqlite3.connect(DB_FILE)
+    conn = sqlite3.connect(config.DB_FILE)
     conn.row_factory = sqlite3.Row #Access via column names instead of indices
     conn.execute('PRAGMA foreign_keys = ON')
     return conn
@@ -26,9 +27,12 @@ def get_connection():
 # Basic functions (sermon)
 # --------------------
 
-def get_sermon_by_code(code: str):
+def get_sermon_by_code(code: str, conn = None):
     """Get a sermon by its code (e.g. 'P371')"""
-    conn = get_connection()
+    new_conn = False
+    if conn is None:
+        new_conn = True
+        conn = get_connection()
     cur = conn.cursor()
     try:
         cur.execute(
@@ -38,17 +42,22 @@ def get_sermon_by_code(code: str):
         row = cur.fetchone()
         if row is None:
             raise NotFoundError(f"Predikan [key]{code}[/key] finns inte. (Ange predikokoden i formatet P001.)")
-        conn.close()
+        if new_conn:
+            conn.close()
         return row
     except sqlite3.Error as e:
         raise DatabaseError(f"Databasfel: {e}")
     finally:
-        conn.close()
+        if new_conn:
+            conn.close()
 
 
-def get_sermon_by_id(id: int):
+def get_sermon_by_id(id: int, conn = None):
     """Get a sermon by its internal database id"""
-    conn = get_connection()
+    new_conn = False
+    if conn is None:
+        new_conn = True
+        conn = get_connection()
     cur = conn.cursor()
     try:
         cur.execute(
@@ -58,32 +67,38 @@ def get_sermon_by_id(id: int):
         row = cur.fetchone()
         if row is None:
             raise NotFoundError(f"Predikan [key]{code}[/key] finns inte.")
-        conn.close()
+        if new_conn:
+            conn.close()
         return row
     except sqlite3.Error as e:
         raise DatabaseError(f"Databasfel: {e}")
     finally:
-        conn.close()
+        if new_conn:
+            conn.close()
 
 
-def get_sermon_id(code: str) -> int:
+def get_sermon_id(code: str, conn = None) -> int:
     """Get the sermon id (internal for database) based on its code (e.g. 'P371')"""
-    row = get_sermon_by_code(code)
+    row = get_sermon_by_code(code, conn)
     return row['id']
 
 
-def get_sermon_code(id: int) -> str:
+def get_sermon_code(id: int, conn = None) -> str:
     """Get the sermon code (P001) based on its internal database id"""
-    row = get_sermon_by_id(id)
+    row = get_sermon_by_id(id, conn)
     return row['code']
 
 
-def sermon_exists(code: str) -> True|False:
+def sermon_exists(code: str, conn = None) -> True|False:
     """Test if a certain sermon code exist in database or not"""
     # This function might not be used, instead used database functions throw errors
     #if not get_sermon_by_code(code):
         #return False
     #return True
+    new_conn = False
+    if conn is None:
+        new_conn = True
+        conn = get_connection()
     conn = get_connection()
     cur = conn.cursor()
     try:
@@ -92,7 +107,8 @@ def sermon_exists(code: str) -> True|False:
             (code,)
         )
         row = cur.fetchone()
-        conn.close()
+        if new_conn:
+            conn.close()
 
         if row is None:
             return False
@@ -340,11 +356,14 @@ def get_related_sermons_for_sermon(code: str):
 # --------------------
 # Write to database from sermonDraft
 # --------------------
-def create_sermon_in_database(draft: sermonDraft):
+def create_sermon_in_database(draft: sermonDraft, conn = None, include_related_sermons = True):
     """Create a new sermon in the database based on data in the draft. Validation is already made in create_sermon_from_draft in services/sermon_draft.py"""
     # Data is inserted into sermon and all other relevant tables
     # No sermon id exists before insertion in database
-    conn = get_connection()
+    new_conn = False
+    if conn is None:
+        new_conn = True
+        conn = get_connection()
     try:
         with conn:
             # 1. Insert sermon
@@ -358,13 +377,15 @@ def create_sermon_in_database(draft: sermonDraft):
             update_recordings(conn, sermon_id, draft.recordings, delete_missing=False)
             update_resources(conn, sermon_id, draft.resources, delete_missing=False)
             update_bible_references(conn, sermon_id, draft.bible_references)
-            update_related_sermons(conn, sermon_id, draft.related_sermons)
+            if include_related_sermons:
+                update_related_sermons(conn, sermon_id, draft.related_sermons)
         #conn.commit()  # conn.commit() and conn.rollback() are executed automatically when using with conn.
     except sqlite3.Error as e:
         #conn.rollback()
         raise DatabaseError(f"Databasfel: {e}")
     finally:
-        conn.close()
+        if new_conn:  # Close connection only if created inside this function
+            conn.close()
 
 
 def insert_sermon_row(conn, draft):  # Update sermon table
@@ -705,7 +726,7 @@ def update_related_sermons(conn, sermon_id, related_sermon_codes: List[str]):
     )
     # Add all related sermons as new posts
     for related_sermon_code in related_sermon_codes:
-        related_sermon_id = get_sermon_id(related_sermon_code)
+        related_sermon_id = get_sermon_id(related_sermon_code, conn)
         id1, id2 = sorted([sermon_id, related_sermon_id])
         cur.execute(
             """

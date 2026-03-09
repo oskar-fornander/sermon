@@ -12,7 +12,7 @@ PATTERN['code'] = re.compile(r'^P\d{3}$')  # Sermon code on this format: P372 et
 PATTERN['related_sermons'] = re.compile(r'^P\d{3}((\s*\,\s*)(P\d{3}))*$') # P001, P002 etc
 PATTERN['date'] = re.compile(r'^20\d{2}-(0[1-9]|1[0-2])-(0[1-9]|[12][0-9]|3[0-1])$') # Date: YYYY-MM-DD, does not validate dates
 PATTERN['manuscript'] = re.compile(r'^P\d{3}[abcde]?\.(pdf|PDF)$')  # Manuscript P371.pdf, P371b.PDF
-PATTERN['recording'] = re.compile(r'^20\d{2}-(0[1-9]|1[0-2])-(0[1-9]|[12][0-9]|3[0-1])_Predikan.mp3$')  # Recording 2026-01-25_Predikan.mp3
+PATTERN['recording'] = re.compile(r'^20\d{2}-(0[1-9]|1[0-2])-(0[1-9]|[12][0-9]|3[0-1])_Predikan.*\..{3}$')  # Recording 2026-01-25_Predikan.mp3 but also 2026-01-25_Predikan_2.mp4 and others variants
 PATTERN['file_name'] = re.compile(r'^.+\..{3}$')  # Generic file name
 PATTERN['url'] = re.compile(r'^https?\:\/\/')  # URL http(s)://...
 
