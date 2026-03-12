@@ -347,6 +347,65 @@ def get_related_sermons_for_sermon(code: str):
         raise DatabaseError(f"Databasfel: {e}")
 
 
+def get_all_manuscripts():
+    """Get all manuscripts in database"""
+    conn = get_connection()
+    cur = conn.cursor()
+    try:
+        cur.execute(
+            """
+            SELECT manuscript.file_name, sermon.code FROM manuscript 
+            JOIN sermon ON manuscript.sermon_id = sermon.id 
+            ORDER BY sermon.code
+            """
+        )
+        rows = cur.fetchall()
+        conn.close()
+        return rows
+    except sqlite3.Error as e:
+        raise DatabaseError(f"Databasfel: {e}")
+
+def get_all_recordings():
+    """Get all recordings in database"""
+    conn = get_connection()
+    cur = conn.cursor()
+    try:
+        cur.execute(
+            """
+            SELECT recording.file_name, sermon.code FROM recording 
+            JOIN sermon ON recording.sermon_id = sermon.id 
+            WHERE recording.file_name IS NOT NULL
+            ORDER BY sermon.code
+            """
+        )
+        rows = cur.fetchall()
+        conn.close()
+        return rows
+    except sqlite3.Error as e:
+        raise DatabaseError(f"Databasfel: {e}")
+
+def get_all_resources():
+    """Get all resources in database"""
+    conn = get_connection()
+    cur = conn.cursor()
+    try:
+        cur.execute(
+            """
+            SELECT resource.file_name, sermon.code FROM resource 
+            JOIN sermon ON resource.sermon_id = sermon.id 
+            ORDER BY sermon.code
+            """
+        )
+        rows = cur.fetchall()
+        conn.close()
+        return rows
+    except sqlite3.Error as e:
+        raise DatabaseError(f"Databasfel: {e}")
+
+
+
+
+
 # --------------------
 # Load from database with sermonDraft
 # --------------------

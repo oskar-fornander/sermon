@@ -14,6 +14,7 @@ from app.commands import list as list_commands
 from app.commands import export as export_commands
 from app.commands import open as open_commands
 from app.commands.edit import edit
+from app.commands import files as files_commands
 
 from app.commands.show import show
 from app.commands.search import search
@@ -26,6 +27,7 @@ app = typer.Typer(help = 'Predikoarkiv')
 #Sub commands
 app.add_typer(list_commands.app, name = 'list')
 app.add_typer(open_commands.app, name = 'open')
+app.add_typer(files_commands.app, name = 'files')
 app.add_typer(export_commands.app, name = 'export')
 
 #Single commands
