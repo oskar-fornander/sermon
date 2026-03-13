@@ -1,4 +1,5 @@
 from pathlib import Path
+from urllib import parse
 #import shutil
 import sqlite3
 from app.config import DB_FILE, PATH_BACKUP
@@ -34,16 +35,17 @@ def get_file_link(path, file_name, title = None, show_missing_file = True, show_
         return f"[link={file_name}]{title}[/link]"
     if not file_name:
         return ''
-    file_path = path / Path(file_name)
+    file_path = path / Path(file_name.strip())
+    url_encoded_path = parse.quote(file_path.as_posix())  # This takes care of special characters and spaces in file names
     marker = ''
     if show_missing_file:
         if not file_path.is_file():  # File does not exist
             marker = f"[alert]{ICON['missing_file']}[/alert]"  # Mark missing file with an icon and style
             if show_title_if_missing:  # Show marker next to title or only marker?
-                return f"{marker} [link=file://{file_path}]{title}[/link]"  # ✘ P371.pdf
+                return f"{marker} [link=file://{url_encoded_path}]{title}[/link]"  # ✘ P371.pdf
             else:
-                return f"[link=file://{file_path}]{marker}[/link]"  # ✘
-    return f"[link=file://{file_path}]{title}[/link]"
+                return f"[link=file://{url_encoded_path}]{marker}[/link]"  # ✘
+    return f"[link=file://{url_encoded_path}]{title}[/link]"
 
 
 def backup_database():
