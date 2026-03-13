@@ -3,6 +3,7 @@ from app.config import PATH_MANUSCRIPTS, PATH_RECORDINGS, PATH_RESOURCES
 from app.db import get_all_manuscripts, get_all_recordings, get_all_resources
 from app.errors import *
 from app.presentation.common import console, clear_screen, render_info_panel
+from app.utils import get_file_link
 
 
 def check_files():
@@ -23,7 +24,7 @@ def check_files():
 
         missing_files = [f"[key]{codes_by_filenames[x]}:[/key] {x}" for x in missing_files]
         missing_files.sort()
-        unused_files = [x for x in unused_files]
+        unused_files = [get_file_link(path, x, show_missing_file=False) for x in unused_files]
         unused_files.sort()
 
         render_info_panel(f"{file_type.upper()}: Saknade filer", '; '.join(missing_files))
