@@ -22,7 +22,7 @@ from app.commands.new import new
 from app.commands.delete import delete
 from app.commands.backup import backup
 
-app = typer.Typer(help = 'Predikoarkiv')
+app = typer.Typer(help = 'Predikoarkiv', no_args_is_help=True)
 
 #Sub commands
 app.add_typer(list_commands.app, name = 'list')
