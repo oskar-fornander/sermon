@@ -1,7 +1,7 @@
 import typer
 from app.presentation.common import clear_screen
 
-app = typer.Typer(help = 'Öppna manuskript, inspelning eller resurs till en predikan')
+app = typer.Typer(help = 'Öppna manuskript, inspelning eller resurs till en predikan', no_args_is_help=True)
 
 
 @app.command('manuscript')

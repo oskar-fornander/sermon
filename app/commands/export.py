@@ -2,7 +2,7 @@
 import typer
 from app.presentation.common import clear_screen
 
-app = typer.Typer(help = 'Exportera registret som html eller enskild predikan som podcast')
+app = typer.Typer(help = 'Exportera registret som html eller enskild predikan som podcast', no_args_is_help=True)
 
 @app.command()
 def html():

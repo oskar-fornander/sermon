@@ -4,7 +4,7 @@ from app.presentation.common import console, clear_screen
 from app.tools.files import check_files
 
 
-app = typer.Typer(help = 'Hantering av filer kopplade till predikningar i databasen')
+app = typer.Typer(help = 'Hantering av filer kopplade till predikningar i databasen', no_args_is_help=True)
 
 
 @app.command('check')
