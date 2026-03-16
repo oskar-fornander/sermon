@@ -17,7 +17,7 @@ def render_sermon_list(title, sermons, order_by = 'code'):
     else:
         table.add_column('[key]Kod[/]', style='key', no_wrap=True, min_width=4)
         table.add_column('Titel', no_wrap=True, min_width=4, max_width=40, overflow='ellipsis')
-        table.add_column('Datum',  min_width=10, no_wrap=True)
+        table.add_column('Datum',  min_width=10, no_wrap=True, width=12, overflow='ellipsis')
         #Setting min_width, no_wrap and overflow does not seem to work properly
     table.add_column(ICON['manuscript']) # table.add_column('Manus')
     table.add_column(ICON['recording']) # table.add_column('Inspelning')
