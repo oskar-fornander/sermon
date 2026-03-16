@@ -36,6 +36,7 @@ predikan/                   # överordnad mapp
 │   │   │   ├── delete.py
 │   │   │   ├── edit.py
 │   │   │   ├── export.py
+│   │   │   ├── files.py
 │   │   │   ├── list.py
 │   │   │   ├── new.py
 │   │   │   ├── open.py
