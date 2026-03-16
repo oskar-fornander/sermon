@@ -7,6 +7,21 @@ from app.config import CONFIG, DB_FILE
 from app.config import init_environment
 from app.presentation.common import render_info_panel
 import typer
+from typer.core import TyperGroup
+
+COMMAND_ORDER = [
+    'list', 'search', 'show',               # Group 0
+    'new', 'edit', 'open',                  # Group 1
+    'export', 'files', 'backup', 'delete'   # Group 2
+]
+
+class OrderedGroup(TyperGroup):
+    def list_commands(self, ctx):
+        # Return commands in the specified order in order to show them like this in the help text
+        all_commands = list(self.commands.keys())
+        #Sort by COMMAND_ORDER. Commands not i list are placed last
+        return sorted(all_commands, key=lambda x: COMMAND_ORDER.index(x) if x in COMMAND_ORDER else 999)
+
 
 init_environment()
 
@@ -22,21 +37,30 @@ from app.commands.new import new
 from app.commands.delete import delete
 from app.commands.backup import backup
 
-app = typer.Typer(help = 'Predikoarkiv', no_args_is_help=True)
+app = typer.Typer(
+        cls=OrderedGroup, 
+        help = 'Predikoarkiv',
+        no_args_is_help=True,
+        add_completion=False
+)
 
-#Sub commands
-app.add_typer(list_commands.app, name = 'list')
-app.add_typer(open_commands.app, name = 'open')
-app.add_typer(files_commands.app, name = 'files')
-app.add_typer(export_commands.app, name = 'export')
+# Register commands. The order they should be shown in --help are defined above
+command_groups = ('Överblick & sök', 'Innehållshantering', 'Export & underhåll')  # Headings for command groups - only for user friendly readability
 
-#Single commands
-app.command()(show)
-app.command()(search)
-app.command()(new)
-app.command()(edit)
-app.command()(delete)
-app.command()(backup)
+# Single commands
+app.command(rich_help_panel=command_groups[0])(search)
+app.command(rich_help_panel=command_groups[0])(show)
+app.command(rich_help_panel=command_groups[1])(new)
+app.command(rich_help_panel=command_groups[1])(edit)
+app.command(rich_help_panel=command_groups[2])(delete)
+app.command(rich_help_panel=command_groups[2])(backup)
+
+# Sub commands 
+app.add_typer(list_commands.app, name = 'list', rich_help_panel=command_groups[0])
+app.add_typer(open_commands.app, name = 'open', rich_help_panel=command_groups[1])
+app.add_typer(export_commands.app, name = 'export', rich_help_panel=command_groups[2])
+app.add_typer(files_commands.app, name = 'files', rich_help_panel=command_groups[2])
+
 
 
 def run():

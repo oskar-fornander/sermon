@@ -9,7 +9,7 @@ from app.presentation.common import console
 
 
 def edit(sermon_code: str):
-    """Interaktiv redigering av en predikan"""
+    """Redigera data för en predikan"""
     clear_screen()
     edit_sermon(sermon_code)
 
