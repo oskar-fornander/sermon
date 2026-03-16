@@ -13,6 +13,12 @@ Privat predikoregister för mina predikningar.
 - ...
 - 
 
+## uv
+
+- uv tool uninstall sermon
+- uv sync  (creates uv.lock)
+- uv tool install --editable .
+
 
 ## Mappstruktur
 Överblick: 

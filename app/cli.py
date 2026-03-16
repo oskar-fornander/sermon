@@ -5,7 +5,7 @@ import traceback
 from app.errors import SermonError
 from app.config import CONFIG, DB_FILE
 from app.config import init_environment
-from app.presentation.common import render_info_panel
+from app.presentation.common import render_info_panel, clear_screen
 import typer
 from typer.core import TyperGroup
 
@@ -65,6 +65,7 @@ app.add_typer(files_commands.app, name = 'files', rich_help_panel=command_groups
 
 def run():
     try:
+        clear_screen()
         app()
     except SermonError as e:
         render_info_panel(title='[error]Fel[/error]', content=f"{e}")

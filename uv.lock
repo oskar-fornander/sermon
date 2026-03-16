@@ -144,7 +144,7 @@ dependencies = [
 requires-dist = [
     { name = "pyyaml", specifier = ">=6.0" },
     { name = "send2trash", specifier = ">=1.8" },
-    { name = "typer", specifier = ">=0.9" },
+    { name = "typer", specifier = ">=0.12.0" },
 ]
 
 [[package]]

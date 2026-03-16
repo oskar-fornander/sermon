@@ -407,15 +407,15 @@ def get_all_resources():
 
 
 # --------------------
-# Load from database with sermonDraft
+# Load from database with SermonDraft
 # --------------------
 
 # load_sermon_as_draft() is in services/sermon_draft.py
 
 # --------------------
-# Write to database from sermonDraft
+# Write to database from SermonDraft
 # --------------------
-def create_sermon_in_database(draft: sermonDraft, conn = None, include_related_sermons = True):
+def create_sermon_in_database(draft: "SermonDraft", conn = None, include_related_sermons = True):
     """Create a new sermon in the database based on data in the draft. Validation is already made in create_sermon_from_draft in services/sermon_draft.py"""
     # Data is inserted into sermon and all other relevant tables
     # No sermon id exists before insertion in database
@@ -472,9 +472,9 @@ def insert_sermon_row(conn, draft):  # Update sermon table
 
 
 # --------------------
-# Update database from sermonDraft
+# Update database from SermonDraft
 # --------------------
-def update_sermon_from_draft(draft: sermonDraft):
+def update_sermon_from_draft(draft: "SermonDraft"):
     """Uppdatera en befintlig predikan i databasen baserat på data i draft."""
     # sermon is UPDATED in database
     # other tables (manuscripts, recordings, etc.) are DELETED and RECREATED in database
@@ -536,8 +536,8 @@ def update_sermon_row(conn, draft):  # Update sermon table
     #console.print('Rows affected:', cur.rowcount)
 
 
-def update_services(conn, sermon_id, services: List[ServiceDraft], delete_missing=False):
-    """Uppdatera gudstjänster för angiven sermon_id utifrån angiven lista med ServiceDraft. Radera poster databasen som saknas i argumentets lista om True, annars lägg bara till. Om satt till False kan denna funktion användas för att lägga till ny post, skickad som lista."""
+def update_services(conn, sermon_id, services: List["ServiceDraft"], delete_missing=False):
+    """Uppdatera gudstjänster för angiven sermon_id utifrån angiven lista med "ServiceDraft". Radera poster databasen som saknas i argumentets lista om True, annars lägg bara till. Om satt till False kan denna funktion användas för att lägga till ny post, skickad som lista."""
     cur = conn.cursor()
     if delete_missing:  # 3. Delete post in database that is not represented in the given list of drafts - only if delete_missing is set to True.
         db_services = get_services_for_sermon(get_sermon_code(sermon_id))  # Current services in database
@@ -587,8 +587,8 @@ def update_services(conn, sermon_id, services: List[ServiceDraft], delete_missin
             )
 
 
-def update_manuscripts(conn, sermon_id, manuscripts: List[ManuscriptDraft], delete_missing=False):
-    """Uppdatera manuskript för angiven sermon_id utifrån angiven lista med ManuscriptDraft. Radera poster databasen som saknas i argumentets lista om True, annars lägg bara till. Om satt till False kan denna funktion användas för att lägga till ny post, skickad som lista."""
+def update_manuscripts(conn, sermon_id, manuscripts: List["ManuscriptDraft"], delete_missing=False):
+    """Uppdatera manuskript för angiven sermon_id utifrån angiven lista med "ManuscriptDraft". Radera poster databasen som saknas i argumentets lista om True, annars lägg bara till. Om satt till False kan denna funktion användas för att lägga till ny post, skickad som lista."""
     cur = conn.cursor()
     if delete_missing:  # 3. Delete post in database that is not represented in the given list of drafts - only if delete_missing is set to True.
         db_manuscripts = get_manuscripts_for_sermon(get_sermon_code(sermon_id))  # Current manuscripts in database
@@ -638,8 +638,8 @@ def update_manuscripts(conn, sermon_id, manuscripts: List[ManuscriptDraft], dele
             )
 
 
-def update_recordings(conn, sermon_id, recordings: List[RecordingDraft], delete_missing=False):
-    """Uppdatera inspelning för angiven sermon_id utifrån angiven lista med RecordingDraft. Radera poster databasen som saknas i argumentets lista om True, annars lägg bara till. Om satt till False kan denna funktion användas för att lägga till ny post, skickad som lista."""
+def update_recordings(conn, sermon_id, recordings: List["RecordingDraft"], delete_missing=False):
+    """Uppdatera inspelning för angiven sermon_id utifrån angiven lista med "RecordingDraft". Radera poster databasen som saknas i argumentets lista om True, annars lägg bara till. Om satt till False kan denna funktion användas för att lägga till ny post, skickad som lista."""
     cur = conn.cursor()
     if delete_missing:  # 3. Delete post in database that is not represented in the given list of drafts - only if delete_missing is set to True.
         db_recordings = get_recordings_for_sermon(get_sermon_code(sermon_id))  # Current recordings in database
@@ -695,8 +695,8 @@ def update_recordings(conn, sermon_id, recordings: List[RecordingDraft], delete_
             )
 
 
-def update_resources(conn, sermon_id, resources: List[ResourceDraft], delete_missing=False):
-    """Uppdatera resurs för angiven sermon_id utifrån angiven lista med ResourceDraft. Radera poster databasen som saknas i argumentets lista om True, annars lägg bara till. Om satt till False kan denna funktion användas för att lägga till ny post, skickad som lista."""
+def update_resources(conn, sermon_id, resources: List["ResourceDraft"], delete_missing=False):
+    """Uppdatera resurs för angiven sermon_id utifrån angiven lista med "ResourceDraft". Radera poster databasen som saknas i argumentets lista om True, annars lägg bara till. Om satt till False kan denna funktion användas för att lägga till ny post, skickad som lista."""
     cur = conn.cursor()
     if delete_missing:  # 3. Delete post in database that is not represented in the given list of drafts - only if delete_missing is set to True.
         db_resources = get_resources_for_sermon(get_sermon_code(sermon_id))  # Current resources in database

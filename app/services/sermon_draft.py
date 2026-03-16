@@ -151,7 +151,7 @@ def new_resource_draft(template = None, sermon_code='') -> ResourceDraft:
         )
 
 
-def load_sermon_as_draft(sermon_code: str) -> sermonDraft:
+def load_sermon_as_draft(sermon_code: str) -> SermonDraft:
     """Fetch a sermon and return as a draft."""
 
     # Get data from the database
@@ -165,8 +165,8 @@ def load_sermon_as_draft(sermon_code: str) -> sermonDraft:
     bible_references = get_bible_references_for_sermon(sermon_code)
     related_sermons = get_related_sermons_for_sermon(sermon_code)
 
-    # Convert that data into a sermonDraft
-    sermon_draft = new_sermon_draft(sermon)  # Create a new sermonDraft with data from the given sermon
+    # Convert that data into a SermonDraft
+    sermon_draft = new_sermon_draft(sermon)  # Create a new SermonDraft with data from the given sermon
     sermon_draft.services = [new_service_draft(s) for s in services]  # The same for all sub tables (some may be more than one element in a list)
     sermon_draft.manuscripts = [new_manuscript_draft(m) for m in manuscripts]
     sermon_draft.recordings = [new_recording_draft(r) for r in recordings]
@@ -233,12 +233,12 @@ def validate_sermon_draft(draft: SermonDraft):
 
 
 
-def deep_copy(draft: sermonDraft):
+def deep_copy(draft: SermonDraft):
     """Make a deep copy of a sermon draft."""
     return copy.deepcopy(draft)
 
 
-def equal_drafts(draft1: sermonDraft, draft2: sermonDraft):
+def equal_drafts(draft1: SermonDraft, draft2: SermonDraft):
     """Compare if the two drafts are equal or not"""
     d1 = asdict(draft1)
     d2 = asdict(draft2)
