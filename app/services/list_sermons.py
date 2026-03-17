@@ -34,7 +34,7 @@ def list_sermons_by_date(n = 0, reverse = False):
         desc = f"De {min(n, len(dates))} senaste predikningarna"
     if reverse:
         dates.reverse()  #Reverse the sorted list if flag --reverse is set
-    desc += " listade efter predikokod"
+    desc += " listade efter datum"
 
     sermons = []
     for date in dates:
