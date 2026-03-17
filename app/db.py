@@ -117,6 +117,26 @@ def sermon_exists(code: str, conn = None) -> True|False:
         raise DatabaseError(f"Databasfel: {e}")
 
 
+def query_sermons(query: str = None, year: int = None, month: str = None, place: str = None, report: str = None, must_have_recording: bool = False):
+    """Make a query for sermons"""
+#Separate function for order by date?????
+    conn = get_connection()
+    cur = conn.cursor()
+    try:
+        cur.execute(
+            """
+            SELECT 
+                sermon.code 
+            FROM sermon
+            ORDER BY sermon.code
+            """
+        )
+        row = cur.fetchall()
+        conn.close()
+        return row
+    except sqlite3.Error as e:
+        raise DatabaseError(f"Databasfel: {e}")
+
 
 def list_sermon_codes():
     """List sermon codes by code"""

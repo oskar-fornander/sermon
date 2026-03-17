@@ -11,7 +11,7 @@ app = typer.Typer(help = 'Lista de senaste predikningarna', invoke_without_comma
 def sermon_listing_function(
         limit: int = typer.Option(10, '--limit', '-n', help='Antal predikningar att visa'),
         all: bool = typer.Option(False, '--all', help='Visa alla predikningar'), 
-        date: bool = typer.Option(False, '--date', help='Sorterat efter datum för framförande istället för kod'),
+        date: bool = typer.Option(False, '--order-by-date', help='Sorterat efter datum för framförande istället för kod'),
         reverse: bool = typer.Option(False, '--reverse', '-r', help='Omvänd sortering'),
 
         year: Optional[int] = typer.Option(None, '--year', help='Filtrera efter år'),
