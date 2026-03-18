@@ -60,6 +60,7 @@ predikan/                   # överordnad mapp
 │   │   │   ├── edit_sermon.py
 │   │   │   ├── list_sermons.py
 │   │   │   ├── new_sermon.py
+│   │   │   ├── search_sermons.py
 │   │   │   ├── sermon_draft.py
 │   │   │   └── show_sermon.py
 │   │   └──tools/

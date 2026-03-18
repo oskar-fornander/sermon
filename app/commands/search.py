@@ -1,6 +1,8 @@
 
 import typer
 from app.presentation.common import clear_screen
+from app.services.search_sermons import search_sermons
+
 
 
 
