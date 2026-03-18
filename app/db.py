@@ -117,23 +117,100 @@ def sermon_exists(code: str, conn = None) -> True|False:
         raise DatabaseError(f"Databasfel: {e}")
 
 
-def query_sermons(query: str = None, year: int = None, month: str = None, place: str = None, report: str = None, must_have_recording: bool = False):
+def query_sermons(query: str = None, year: int = None, month: str = None, place: str = None, report: str = None, must_have_recording: bool = False, limit: int = 0):
     """Make a query for sermons"""
 #Separate function for order by date?????
+#limit is the number of hits to return
+
+    #def normalize(text: str) -> str:  # Use to compare lower case words. LIKE is case insensitive but Ä≠ä, a problem this function solves.
+    #    return text.lower()
+# Why does this function not work? no such function: normalize
+
+    sql = """
+    SELECT sermon.code
+    FROM sermon
+    """
+    conditions = []
+    params = []
+
+    if query:  # Search query
+        conditions.append("""
+            (
+                sermon.title LIKE ?
+                OR sermon.context LIKE ?
+                OR sermon.introduction LIKE ?
+                OR sermon.message LIKE ?
+                OR sermon.notes LIKE ?
+            )
+        """)
+        for _ in range(5):  # Make sure to add as many parameters (the same search term) as there are queries above
+            params.append(f"%{query}%")
+
+    if year:  # Filter by year
+        conditions.append("""
+            EXISTS (
+                SELECT 1 FROM service
+                WHERE service.sermon_id = sermon.id
+                AND strftime('%Y', service.date) = ?
+            )
+        """)
+        params.append(str(year))
+    
+    if month:  # Filter by month
+        month_names = ['', 'januari', 'februari', 'mars', 'april', 'maj', 'juni', 'juli', 'augusti', 'september', 'oktober', 'november', 'december']
+        conditions.append("""
+            EXISTS (
+                SELECT 1 FROM service
+                WHERE service.sermon_id = sermon.id
+                AND month_names[strftime('%-m', service.date)] LIKE ?
+            )
+        """)
+        params.append(f"%{month}%")  # Match 'jan' with 'januari' etc.
+    
+    if place:  # Filter by place
+        conditions.append("""
+            EXISTS (
+                SELECT 1 FROM service
+                WHERE service.sermon_id = sermon.id
+                AND service.place LIKE ?
+            )
+        """)
+        params.append(f"%{place}%")
+
+    if report:  # Filter by report
+        conditions.append("""
+            (
+                sermon.report == ?
+            )
+        """)
+        params.append(report)
+    
+    if must_have_recording:  # Filter out sermons that have at least one recording (file or url)
+        conditions.append("""
+            EXISTS (
+                SELECT 1 FROM recording
+                WHERE recording.sermon_id = sermon.id
+            )
+        """)
+
+    if limit:  # Limit the number of hits to show?
+        sql += " LIMIT ?"
+        params.append(limit)
+
+    if conditions:
+        sql += "WHERE " + " AND ".join(conditions)  # Add all conditions ANDed
+
+    sql += "ORDER BY sermon.code"  # How to order the hits
+
+    print(sql)
+
     conn = get_connection()
     cur = conn.cursor()
     try:
-        cur.execute(
-            """
-            SELECT 
-                sermon.code 
-            FROM sermon
-            ORDER BY sermon.code
-            """
-        )
-        row = cur.fetchall()
+        cur.execute(sql, params)
+        rows = cur.fetchall()
         conn.close()
-        return row
+        return rows
     except sqlite3.Error as e:
         raise DatabaseError(f"Databasfel: {e}")
 
@@ -151,9 +228,9 @@ def list_sermon_codes():
             ORDER BY sermon.code
             """
         )
-        row = cur.fetchall()
+        rows = cur.fetchall()
         conn.close()
-        return row
+        return rows
     except sqlite3.Error as e:
         raise DatabaseError(f"Databasfel: {e}")
 
