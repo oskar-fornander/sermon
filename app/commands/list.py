@@ -33,6 +33,6 @@ def sermon_listing_function(
     if date:
         list_sermons_by_date(n=n, reverse=reverse)  #List sermons by service dates
     else:
-        list_sermons_by_code(n=n, reverse=reverse)  #List sermons by code, e.g. P372
-
+        #list_sermons_by_code(n=n, reverse=reverse, year, month, place, report, has_recording)  #List sermons by code, e.g. P372
+        list_sermons_by_code(n=n, reverse=reverse, year=year, month=month, place=place, report=report, must_have_recording=has_recording)
 

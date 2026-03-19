@@ -117,14 +117,10 @@ def sermon_exists(code: str, conn = None) -> True|False:
         raise DatabaseError(f"Databasfel: {e}")
 
 
-def query_sermons(query: str = None, year: int = None, month: str = None, place: str = None, report: str = None, must_have_recording: bool = False, limit: int = 0):
+def query_sermons(query: str = None, year: int = None, month: int = None, place: str = None, report: str = None, must_have_recording: bool = False, limit: int = 0, reverse = False):
     """Make a query for sermons"""
 #Separate function for order by date?????
 #limit is the number of hits to return
-
-    #def normalize(text: str) -> str:  # Use to compare lower case words. LIKE is case insensitive but Ä≠ä, a problem this function solves.
-    #    return text.lower()
-# Why does this function not work? no such function: normalize
 
     sql = """
     SELECT sermon.code, sermon.title
@@ -135,74 +131,70 @@ def query_sermons(query: str = None, year: int = None, month: str = None, place:
 
     if query:  # Search query
         conditions.append("""
-            (
-                LOWER(sermon.title) LIKE ?
-                OR LOWER(sermon.context) LIKE ?
-                OR LOWER(sermon.introduction) LIKE ?
-                OR LOWER(sermon.message) LIKE ?
-                OR LOWER(sermon.notes) LIKE ?
-            )
+        (
+            LOWER(sermon.title) LIKE ?
+            OR LOWER(sermon.context) LIKE ?
+            OR LOWER(sermon.introduction) LIKE ?
+            OR LOWER(sermon.message) LIKE ?
+            OR LOWER(sermon.notes) LIKE ?
+        )
         """)
         for _ in range(5):  # Make sure to add as many parameters (the same search term) as there are queries above
             params.append(f"%{query.lower()}%")  # Make search case insensitive also for åäö with .lower() and LOWER()
 
-    if year:  # Filter by year
+    if year or month:  # Filter by year and/or month (if both are given we assume both will apply to the same date, therefore we have a common search)
+        year = str(year) if year else '%'  # Use asterisk for year if no year is given, works with LIKE
+        month = str(month) if month else '%'  # (Note: SQLite only supports %m (month with leading 0), %Y (year) and %d (day) in strftime().)
         conditions.append("""
-            EXISTS (
-                SELECT 1 FROM service
-                WHERE service.sermon_id = sermon.id
-                AND strftime('%Y', service.date) = ?
-            )
+        EXISTS (
+            SELECT 1 FROM service
+            WHERE service.sermon_id = sermon.id
+            AND strftime('%Y', service.date) LIKE ?
+            AND CAST(strftime('%m', service.date) AS INTEGER) LIKE ?
+        )
         """)
-        params.append(str(year))
-    
-    if month:  # Filter by month
-        month_names = ['', 'januari', 'februari', 'mars', 'april', 'maj', 'juni', 'juli', 'augusti', 'september', 'oktober', 'november', 'december']
-        conditions.append("""
-            EXISTS (
-                SELECT 1 FROM service
-                WHERE service.sermon_id = sermon.id
-                AND month_names[strftime('%-m', service.date)] LIKE ?
-            )
-        """)
-        params.append(f"%{month}%")  # Match 'jan' with 'januari' etc.
+        params.append(year)
+        params.append(month)
     
     if place:  # Filter by place
         conditions.append("""
-            EXISTS (
-                SELECT 1 FROM service
-                WHERE service.sermon_id = sermon.id
-                AND LOWER(service.place) LIKE ?
-            )
+        EXISTS (
+            SELECT 1 FROM service
+            WHERE service.sermon_id = sermon.id
+            AND LOWER(service.place) LIKE ?
+        )
         """)
         params.append(f"%{place.lower()}%")
 
     if report:  # Filter by report
         conditions.append("""
-            (
-                sermon.report == ?
-            )
+        (
+            sermon.report == ?
+        )
         """)
         params.append(report)
     
     if must_have_recording:  # Filter out sermons that have at least one recording (file or url)
         conditions.append("""
-            EXISTS (
-                SELECT 1 FROM recording
-                WHERE recording.sermon_id = sermon.id
-            )
+        EXISTS (
+            SELECT 1 FROM recording
+            WHERE recording.sermon_id = sermon.id
+        )
         """)
-
-    if limit:  # Limit the number of hits to show?
-        sql += " LIMIT ?"
-        params.append(limit)
 
     if conditions:
         sql += "WHERE " + " AND ".join(conditions)  # Add all conditions ANDed
 
-    sql += "ORDER BY sermon.code"  # How to order the hits
+    sorting_order = 'DESC' if reverse else 'ASC'
+    sql += "\n    ORDER BY sermon.code " + sorting_order  # How to order the hits
+
+    if limit:  # Limit the number of hits to show?
+        sql += "\n    LIMIT ?"
+        params.append(limit)
+
 
     print(sql)
+    print(params)
 
     conn = get_connection()
     cur = conn.cursor()
