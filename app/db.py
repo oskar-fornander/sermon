@@ -127,7 +127,7 @@ def query_sermons(query: str = None, year: int = None, month: str = None, place:
 # Why does this function not work? no such function: normalize
 
     sql = """
-    SELECT sermon.code
+    SELECT sermon.code, sermon.title
     FROM sermon
     """
     conditions = []
@@ -136,15 +136,15 @@ def query_sermons(query: str = None, year: int = None, month: str = None, place:
     if query:  # Search query
         conditions.append("""
             (
-                sermon.title LIKE ?
-                OR sermon.context LIKE ?
-                OR sermon.introduction LIKE ?
-                OR sermon.message LIKE ?
-                OR sermon.notes LIKE ?
+                LOWER(sermon.title) LIKE ?
+                OR LOWER(sermon.context) LIKE ?
+                OR LOWER(sermon.introduction) LIKE ?
+                OR LOWER(sermon.message) LIKE ?
+                OR LOWER(sermon.notes) LIKE ?
             )
         """)
         for _ in range(5):  # Make sure to add as many parameters (the same search term) as there are queries above
-            params.append(f"%{query}%")
+            params.append(f"%{query.lower()}%")  # Make search case insensitive also for åäö with .lower() and LOWER()
 
     if year:  # Filter by year
         conditions.append("""
@@ -172,10 +172,10 @@ def query_sermons(query: str = None, year: int = None, month: str = None, place:
             EXISTS (
                 SELECT 1 FROM service
                 WHERE service.sermon_id = sermon.id
-                AND service.place LIKE ?
+                AND LOWER(service.place) LIKE ?
             )
         """)
-        params.append(f"%{place}%")
+        params.append(f"%{place.lower()}%")
 
     if report:  # Filter by report
         conditions.append("""
