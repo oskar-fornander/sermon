@@ -206,6 +206,10 @@ def query_sermons(query: str = None, year: int = None, month: int = None, place:
     except sqlite3.Error as e:
         raise DatabaseError(f"Databasfel: {e}")
 
+def query_services(query: str = None, year: int = None, month: int = None, place: str = None, report: str = None, must_have_recording: bool = False, limit: int = 0, reverse = False):
+    """Make a query for services"""
+    pass
+
 
 def list_sermon_codes():
     """List sermon codes by code"""
