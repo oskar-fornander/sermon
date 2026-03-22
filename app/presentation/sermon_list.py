@@ -4,8 +4,11 @@ from app.utils import get_file_link
 from app.presentation.common import *
 
 
-def render_sermon_list(title, sermons, order_by = 'code'):
+def render_sermon_list(title='', sermons=[], order_by='code', reverse = False):
     """Render a presentation of a list of sermons, sorted by code or date."""
+
+    if not reverse:  # Reverse for presentation?
+        sermons.reverse()
 
     table = Table(title=None, box=box.SIMPLE, expand=False, row_styles=['', 'on black']) #A table inside the panel
 

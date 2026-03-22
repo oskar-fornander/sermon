@@ -11,6 +11,7 @@ app = typer.Typer(help = 'Lista de senaste predikningarna', invoke_without_comma
 def sermon_listing_function(
         limit: int = typer.Option(10, '--limit', '-n', help='Antal predikningar att visa'),
         all: bool = typer.Option(False, '--all', help='Visa alla predikningar'), 
+        offset: int = typer.Option(0, '--offset', help='Offset från senaste predikan'),
         #sort: str = typer.Option("code", "--sort", help="Sortera efter predikokod 'code' eller datum 'date'"),
         sort: Literal['code', 'date'] = typer.Option('code', '--sort', help="Sortera efter predikokod 'code' eller datum 'date'"),
         reverse: bool = typer.Option(False, '--reverse', '-r', help='Omvänd sortering'),
@@ -28,10 +29,11 @@ def sermon_listing_function(
     
     if all:
         limit = 0  # Display all
+        offset = 0  # No offset in search
 
     if sort == 'date':
-        list_sermons(list_by='date', n=limit, reverse=reverse, year=year, month=month, place=place, report=report, must_have_recording=has_recording)  # List sermons by service dates
+        list_sermons(list_by='date', n=limit, offset=offset, reverse=reverse, year=year, month=month, place=place, report=report, must_have_recording=has_recording)  # List sermons by service dates
     else:
-        list_sermons(list_by='code', n=limit, reverse=reverse, year=year, month=month, place=place, report=report, must_have_recording=has_recording)  # List sermons by sermon code
+        list_sermons(list_by='code', n=limit, offset=offset, reverse=reverse, year=year, month=month, place=place, report=report, must_have_recording=has_recording)  # List sermons by sermon code
 
 

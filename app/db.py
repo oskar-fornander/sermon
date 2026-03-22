@@ -117,7 +117,7 @@ def sermon_exists(code: str, conn = None) -> True|False:
         raise DatabaseError(f"Databasfel: {e}")
 
 
-def query_sermons(query: str = None, year: int = None, month: int = None, place: str = None, report: str = None, must_have_recording: bool = False, limit: int = 0, reverse = False):
+def query_sermons(query: str = None, year: int = None, month: int = None, place: str = None, report: str = None, must_have_recording: bool = False, limit: int = 0, offset: int = 0):
     """Make a query for sermons"""
 #Separate function for order by date?????
 #limit is the number of hits to return
@@ -185,12 +185,14 @@ def query_sermons(query: str = None, year: int = None, month: int = None, place:
     if conditions:
         sql += "WHERE " + " AND ".join(conditions)  # Add all conditions ANDed
 
-    sorting_order = 'DESC' if reverse else 'ASC'
-    sql += "\n    ORDER BY sermon.code " + sorting_order  # How to order the hits
+    sql += "\n    ORDER BY sermon.code DESC"  # Always search from the end of the database; i.e. include the last sermons in the search
 
     if limit:  # Limit the number of hits to show?
         sql += "\n    LIMIT ?"
         params.append(limit)
+    if offset:
+        sql += "\n    OFFSET ?"
+        params.append(offset)
 
 
     print(sql)
@@ -206,7 +208,7 @@ def query_sermons(query: str = None, year: int = None, month: int = None, place:
     except sqlite3.Error as e:
         raise DatabaseError(f"Databasfel: {e}")
 
-def query_services(query: str = None, year: int = None, month: int = None, place: str = None, report: str = None, must_have_recording: bool = False, limit: int = 0, reverse = False):
+def query_services(query: str = None, year: int = None, month: int = None, place: str = None, report: str = None, must_have_recording: bool = False, limit: int = 0):
     """Make a query for services"""
     pass
 
