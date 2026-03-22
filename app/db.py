@@ -190,9 +190,9 @@ def query_sermons(query: str = None, year: int = None, month: int = None, place:
     if limit:  # Limit the number of hits to show?
         sql += "\n    LIMIT ?"
         params.append(limit)
-    if offset:
-        sql += "\n    OFFSET ?"
-        params.append(offset)
+        if offset:
+            sql += "\n    OFFSET ?"
+            params.append(offset)
 
 
     print(sql)

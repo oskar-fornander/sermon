@@ -25,10 +25,13 @@ def list_sermons(list_by='code', n=0, offset=0, reverse = False, year = None, mo
         if offset > 0:
             desc += f" (offset: {offset})"
     if list_by == 'date':
-        desc += " listade efter datum.\n"
+        desc += " listade efter datum."
     else:
-        desc += " listade efter predikokod.\n"
-    desc += f"Filter: "
+        desc += " listade efter predikokod."
+    desc += f"\n{n=} "
+    if offset > 0:
+        desc += f"{offset=}"
+    desc += f"\nFilter: "
     if year:
         desc += f"{year=} "
     if month:
