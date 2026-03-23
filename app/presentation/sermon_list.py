@@ -4,11 +4,12 @@ from app.utils import get_file_link
 from app.presentation.common import *
 
 
-def render_sermon_list(title='', sermons=[], order_by='code', reverse = False):
+def render_sermon_list(title='', sermons=[], dates=[], order_by='code', reverse = False):
     """Render a presentation of a list of sermons, sorted by code or date."""
 
     if not reverse:  # Reverse for presentation?
         sermons.reverse()
+        dates.reverse()
 
     table = Table(title=None, box=box.SIMPLE, expand=False, row_styles=['', 'on black']) #A table inside the panel
 
@@ -28,22 +29,21 @@ def render_sermon_list(title='', sermons=[], order_by='code', reverse = False):
     table.add_column('±', style='notes', no_wrap=True)  # Report column
     
 
-    for sermon in sermons:  # Each sermon is a sermonDraft
-
+    #for sermon in sermons:  
+    for i, sermon in enumerate(sermons):  # Each sermon is a sermonDraft
         # Join all manuscripts, recordings and resources into single string for presentation in table
-        #manuscript = ' '.join([f"[link=file://{PATH_MANUSCRIPTS}/{x.file_name}][link_style]{LIST_MARKER}[/]" for x in sermon.manuscripts])
-        #recording = ' '.join([f"[link=file://{PATH_RECORDINGS}/{x.file_name}][link_style]{LIST_MARKER}[/]" for x in sermon.recordings])
-        #resource = ' '.join([f"[link=file://{PATH_RESOURCES}/{x.file_name}][link_style]{LIST_MARKER}[/]" for x in sermon.resources])
         manuscript = ' '.join([get_file_link(PATH_MANUSCRIPTS, x.file_name, title=LIST_MARKER, show_title_if_missing=False) for x in sermon.manuscripts])
         recording = ' '.join([get_file_link(PATH_RECORDINGS, x.file_name or x.external_url, title=LIST_MARKER, show_title_if_missing=False) for x in sermon.recordings])
         resource = ' '.join([get_file_link(PATH_RESOURCES, x.file_name, title=LIST_MARKER, show_title_if_missing=False) for x in sermon.resources])
 
-
         if order_by == 'date':
+            date, place = '', ''
             if sermon.services:
-                date = sermon.services[-1].date  # Get the last date this sermon was preached in a service
-                place = sermon.services[-1].place
-                table.add_row(sermon.code, date, place, sermon.title, manuscript, recording, resource, sermon.report)
+                for s in sermon.services:  # Find the correct service to show
+                    if s.date == dates[i]:
+                        date = s.date  # Date of the service to show
+                        place = s.place
+            table.add_row(sermon.code, date, place, sermon.title, manuscript, recording, resource, sermon.report)
         else: #code
             service = ''
             if sermon.services:

@@ -15,8 +15,8 @@ def list_sermons(list_by='code', n=0, offset=0, reverse = False, year = None, mo
 
     result = query_sermons(sort=list_by, limit=n, offset=offset, query = None, year=year, month=month_index, place=place, report=report, must_have_recording=must_have_recording)
 
-    #from app.presentation.common import console
-    #console.print([(r['code'], r['title']) for r in result])
+    from app.presentation.common import console
+    console.print([r['code'] for r in result])
 
     # Build descriptive text to show above table
     desc = f"Alla ({len(result)}) predikningar"
@@ -45,10 +45,14 @@ def list_sermons(list_by='code', n=0, offset=0, reverse = False, year = None, mo
 
 
     sermons = []
+    dates = []
     for r in result:
         sermons.append(load_sermon_as_draft(r['code']))  # Get sermons as sermondDraft objects and store in a list
+    if list_by == 'date':  # Dates for the services to show must be included when listed by date
+        for r in result:
+            dates.append(r['date'])
 
-    render_sermon_list(title=desc, sermons=sermons, order_by=list_by, reverse=reverse)
+    render_sermon_list(title=desc, sermons=sermons, dates=dates, order_by=list_by, reverse=reverse)
 
 
 

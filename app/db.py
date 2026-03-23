@@ -120,7 +120,7 @@ def sermon_exists(code: str, conn = None) -> True|False:
 def query_sermons(sort: str = 'code', limit: int = 0, offset: int = 0, query: str = None, year: int = None, month: int = None, place: str = None, report: str = None, must_have_recording: bool = False):
     """Make a query for sermons"""
 
-    if sort == 'date':
+    if sort == 'date':  # When listed by date the service date must be included form the service table
         sql = """
         SELECT sermon.code, service.date
         FROM service
@@ -222,7 +222,10 @@ def query_sermons(sort: str = 'code', limit: int = 0, offset: int = 0, query: st
     if conditions:
         sql += "WHERE " + "AND".join(conditions)  # Add all conditions ANDed
 
-    sql += "\n    ORDER BY sermon.code DESC"  # Always search from the end of the database; i.e. include the last sermons in the search
+    if sort == 'date':
+        sql += "\n    ORDER BY service.date DESC"  # Always search from the end of the database; i.e. include the last sermons in the search - based on date of service
+    else:  # code
+        sql += "\n    ORDER BY sermon.code DESC"  # Always search from the end of the database; i.e. include the last sermons in the search
 
     if limit:  # Limit the number of hits to show?
         sql += "\n    LIMIT ?"
