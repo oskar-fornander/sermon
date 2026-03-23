@@ -1,0 +1,228 @@
+
+Jag bygger en CLI-applikation i Python (med Typer och SQLite) för att hantera mitt privata predikoregister som inkluderar manuskript (pdf), inspelningar (mp3 eller video eller url) och extra resurser (ofta pdf) samt förstås metadata.
+
+## Funktionalitet (det som ännu inte är implementerat står inom parentes):
+
+* `sermon list` – lista predikningar
+* `sermon search` – sök bland predikningar
+* `sermon show` – visa predikan snyggt
+
+* `sermon new` – skapa ny predikan (med interaktiv edit)
+* `sermon edit` – avancerad interaktiv redigering (inkl. nested resurser som manus, inspelningar etc.)
+* (`sermon open` – öppna filer till predikan)
+
+* (`sermon export` – exportera html-översikt + till podcast)
+* `sermon files check/open` – hantera filer (saknade/överflödiga + öppna mapp i Finder)
+* `sermon backup` – backup av SQLite-databasen
+* `sermon delete` – radera predikan + filer (med send2trash)
+
+## Databas:
+
+* SQLite
+* Huvudtabell: sermon
+* Relaterade tabeller: service, manuscript, recording, resource, bible_reference, sermon_relation
+* Jag använder FOREIGN KEYs och ON DELETE CASCADE
+* Jag använder interna id:n (AUTOINCREMENT)
+* Längst ned klistrar jag in hur schema.sql ser ut
+
+## Arkitektur:
+
+* CLI-lager (Typer)
+* service-lager (logik + interactive edit)
+* db.py (alla databasoperationer)
+* config.yaml i ~/.config/sermon/ (filen skapas om den saknas vid första körning) innehåller sökvägar
+* archive-mapp med databas + filer (synkad via moln) (se längre ned hur mappstrukturen är uppbyggd och vilka filer som finns för projektet och datan)
+
+## Viktiga implementationer:
+
+* Jag använder dataclasses (SermonDraft etc.)
+* Jag använder "update istället för delete+insert" för huvudtabellen
+* Jag använder "delete+recreate" för vissa relaterade tabeller där det är enklare
+* Jag har egen felhantering med custom exceptions (ValidationError, DatabaseError, etc.)
+* Jag använder with conn: för transaktioner
+
+## Ny funktion jag jobbar på:
+
+Jag håller på att implementera:
+
+* `query_sermons()` i db.py 
+* används av både `sermon list` och `sermon search`
+
+Den stödjer:
+
+* fritextsökning (title, message, etc.)
+* filter (år, månad, plats, har inspelning, etc.)
+* dynamiskt byggd SQL
+
+
+## Vägen vidare
+
+Låt denna prompt bli den bakgrund och sammanhang du behöver för att kunna hjälpa mig med kommande frågor och resonemang för att utveckla mitt projekt. Utifrån det jag skrivit här – är det något du vill fråga om för klargöranden?
+Jag har ingen fråga just nu, men kommer vilja fortsätta implementera den senaste sök- och filter funktioner query_sermon() och mostvarande service-funktioner för både search och list.
+
+Svara kortfattat, konkret och med fokus på praktisk implementation i mitt projekt.
+
+
+Nedan kommer dels mappstruktur och filer och dels schemat för sqlite-databasen.
+
+
+## Mappstruktur
+Överblick: 
+```
+predikan            # överordnad mapp
+├── sermon/         # koden - synkas mot GitHub
+└── archive/        # filerna - synkas med molntjänst
+```
+Fullständig mappstruktur:
+```
+predikan/                   # överordnad mapp
+├── sermon/                 # CLI-projekt (GitHub)
+│   ├── app/                # Alla python-filer
+│   │   ├── cli.py          
+│   │   ├── config.py
+│   │   ├── db.py
+│   │   ├── errors.py
+│   │   ├── utils.py
+│   │   ├── commands/       # Varje CLI-kommando har en egen fil
+│   │   │   ├── backup.py
+│   │   │   ├── delete.py
+│   │   │   ├── edit.py
+│   │   │   ├── export.py
+│   │   │   ├── files.py
+│   │   │   ├── list.py
+│   │   │   ├── new.py
+│   │   │   ├── open.py
+│   │   │   ├── search.py
+│   │   │   └── show.py
+│   │   ├── presentation/
+│   │   │   ├── common.py
+│   │   │   ├── edit_sermon.py
+│   │   │   ├── new_sermon.py
+│   │   │   ├── sermon_card.py
+│   │   │   ├── sermon_list.py
+│   │   │   └── theme.py
+│   │   ├── services/
+│   │   │   ├── delete_sermon.py
+│   │   │   ├── edit_sermon.py
+│   │   │   ├── list_sermons.py
+│   │   │   ├── new_sermon.py
+│   │   │   ├── search_sermons.py
+│   │   │   ├── sermon_draft.py
+│   │   │   └── show_sermon.py
+│   │   └──tools/
+│   │       ├── files.py
+│   │       └── import_xml.py     # Engångsskript för import från gammalt system, kör så här: python -m app.tools.import_xml.py sermons.xml Skapar ny databasfil.
+│   │
+│   ├── config.yaml           # Konfigurationsfil (Den riktiga konfigurationsfilen finns i ~/.config/sermon/config.yaml)
+│   ├── schema.sql            # Schema för databasen
+│   ├── README.md             
+│   ├── pyproject.toml        
+│   └── uv.lock
+│
+└── archive/                  # filer (synkade med molntjänst)
+    ├── data/
+    │   ├── sermons.db        # SQLite
+    │   └── backup
+    │       ├── sermon_2026-03-21.db
+    │       └── sermon ...
+    │
+    ├── files/
+    │   ├── manuscripts/      # PDF
+    │   ├── recordings/       # MP3
+    │   ├── resources/        # PDF etc.
+    │   └── originals/        # Diverse originalfiler etc. som inte kopplas till databasen
+    │
+    └── html/
+        └── index.html        # Mobil översikt
+```
+
+
+## schema.sql
+
+-- schema.sql for sermon.db
+CREATE TABLE IF NOT EXISTS sermon (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    code TEXT UNIQUE NOT NULL,
+    title TEXT NOT NULL,
+    context TEXT,
+    introduction TEXT,
+    message TEXT,
+    report TEXT CHECK (report IN ('A','B','C') OR report IS NULL),
+    notes TEXT
+);
+
+CREATE TABLE IF NOT EXISTS service (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    sermon_id INTEGER NOT NULL,
+    date TEXT NOT NULL,
+    place TEXT NOT NULL,
+    notes TEXT,
+    FOREIGN KEY (sermon_id) 
+        REFERENCES sermon(id) 
+        ON DELETE CASCADE
+);
+
+CREATE TABLE IF NOT EXISTS manuscript (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    sermon_id INTEGER NOT NULL,
+    file_name TEXT NOT NULL,
+    date TEXT NOT NULL,
+    notes TEXT,
+    FOREIGN KEY (sermon_id) 
+        REFERENCES sermon(id) 
+        ON DELETE CASCADE
+    UNIQUE (sermon_id, file_name)
+);
+
+CREATE TABLE IF NOT EXISTS recording (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    sermon_id INTEGER NOT NULL,
+    type TEXT NOT NULL,
+    date TEXT NOT NULL,
+    file_name TEXT,
+    external_url TEXT,
+    notes TEXT,
+    FOREIGN KEY (sermon_id) 
+        REFERENCES sermon(id) 
+        ON DELETE CASCADE
+);
+
+CREATE TABLE IF NOT EXISTS resource (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    sermon_id INTEGER NOT NULL,
+    file_name TEXT NOT NULL,
+    title TEXT,
+    notes TEXT,
+    FOREIGN KEY (sermon_id) 
+        REFERENCES sermon(id) 
+        ON DELETE CASCADE
+);
+
+CREATE TABLE IF NOT EXISTS bible_reference (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    sermon_id INTEGER NOT NULL,
+    reference_text TEXT NOT NULL,
+    FOREIGN KEY (sermon_id) 
+        REFERENCES sermon(id) 
+        ON DELETE CASCADE
+);
+
+CREATE TABLE IF NOT EXISTS sermon_relation (
+    sermon_id INTEGER NOT NULL,
+    related_sermon_id INTEGER NOT NULL,
+    FOREIGN KEY (sermon_id) REFERENCES sermon(id) ON DELETE CASCADE,
+    FOREIGN KEY (related_sermon_id) REFERENCES sermon(id) ON DELETE CASCADE,
+    CHECK (sermon_id < related_sermon_id),
+    CHECK (sermon_id != related_sermon_id),
+    UNIQUE (sermon_id, related_sermon_id)
+);
+
+CREATE INDEX IF NOT EXISTS idx_service_sermon ON service(sermon_id);
+CREATE INDEX IF NOT EXISTS idx_manuscript_sermon ON manuscript(sermon_id);
+CREATE INDEX IF NOT EXISTS idx_recording_sermon ON recording(sermon_id);
+CREATE INDEX IF NOT EXISTS idx_resource_sermon ON resource(sermon_id);
+CREATE INDEX IF NOT EXISTS idx_bible_sermon ON bible_reference(sermon_id);
+
+CREATE INDEX IF NOT EXISTS idx_relation_sermon ON sermon_relation(sermon_id);
+CREATE INDEX IF NOT EXISTS idx_relation_related ON sermon_relation(related_sermon_id);
+

@@ -9,7 +9,6 @@ Privat predikoregister för mina predikningar.
 - sökfunktion
 - podcast-funktion?
 - Snygg och säker felhantering
-- Sök filer som saknas eller är överflödiga
 - ...
 - 
 
@@ -24,7 +23,7 @@ Privat predikoregister för mina predikningar.
 Överblick: 
 ```
 predikan            # överordnad mapp
-├── sermon/         # koden - synkas med git
+├── sermon/         # koden - synkas mot GitHub
 └── archive/        # filerna - synkas med molntjänst
 ```
 Fullständig mappstruktur:
@@ -64,18 +63,21 @@ predikan/                   # överordnad mapp
 │   │   │   ├── sermon_draft.py
 │   │   │   └── show_sermon.py
 │   │   └──tools/
+│   │       ├── files.py
 │   │       └── import_xml.py     # Engångsskript för import från gammalt system, kör så här: python -m app.tools.import_xml.py sermons.xml Skapar ny databasfil.
 │   │
-│   ├── .gitignore
+│   ├── config.yaml           # Konfigurationsfil (Den riktiga konfigurationsfilen finns i ~/.config/sermon/config.yaml)
 │   ├── schema.sql            # Schema för databasen
-│   ├── config.yaml           # Konfigurationsfil
-│   ├── requirements.txt      
-│   ├── pyproject.toml
-│   └── README.md
+│   ├── README.md             
+│   ├── pyproject.toml        
+│   └── uv.lock
 │
-└── archive/                  # filer (molntjänst)
+└── archive/                  # filer (synkade med molntjänst)
     ├── data/
-    │   └── sermons.db        # SQLite
+    │   ├── sermons.db        # SQLite
+    │   └── backup
+    │       ├── sermon_2026-03-21.db
+    │       └── sermon ...
     │
     ├── files/
     │   ├── manuscripts/      # PDF
@@ -87,8 +89,8 @@ predikan/                   # överordnad mapp
         └── index.html        # Mobil översikt
 ```
 
-All kod ligger i mappen `sermon/` och synkas med Git.
-Alla filer ligger i mappen `archive/` som synkas med valfri *molntjänst*.
+All kod ligger i mappen `sermon/` och synkas mot GitHub.
+Alla filer ligger i mappen `archive/` som synkas med molntjänst (Mega).
 
 ## Molntjänst
 
