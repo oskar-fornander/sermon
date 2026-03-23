@@ -13,13 +13,13 @@ def list_sermons(list_by='code', n=0, offset=0, reverse = False, year = None, mo
     if list_by not in ('code', 'date'):
         raise ValidationError(f"Invalid value of argument list_by: {list_by} Must be 'code' or 'date'")
 
-    result = query_services(sort=list_by, limit=n, offset=offset, query = None, year=year, month=month_index, place=place, report=report, must_have_recording=must_have_recording)
+    result = query_sermons(sort=list_by, limit=n, offset=offset, query = None, year=year, month=month_index, place=place, report=report, must_have_recording=must_have_recording)
 
     #from app.presentation.common import console
     #console.print([(r['code'], r['title']) for r in result])
 
     # Build descriptive text to show above table
-    desc = 'Alla predikningar'
+    desc = f"Alla ({len(result)}) predikningar"
     if n > 0:  # If not show all (n=0 means --all)
         desc = f"De {min(n, len(result))} senaste predikningarna"
         if offset > 0:
@@ -48,7 +48,7 @@ def list_sermons(list_by='code', n=0, offset=0, reverse = False, year = None, mo
     for r in result:
         sermons.append(load_sermon_as_draft(r['code']))  # Get sermons as sermondDraft objects and store in a list
 
-    render_sermon_list(title=desc, sermons=sermons, order_by='code', reverse=reverse)
+    render_sermon_list(title=desc, sermons=sermons, order_by=list_by, reverse=reverse)
 
 
 

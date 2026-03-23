@@ -119,18 +119,19 @@ def sermon_exists(code: str, conn = None) -> True|False:
 
 def query_sermons(sort: str = 'code', limit: int = 0, offset: int = 0, query: str = None, year: int = None, month: int = None, place: str = None, report: str = None, must_have_recording: bool = False):
     """Make a query for sermons"""
-#Separate function for order by date?????
-#limit is the number of hits to return
 
     if sort == 'date':
-        pass
+        sql = """
+        SELECT sermon.code, service.date
+        FROM service
+        JOIN sermon ON service.sermon_id = sermon.id
+        """
     else:  # sort == 'code'
-        pass
+        sql = """
+        SELECT sermon.code
+        FROM sermon
+        """
 
-    sql = """
-    SELECT sermon.code
-    FROM sermon
-    """
     conditions = []
     params = []
 
@@ -142,33 +143,64 @@ def query_sermons(sort: str = 'code', limit: int = 0, offset: int = 0, query: st
             OR LOWER(sermon.introduction) LIKE ?
             OR LOWER(sermon.message) LIKE ?
             OR LOWER(sermon.notes) LIKE ?
+            OR EXISTS (
+                SELECT 1 FROM manuscript
+                WHERE manuscript.sermon_id = sermon.id
+                AND LOWER(manuscript.notes) LIKE ?
+            )
+            OR EXISTS (
+                SELECT 1 FROM service
+                WHERE service.sermon_id = sermon.id
+                AND LOWER(service.notes) LIKE ?
+            )
+            OR EXISTS (
+                SELECT 1 FROM recording
+                WHERE recording.sermon_id = sermon.id
+                AND LOWER(recording.notes) LIKE ?
+            )
+            OR EXISTS (
+                SELECT 1 FROM resource
+                WHERE resource.sermon_id = sermon.id
+                AND LOWER(resource.notes) LIKE ?
+            )
         )
         """)
-        for _ in range(5):  # Make sure to add as many parameters (the same search term) as there are queries above
+        for _ in range(9):  # Make sure to add as many parameters (the same search term) as there are queries above
             params.append(f"%{query.lower()}%")  # Make search case insensitive also for åäö with .lower() and LOWER()
 
     if year or month:  # Filter by year and/or month (if both are given we assume both will apply to the same date, therefore we have a common search)
         year = str(year) if year else '%'  # Use asterisk for year if no year is given, works with LIKE
         month = str(month) if month else '%'  # (Note: SQLite only supports %m (month with leading 0), %Y (year) and %d (day) in strftime().)
-        conditions.append("""
-        EXISTS (
-            SELECT 1 FROM service
-            WHERE service.sermon_id = sermon.id
-            AND strftime('%Y', service.date) LIKE ?
+        if sort == 'date':
+            conditions.append("""
+            strftime('%Y', service.date) LIKE ?
             AND CAST(strftime('%m', service.date) AS INTEGER) LIKE ?
-        )
-        """)
+            """)
+        else:  # code
+            conditions.append("""
+            EXISTS (
+                SELECT 1 FROM service
+                WHERE service.sermon_id = sermon.id
+                AND strftime('%Y', service.date) LIKE ?
+                AND CAST(strftime('%m', service.date) AS INTEGER) LIKE ?
+            )
+            """)
         params.append(year)
         params.append(month)
     
     if place:  # Filter by place
-        conditions.append("""
-        EXISTS (
-            SELECT 1 FROM service
-            WHERE service.sermon_id = sermon.id
-            AND LOWER(service.place) LIKE ?
-        )
-        """)
+        if sort == 'date':
+            conditions.append("""
+            LOWER(service.place) LIKE ?
+            """)
+        else:
+            conditions.append("""
+            EXISTS (
+                SELECT 1 FROM service
+                WHERE service.sermon_id = sermon.id
+                AND LOWER(service.place) LIKE ?
+            )
+            """)
         params.append(f"%{place.lower()}%")
 
     if report:  # Filter by report

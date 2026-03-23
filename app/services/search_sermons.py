@@ -11,7 +11,7 @@ def search_sermons(search_term):
 
     result = query_sermons(query=search_term)
 
-    console.print([(r['code'], r['title']) for r in result])
+    console.print([r['code'] for r in result])
 
 
 
