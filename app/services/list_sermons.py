@@ -15,8 +15,8 @@ def list_sermons(list_by='code', n=0, offset=0, reverse = False, year = None, mo
 
     result = query_sermons(query = None, year=year, month=month_index, place=place, report=report, must_have_recording=must_have_recording, limit=n, offset=offset)
 
-    from app.presentation.common import console
-    console.print([(r['code'], r['title']) for r in result])
+    #from app.presentation.common import console
+    #console.print([(r['code'], r['title']) for r in result])
 
     # Build descriptive text to show above table
     desc = 'Alla predikningar'

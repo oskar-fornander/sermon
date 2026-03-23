@@ -22,10 +22,10 @@ def render_sermon_list(title='', sermons=[], order_by='code', reverse = False):
         table.add_column('Titel', no_wrap=True, min_width=4, max_width=40, overflow='ellipsis')
         table.add_column('Datum',  min_width=10, no_wrap=True, width=12, overflow='ellipsis')
         #Setting min_width, no_wrap and overflow does not seem to work properly
-    table.add_column(ICON['manuscript']) # table.add_column('Manus')
-    table.add_column(ICON['recording']) # table.add_column('Inspelning')
-    table.add_column(ICON['resource']) # table.add_column('Resurs')
-    table.add_column('±', style='notes')
+    table.add_column(ICON['manuscript'], no_wrap=True) # table.add_column('Manus')
+    table.add_column(ICON['recording'], no_wrap=True) # table.add_column('Inspelning')
+    table.add_column(ICON['resource'], no_wrap=True) # table.add_column('Resurs')
+    table.add_column('±', style='notes', no_wrap=True)  # Report column
     
 
     for sermon in sermons:  # Each sermon is a sermonDraft

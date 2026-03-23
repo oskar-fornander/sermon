@@ -123,7 +123,7 @@ def query_sermons(query: str = None, year: int = None, month: int = None, place:
 #limit is the number of hits to return
 
     sql = """
-    SELECT sermon.code, sermon.title
+    SELECT sermon.code
     FROM sermon
     """
     conditions = []
@@ -183,7 +183,7 @@ def query_sermons(query: str = None, year: int = None, month: int = None, place:
         """)
 
     if conditions:
-        sql += "WHERE " + " AND ".join(conditions)  # Add all conditions ANDed
+        sql += "WHERE " + "AND".join(conditions)  # Add all conditions ANDed
 
     sql += "\n    ORDER BY sermon.code DESC"  # Always search from the end of the database; i.e. include the last sermons in the search
 
