@@ -7,13 +7,13 @@ from app.errors import ValidationError
 
 def list_sermons(list_by='code', n=0, offset=0, reverse = False, year = None, month = None, place = None, report = None, must_have_recording = False):
     """List sermons by code or date"""
-    if list_by == 'date':
-        pass
-        query_services()
 
     month_index = parse_month(month)
 
-    result = query_sermons(query = None, year=year, month=month_index, place=place, report=report, must_have_recording=must_have_recording, limit=n, offset=offset)
+    if list_by not in ('code', 'date'):
+        raise ValidationError(f"Invalid value of argument list_by: {list_by} Must be 'code' or 'date'")
+
+    result = query_services(sort=list_by, limit=n, offset=offset, query = None, year=year, month=month_index, place=place, report=report, must_have_recording=must_have_recording)
 
     #from app.presentation.common import console
     #console.print([(r['code'], r['title']) for r in result])

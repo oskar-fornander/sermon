@@ -117,10 +117,15 @@ def sermon_exists(code: str, conn = None) -> True|False:
         raise DatabaseError(f"Databasfel: {e}")
 
 
-def query_sermons(query: str = None, year: int = None, month: int = None, place: str = None, report: str = None, must_have_recording: bool = False, limit: int = 0, offset: int = 0):
+def query_sermons(sort: str = 'code', limit: int = 0, offset: int = 0, query: str = None, year: int = None, month: int = None, place: str = None, report: str = None, must_have_recording: bool = False):
     """Make a query for sermons"""
 #Separate function for order by date?????
 #limit is the number of hits to return
+
+    if sort == 'date':
+        pass
+    else:  # sort == 'code'
+        pass
 
     sql = """
     SELECT sermon.code
