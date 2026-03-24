@@ -3,6 +3,7 @@ from app.db import query_sermons, query_services, list_sermon_codes, list_servic
 from app.services.sermon_draft import load_sermon_as_draft
 from app.presentation.sermon_list import render_sermon_list
 from app.errors import ValidationError
+from app.utils import parse_month
 
 
 def list_sermons(list_by='code', n=0, offset=0, reverse = False, year = None, month = None, place = None, report = None, must_have_recording = False):
@@ -52,32 +53,8 @@ def list_sermons(list_by='code', n=0, offset=0, reverse = False, year = None, mo
         for r in result:
             dates.append(r['date'])
 
-    render_sermon_list(title=desc, sermons=sermons, dates=dates, order_by=list_by, reverse=reverse)
+    render_sermon_list(title='Predikoarkiv – listar predikningar', content=desc, sermons=sermons, dates=dates, order_by=list_by, reverse=reverse)
 
-
-
-
-def parse_month(value: str) -> int:
-    MONTH_MAP = {
-        "1": 1, "01": 1, "jan": 1, "januari": 1, "january": 1,
-        "2": 2, "02": 2, "feb": 2, "febr": 2, "februari": 2, "february": 2,
-        "3": 3, "03": 3, "mar": 3, "mars": 3, "march": 3,
-        "4": 4, "04": 4, "apr": 4, "april": 4,
-        "5": 5, "05": 5, "maj": 5, "may": 5,
-        "6": 6, "06": 6, "jun": 6, "juni": 6, "june": 6,
-        "7": 7, "07": 7, "jul": 7, "juli": 7, "july": 7,
-        "8": 8, "08": 8, "aug": 8, "augusti": 8, "august": 8,
-        "9": 9, "09": 9, "sep": 9, "sept": 9, "september": 9,
-        "10": 10, "okt": 10, "oktober": 10, "october": 10,
-        "11": 11, "nov": 11, "november": 11,
-        "12": 12, "dec": 12, "december": 12,
-    }
-    if not value:
-        return None
-    key = value.strip().lower()
-    if key not in MONTH_MAP:
-        raise ValidationError(f"Ogiltig månad: {value}")
-    return MONTH_MAP[key]
 
 
 

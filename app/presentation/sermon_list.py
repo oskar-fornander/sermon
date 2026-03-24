@@ -4,7 +4,7 @@ from app.utils import get_file_link
 from app.presentation.common import *
 
 
-def render_sermon_list(title='', sermons=[], dates=[], order_by='code', reverse = False):
+def render_sermon_list(title='Predikoarkiv', content='', sermons=[], dates=[], order_by='code', reverse = False):
     """Render a presentation of a list of sermons, sorted by code or date."""
 
     if not reverse:  # Reverse for presentation?
@@ -51,12 +51,12 @@ def render_sermon_list(title='', sermons=[], dates=[], order_by='code', reverse 
             table.add_row(sermon.code, sermon.title, service, manuscript, recording, resource, sermon.report)
 
 
-    body = Group(f"[info]{title}[/info]", table)
+    body = Group(f"\n[info]{content}[/info]", table)
     last_sermon = sermons[-1].code if len(sermons) > 0 else 'P000'
     print()
     console.print(
         Panel(body,
-            title = f"[title]Predikoarkiv[/title]",
+            title = f"[title]{title}[/title]",
             title_align = 'left', 
             subtitle = f"[tip]Tips:[/] [code]sermon show {last_sermon}[/]",
             subtitle_align = 'right',

@@ -6,6 +6,7 @@ from app.config import DB_FILE, PATH_BACKUP
 from datetime import datetime, date, timedelta
 import re
 from app.presentation.common import ICON, console
+from app.errors import ValidationError
 
 
 PATTERN = {}  # Patterns to check validity of user inputs when creating and editing a sermon
@@ -25,6 +26,28 @@ def get_last_sunday():
     days_since_sunday = (today.weekday() + 1) % 7
     last_sunday = today - timedelta(days=days_since_sunday)
     return last_sunday.isoformat()  
+
+def parse_month(value: str) -> int:
+    MONTH_MAP = {
+        "1": 1, "01": 1, "jan": 1, "januari": 1, "january": 1,
+        "2": 2, "02": 2, "feb": 2, "febr": 2, "februari": 2, "february": 2,
+        "3": 3, "03": 3, "mar": 3, "mars": 3, "march": 3,
+        "4": 4, "04": 4, "apr": 4, "april": 4,
+        "5": 5, "05": 5, "maj": 5, "may": 5,
+        "6": 6, "06": 6, "jun": 6, "juni": 6, "june": 6,
+        "7": 7, "07": 7, "jul": 7, "juli": 7, "july": 7,
+        "8": 8, "08": 8, "aug": 8, "augusti": 8, "august": 8,
+        "9": 9, "09": 9, "sep": 9, "sept": 9, "september": 9,
+        "10": 10, "okt": 10, "oktober": 10, "october": 10,
+        "11": 11, "nov": 11, "november": 11,
+        "12": 12, "dec": 12, "december": 12,
+    }
+    if not value:
+        return None
+    key = value.strip().lower()
+    if key not in MONTH_MAP:
+        raise ValidationError(f"Ogiltig månad: {value}")
+    return MONTH_MAP[key]
 
 
 def get_file_link(path, file_name, title = None, show_missing_file = True, show_title_if_missing = True):

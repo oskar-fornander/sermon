@@ -14,10 +14,8 @@ from app.services.search_sermons import search_sermons
 
 def search(
         search_term: str, 
-        limit: int = typer.Option(10, '--limit', '-n', help='Antal predikningar att visa'),
-        all: bool = typer.Option(True, '--all', help='Visa alla predikningar'), 
+        limit: int = typer.Option(0, '--limit', '-n', help='Begränsa sökresultatet till antal predikningar (0 = ingen begränsning)'),
         offset: int = typer.Option(0, '--offset', help='Offset från senaste predikan'),
-        #sort: str = typer.Option("code", "--sort", help="Sortera efter predikokod 'code' eller datum 'date'"),
         sort: Literal['code', 'date'] = typer.Option('code', '--sort', help="Sortera efter predikokod 'code' eller datum 'date'"),
         reverse: bool = typer.Option(False, '--reverse', '-r', help='Omvänd sortering'),
 
@@ -33,8 +31,7 @@ def search(
     clear_screen()
     print(f"Sök på '{search_term}' bland predikningarna")
 
-    if all:
-        limit = 0  # Display all
+    if limit == 0:
         offset = 0  # No offset in search
 
     if sort == 'date':
