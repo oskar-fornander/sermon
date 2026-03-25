@@ -14,9 +14,23 @@ Privat predikoregister för mina predikningar.
 
 ## uv
 
-- uv tool uninstall sermon
-- uv sync  (creates uv.lock)
-- uv tool install --editable .
+
+``` Installera CLI globalt (editable)
+uv tool uninstall sermon        # valfritt men bra vid ändringar
+uv sync                         # uppdatera dependencies (creates uv.lock) 
+uv tool install --editable .    # installera
+```
+
+`uv run sermon ...`  - Köra appen utan global installation
+
+## venv + pip
+
+``` Installera med venv + pip
+python -m venv .venv            # skapa ett virtual environment
+source .venv/bin/activate       # aktivera venv
+pip install -e .                # installera projekt gobalt (editable)
+```
+`pip install -e .` eller `p install -r requirements.txt`  # När dependencies ändrats
 
 
 ## Mappstruktur
