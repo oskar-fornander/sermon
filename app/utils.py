@@ -71,11 +71,12 @@ def get_file_link(path, file_name, title = None, show_missing_file = True, show_
             else:
                 return f"[link=file://{url_encoded_path}]{marker}[/link]"  # ✘
     if show_meta:  # Show length of mp3-file and number of pages in pdf
+        meta = ''
         if '.mp3' in file_name:
-            meta = f"[notes]({get_audio_length(url_encoded_path)})[/notes]"
+            meta = f" [notes]({get_audio_length(url_encoded_path)})[/notes]"
         elif '.pdf' in file_name:
-            meta = f"[notes]({get_pdf_pages(url_encoded_path)})[/notes]"
-        return f"[link=file://{url_encoded_path}]{title}[/link] {meta}"
+            meta = f" [notes]({get_pdf_pages(url_encoded_path)})[/notes]"
+        return f"[link=file://{url_encoded_path}]{title}[/link]{meta}"
     return f"[link=file://{url_encoded_path}]{title}[/link]"
 
 
