@@ -1,6 +1,6 @@
 import app.config as config
 from app.presentation.common import *
-from app.utils import get_file_link
+from app.utils import get_file_link, get_audio_length, get_pdf_pages
 
 
 def render_sermon_card(sermon_draft, preview=False, menu=[], edited_fields=[]):
@@ -58,7 +58,7 @@ def render_sermon_card(sermon_draft, preview=False, menu=[], edited_fields=[]):
     if not manuscripts:
         elements[-1] += ' – '  # Add at end of line if no data to show
     for manuscript in manuscripts:
-        link = get_file_link(config.PATH_MANUSCRIPTS, manuscript.file_name)
+        link = get_file_link(config.PATH_MANUSCRIPTS, manuscript.file_name, show_meta = True)
         elements.append(f"{TAB_}[notes]{manuscript.date}[/notes]  {link}")
         if manuscript.notes:
             elements[-1] += f"{TAB_}[notes]• {manuscript.notes}[/notes]"  # Add notes at end of the same line
@@ -71,7 +71,7 @@ def render_sermon_card(sermon_draft, preview=False, menu=[], edited_fields=[]):
         elements[-1] += ' – '  # Add at end of line if no data to show
     for recording in recordings:
         if recording.file_name:
-            link = get_file_link(config.PATH_RECORDINGS, recording.file_name)
+            link = get_file_link(config.PATH_RECORDINGS, recording.file_name, show_meta = True)
             elements.append(f"{TAB_}[notes]{recording.date}[/notes]  {link}")
         elif recording.external_url: # Either a local file OR an external link for each recording
             link_title = 'extern url'

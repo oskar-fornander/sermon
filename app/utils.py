@@ -1,5 +1,7 @@
 from pathlib import Path
 from urllib import parse
+from mutagen.mp3 import MP3
+from pypdf import PdfReader
 #import shutil
 import sqlite3
 from app.config import DB_FILE, PATH_BACKUP
@@ -50,7 +52,7 @@ def parse_month(value: str) -> int:
     return MONTH_MAP[key]
 
 
-def get_file_link(path, file_name, title = None, show_missing_file = True, show_title_if_missing = True):
+def get_file_link(path, file_name, title = None, show_missing_file = True, show_title_if_missing = True, show_meta = False):
     """Get a link to path/file with styles for print in console"""
     if not title:
         title = file_name
@@ -68,7 +70,35 @@ def get_file_link(path, file_name, title = None, show_missing_file = True, show_
                 return f"{marker} [link=file://{url_encoded_path}]{title}[/link]"  # ✘ P371.pdf
             else:
                 return f"[link=file://{url_encoded_path}]{marker}[/link]"  # ✘
+    if show_meta:  # Show length of mp3-file and number of pages in pdf
+        if '.mp3' in file_name:
+            meta = f"[notes]({get_audio_length(url_encoded_path)})[/notes]"
+        elif '.pdf' in file_name:
+            meta = f"[notes]({get_pdf_pages(url_encoded_path)})[/notes]"
+        return f"[link=file://{url_encoded_path}]{title}[/link] {meta}"
     return f"[link=file://{url_encoded_path}]{title}[/link]"
+
+
+def get_audio_length(path: str) -> str:
+    """Get length of an mp3 audio file in minutes and seconds"""
+    try:
+        audio = MP3(path)
+        length_seconds = int(audio.info.length)
+        m, s = divmod(length_seconds, 60)
+        return f"{m}:{s:02}"
+    except Exception:
+        return ''
+
+def get_pdf_pages(path: str) -> str:
+    """Get number of pages in a pdf document"""
+    try:
+        reader = PdfReader(path)
+        num_pages = len(reader.pages)
+        if num_pages < 2:
+            return f"{num_pages} sida"
+        return f"{num_pages} sidor"
+    except Exception:
+        return ''
 
 
 def backup_database():
