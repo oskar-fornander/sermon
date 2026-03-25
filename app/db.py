@@ -510,6 +510,7 @@ def get_all_recordings():
             SELECT recording.file_name, sermon.code FROM recording 
             JOIN sermon ON recording.sermon_id = sermon.id 
             WHERE recording.file_name IS NOT NULL
+            AND TRIM(recording.file_name) != ''
             ORDER BY sermon.code
             """
         )

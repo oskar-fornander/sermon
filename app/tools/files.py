@@ -17,6 +17,7 @@ def check_files():
 
     for file_type, func, path in (('manus', get_all_manuscripts, PATH_MANUSCRIPTS), ('inspelningar', get_all_recordings, PATH_RECORDINGS), ('resurser', get_all_resources, PATH_RESOURCES)):
         rows = func()  # Get all manuscripts/recordings/resources from database
+        #print([row['file_name'] for row in rows])
         codes_by_filenames = {normalize_filename(file): code for file, code in rows}
         db_files = {normalize_filename(file) for file, code in rows}
         disk_files = list_files(path)

@@ -297,8 +297,10 @@ def user_edit_generic_complex(sermon_code, title, data, fields, path = None, new
 
         if new_value:  # No change if empty: keep value
             if new_value == '-':  # Clear field if allowed
-                if field_name.lower() in ['rubrik', 'kommentar', 'extern url'] or (field_name.lower() == 'filnamn' and title.lower() == 'inspelning'):  # Only these fields can be empty: title, comment and external url, and file name but only if for recording
+                if field_name.lower() in ['rubrik', 'kommentar', 'extern url']: # Only these fields can be empty: title, comment and external url, and file name but only if for recording
                     setattr(data[row], fields[item - 1][0], '')
+                elif (field_name.lower() == 'filnamn' and title.lower() == 'inspelning'):
+                    setattr(data[row], fields[item - 1][0], None)  # No file name should be None (NULL) not ''
                 else:
                     console.print('Detta fält får inte vara tomt')
                     time.sleep(1)
