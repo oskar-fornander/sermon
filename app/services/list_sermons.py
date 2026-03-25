@@ -3,18 +3,25 @@ from app.db import query_sermons, query_services, list_sermon_codes, list_servic
 from app.services.sermon_draft import load_sermon_as_draft
 from app.presentation.sermon_list import render_sermon_list
 from app.errors import ValidationError
-from app.utils import parse_month
+from app.utils import parse_month, PATTERN
 
 
-def list_sermons(list_by='code', n=0, offset=0, reverse = False, year = None, month = None, place = None, report = None, must_have_recording = False):
+def list_sermons(list_by='code', n=0, offset=0, reverse = False, date = None, year = None, month = None, place = None, report = None, must_have_recording = False):
     """List sermons by code or date"""
 
     month_index = parse_month(month)
+    if not date is None:
+        if PATTERN['date'].match(date):  # If a valid date is given as an argument then year and month are ignored in the filtering
+            year = None
+            month = None
+        else:
+            date = None
+
 
     if list_by not in ('code', 'date'):
         raise ValidationError(f"Invalid value of argument list_by: {list_by} Must be 'code' or 'date'")
 
-    result = query_sermons(sort=list_by, limit=n, offset=offset, query = None, year=year, month=month_index, place=place, report=report, must_have_recording=must_have_recording)
+    result = query_sermons(sort=list_by, limit=n, offset=offset, query = None, date=date, year=year, month=month_index, place=place, report=report, must_have_recording=must_have_recording)
 
     from app.presentation.common import console
     console.print([r['code'] for r in result])
@@ -33,6 +40,8 @@ def list_sermons(list_by='code', n=0, offset=0, reverse = False, year = None, mo
     if offset > 0:
         desc += f"{offset=}"
     desc += f"\nFilter: "
+    if date:
+        desc += f"{date=} "
     if year:
         desc += f"{year=} "
     if month:
