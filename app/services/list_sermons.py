@@ -12,12 +12,9 @@ def list_sermons(list_by='code', n=0, offset=0, reverse = False, date = None, da
 
     month_index = parse_month(month)
     if not date is None:
-        if PATTERN['date'].match(date):  # If a valid date is given as an argument then year and month are ignored in the filtering
-            year = None
-            month = None
-        else:
-            date = None
-
+        validate_date(date)  # Raise an error if date is invalid. If a valid date is given as an argument then year and month are ignored in the filtering
+        year = None
+        month = None
 
     if list_by not in ('code', 'date'):
         raise ValidationError(f"Invalid value of argument list_by: {list_by} Must be 'code' or 'date'")
@@ -30,10 +27,6 @@ def list_sermons(list_by='code', n=0, offset=0, reverse = False, date = None, da
     if date_from and date_to and date_from > date_to:
         #raise ValidationError('Datumfel: --from måste vara före --to')  # Raise an error if in wrong order
         date_from, date_to = date_to, date_from  # Simply swap them?
-    if not date_from:
-        date_from = '1900-01-01'  # Universal start date for filtering search in database
-    if not date_to:
-        date_to = datetime.date.today().strftime('%Y-%m-%d')  # Universal end date
 
 
     result = query_sermons(sort=list_by, limit=n, offset=offset, query = None, date=date, date_from=date_from, date_to=date_to, year=year, month=month_index, place=place, report=report, must_have_recording=must_have_recording)
@@ -52,9 +45,17 @@ def list_sermons(list_by='code', n=0, offset=0, reverse = False, date = None, da
         desc += " listade efter datum."
     else:
         desc += " listade efter predikokod."
-    desc += f"\n{n=} "
+    desc += f"\nAntal: {n} \n"
     if offset > 0:
         desc += f"{offset=}"
+    if date_from and date_to:
+        desc += f"Period: {date_from} – {date_to}"
+    elif date_from:
+        desc += f"Period: från {date_from}"
+    elif date_to:
+        desc += f"Period: till {date_to}"
+    else:
+        desc += 'Period: –'
     desc += f"\nFilter: "
     if date:
         desc += f"{date=} "

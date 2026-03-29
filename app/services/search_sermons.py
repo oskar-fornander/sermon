@@ -23,10 +23,6 @@ def search_sermons(search_term = '', list_by='code', n=0, offset=0, reverse = Fa
     if date_from and date_to and date_from > date_to:
         #raise ValidationError('Datumfel: --from måste vara före --to')  # Raise an error if in wrong order
         date_from, date_to = date_to, date_from  # Simply swap them?
-    if not date_from:
-        date_from = '1900-01-01'  # Universal start date for filtering search in database
-    if not date_to:
-        date_to = datetime.date.today().strftime('%Y-%m-%d')  # Universal end date
 
 
     result = query_sermons(sort=list_by, limit=n, offset=offset, query=search_term, date_from=date_from, date_to=date_to, year=year, month=month_index, place=place, report=report, must_have_recording=must_have_recording)

@@ -168,25 +168,28 @@ def query_sermons(sort: str = 'code', limit: int = 0, offset: int = 0, query: st
         for _ in range(9):  # Make sure to add as many parameters (the same search term) as there are queries above
             params.append(f"%{query.lower()}%")  # Make search case insensitive also for åäö with .lower() and LOWER()
 
-    # Filter by start and end date (always)
-    if not (date_from and date_to):
-        raise DatabaseError("Inga datum angivna för filtrering")
+    sub_conditions = []  # These are used for EXISTS() when query for service
+    sub_params = []
+
+    # Filter by start and end date 
     if sort == 'date':
-        conditions.append("""
-        strftime('%Y-%m-%d', service.date) >= ?
-        AND strftime('%Y-%m-%d', service.date) <= ?
-        """)
+        if date_from:
+            conditions.append("""
+            service.date >= ?
+            """)
+            params.append(date_from)
+        if date_to:
+            conditions.append("""
+            service.date <= ?
+            """)
+            params.append(date_to)
     else:  # code
-        conditions.append("""
-        EXISTS (
-            SELECT 1 FROM service
-            WHERE service.sermon_id = sermon.id
-            AND strftime('%Y-%m-%d', service.date) >= ?
-            AND strftime('%Y-%m-%d', service.date) <= ?
-        )
-        """)
-    params.append(date_from)
-    params.append(date_to)
+        if date_from:
+            sub_conditions.append("service.date >= ?")
+            sub_params.append(date_from)
+        if date_to:
+            sub_conditions.append("service.date <= ?")
+            sub_params.append(date_to)
 
 
     if date:  # Filter by ISO date: YYYY-MM-DD
@@ -194,15 +197,10 @@ def query_sermons(sort: str = 'code', limit: int = 0, offset: int = 0, query: st
             conditions.append("""
             strftime('%Y-%m-%d', service.date) = ?
             """)
+            params.append(date)
         else:  # code
-            conditions.append("""
-            EXISTS (
-                SELECT 1 FROM service
-                WHERE service.sermon_id = sermon.id
-                AND strftime('%Y-%m-%d', service.date) = ?
-            )
-            """)
-        params.append(date)
+            sub_conditions.append("service.date = ?")
+            sub_params.append(date)
     elif year or month:  # Filter by year and/or month (if both are given we assume both will apply to the same date, therefore we have a common search)
         year = str(year) if year else '%'  # Use asterisk for year if no year is given, works with LIKE
         month = str(month) if month else '%'  # (Note: SQLite only supports %m (month with leading 0), %Y (year) and %d (day) in strftime().)
@@ -213,32 +211,23 @@ def query_sermons(sort: str = 'code', limit: int = 0, offset: int = 0, query: st
                 AND CAST(strftime('%m', service.date) AS INTEGER) LIKE ?
             )
             """)
+            params.append(year)
+            params.append(month)
         else:  # code
-            conditions.append("""
-            EXISTS (
-                SELECT 1 FROM service
-                WHERE service.sermon_id = sermon.id
-                AND strftime('%Y', service.date) LIKE ?
-                AND CAST(strftime('%m', service.date) AS INTEGER) LIKE ?
-            )
-            """)
-        params.append(year)
-        params.append(month)
-    
+            sub_conditions.append("strftime('%Y', service.date) LIKE ?")
+            sub_conditions.append("CAST(strftime('%m', service.date) AS INTEGER) LIKE ?")
+            sub_params.append(year)
+            sub_params.append(month)
+    print(sub_conditions) 
     if place:  # Filter by place
         if sort == 'date':
             conditions.append("""
             LOWER(service.place) LIKE ?
             """)
+            params.append(f"%{place.lower()}%")
         else:
-            conditions.append("""
-            EXISTS (
-                SELECT 1 FROM service
-                WHERE service.sermon_id = sermon.id
-                AND LOWER(service.place) LIKE ?
-            )
-            """)
-        params.append(f"%{place.lower()}%")
+            sub_conditions.append("LOWER(service.place) LIKE ?")
+            sub_params.append(f"%{place.lower()}%")
 
     if report:  # Filter by report
         conditions.append("""
@@ -255,6 +244,17 @@ def query_sermons(sort: str = 'code', limit: int = 0, offset: int = 0, query: st
             WHERE recording.sermon_id = sermon.id
         )
         """)
+
+
+    if sub_conditions:
+        conditions.append(f"""
+        EXISTS (
+            SELECT 1 FROM service
+            WHERE service.sermon_id = sermon.id
+            AND {'\n            AND '.join(sub_conditions)}
+        )
+        """)
+        params.extend(sub_params)
 
     if conditions:
         sql += "WHERE " + "AND".join(conditions)  # Add all conditions ANDed
