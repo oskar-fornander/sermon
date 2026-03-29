@@ -137,33 +137,33 @@ def query_sermons(sort: str = 'code', limit: int = 0, offset: int = 0, query: st
 
     if query:  # Search query
         conditions.append("""
-        (
-            LOWER(sermon.title) LIKE ?
-            OR LOWER(sermon.context) LIKE ?
-            OR LOWER(sermon.introduction) LIKE ?
-            OR LOWER(sermon.message) LIKE ?
-            OR LOWER(sermon.notes) LIKE ?
-            OR EXISTS (
-                SELECT 1 FROM manuscript
-                WHERE manuscript.sermon_id = sermon.id
-                AND LOWER(manuscript.notes) LIKE ?
+            (
+                LOWER(sermon.title) LIKE ?
+                OR LOWER(sermon.context) LIKE ?
+                OR LOWER(sermon.introduction) LIKE ?
+                OR LOWER(sermon.message) LIKE ?
+                OR LOWER(sermon.notes) LIKE ?
+                OR EXISTS (
+                    SELECT 1 FROM manuscript
+                    WHERE manuscript.sermon_id = sermon.id
+                    AND LOWER(manuscript.notes) LIKE ?
+                )
+                OR EXISTS (
+                    SELECT 1 FROM service
+                    WHERE service.sermon_id = sermon.id
+                    AND LOWER(service.notes) LIKE ?
+                )
+                OR EXISTS (
+                    SELECT 1 FROM recording
+                    WHERE recording.sermon_id = sermon.id
+                    AND LOWER(recording.notes) LIKE ?
+                )
+                OR EXISTS (
+                    SELECT 1 FROM resource
+                    WHERE resource.sermon_id = sermon.id
+                    AND LOWER(resource.notes) LIKE ?
+                )
             )
-            OR EXISTS (
-                SELECT 1 FROM service
-                WHERE service.sermon_id = sermon.id
-                AND LOWER(service.notes) LIKE ?
-            )
-            OR EXISTS (
-                SELECT 1 FROM recording
-                WHERE recording.sermon_id = sermon.id
-                AND LOWER(recording.notes) LIKE ?
-            )
-            OR EXISTS (
-                SELECT 1 FROM resource
-                WHERE resource.sermon_id = sermon.id
-                AND LOWER(resource.notes) LIKE ?
-            )
-        )
         """)
         for _ in range(9):  # Make sure to add as many parameters (the same search term) as there are queries above
             params.append(f"%{query.lower()}%")  # Make search case insensitive also for åäö with .lower() and LOWER()
@@ -185,21 +185,27 @@ def query_sermons(sort: str = 'code', limit: int = 0, offset: int = 0, query: st
             params.append(date_to)
     else:  # code
         if date_from:
-            sub_conditions.append("service.date >= ?")
+            sub_conditions.append("""
+                service.date >= ?
+                """)
             sub_params.append(date_from)
         if date_to:
-            sub_conditions.append("service.date <= ?")
+            sub_conditions.append("""
+                service.date <= ?
+                """)
             sub_params.append(date_to)
 
 
     if date:  # Filter by ISO date: YYYY-MM-DD
         if sort == 'date':
             conditions.append("""
-            strftime('%Y-%m-%d', service.date) = ?
+            service.date = ?
             """)
             params.append(date)
         else:  # code
-            sub_conditions.append("service.date = ?")
+            sub_conditions.append("""
+                service.date = ?
+                """)
             sub_params.append(date)
     elif year or month:  # Filter by year and/or month (if both are given we assume both will apply to the same date, therefore we have a common search)
         year = str(year) if year else '%'  # Use asterisk for year if no year is given, works with LIKE
@@ -218,7 +224,7 @@ def query_sermons(sort: str = 'code', limit: int = 0, offset: int = 0, query: st
             sub_conditions.append("CAST(strftime('%m', service.date) AS INTEGER) LIKE ?")
             sub_params.append(year)
             sub_params.append(month)
-    print(sub_conditions) 
+
     if place:  # Filter by place
         if sort == 'date':
             conditions.append("""
@@ -226,49 +232,47 @@ def query_sermons(sort: str = 'code', limit: int = 0, offset: int = 0, query: st
             """)
             params.append(f"%{place.lower()}%")
         else:
-            sub_conditions.append("LOWER(service.place) LIKE ?")
+            sub_conditions.append("""
+                LOWER(service.place) LIKE ?""")
             sub_params.append(f"%{place.lower()}%")
 
     if report:  # Filter by report
         conditions.append("""
-        (
             sermon.report == ?
-        )
-        """)
+            """)
         params.append(report)
     
     if must_have_recording:  # Filter out sermons that have at least one recording (file or url)
         conditions.append("""
-        EXISTS (
-            SELECT 1 FROM recording
-            WHERE recording.sermon_id = sermon.id
-        )
-        """)
+            EXISTS (
+                SELECT 1 FROM recording
+                WHERE recording.sermon_id = sermon.id
+            )
+            """)
 
 
     if sub_conditions:
         conditions.append(f"""
-        EXISTS (
-            SELECT 1 FROM service
-            WHERE service.sermon_id = sermon.id
-            AND {'\n            AND '.join(sub_conditions)}
-        )
-        """)
+            EXISTS (
+                SELECT 1 FROM service
+                WHERE service.sermon_id = sermon.id
+                AND {'AND '.join(sub_conditions)}
+            ) """)
         params.extend(sub_params)
 
     if conditions:
         sql += "WHERE " + "AND".join(conditions)  # Add all conditions ANDed
 
     if sort == 'date':
-        sql += "\n    ORDER BY service.date DESC"  # Always search from the end of the database; i.e. include the last sermons in the search - based on date of service
+        sql += "\n        ORDER BY service.date DESC"  # Always search from the end of the database; i.e. include the last sermons in the search - based on date of service
     else:  # code
-        sql += "\n    ORDER BY sermon.code DESC"  # Always search from the end of the database; i.e. include the last sermons in the search
+        sql += "\n        ORDER BY sermon.code DESC"  # Always search from the end of the database; i.e. include the last sermons in the search
 
     if limit:  # Limit the number of hits to show?
-        sql += "\n    LIMIT ?"
+        sql += "\n        LIMIT ?"
         params.append(limit)
         if offset:
-            sql += "\n    OFFSET ?"
+            sql += "\n        OFFSET ?"
             params.append(offset)
 
 

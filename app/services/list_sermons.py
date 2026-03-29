@@ -45,7 +45,9 @@ def list_sermons(list_by='code', n=0, offset=0, reverse = False, date = None, da
         desc += " listade efter datum."
     else:
         desc += " listade efter predikokod."
-    desc += f"\nAntal: {n} \n"
+    desc += '\nAntal: '
+    desc += str(n) if n > 0 else 'alla'
+    desc += '\n'
     if offset > 0:
         desc += f"{offset=}"
     if date_from and date_to:
