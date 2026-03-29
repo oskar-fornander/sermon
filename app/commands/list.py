@@ -4,6 +4,7 @@ from app.services.list_sermons import list_sermons
 from app.presentation.common import clear_screen
 from app.errors import ValidationError
 
+
 app = typer.Typer(help = 'Lista de senaste predikningarna', invoke_without_command=True)
 #   sermon list [--limit N] [--all] [--date] [--reverse]
 
@@ -11,8 +12,9 @@ app = typer.Typer(help = 'Lista de senaste predikningarna', invoke_without_comma
 def sermon_listing_function(
         limit: int = typer.Option(10, '--limit', '-n', help='Antal predikningar att visa'),
         all: bool = typer.Option(False, '--all', help='Visa alla predikningar'), 
+        date_from: str = typer.Option('', '--from', help='Visa predikningar senare än detta datum'),
+        date_to: str = typer.Option('', '--to', help='Visa predikningar före detta datum'),
         offset: int = typer.Option(0, '--offset', help='Offset från senaste predikan'),
-        #sort: str = typer.Option("code", "--sort", help="Sortera efter predikokod 'code' eller datum 'date'"),
         sort: Literal['code', 'date'] = typer.Option('code', '--sort', help="Sortera efter predikokod 'code' eller datum 'date'"),
         reverse: bool = typer.Option(False, '--reverse', '-r', help='Omvänd sortering'),
 
@@ -33,8 +35,8 @@ def sermon_listing_function(
         offset = 0  # No offset in search
 
     if sort == 'date':
-        list_sermons(list_by='date', n=limit, offset=offset, reverse=reverse, date=date, year=year, month=month, place=place, report=report, must_have_recording=has_recording)  # List sermons by service dates
+        list_sermons(list_by='date', n=limit, offset=offset, reverse=reverse, date=date, date_from=date_from, date_to=date_to, year=year, month=month, place=place, report=report, must_have_recording=has_recording)  # List sermons by service dates
     else:
-        list_sermons(list_by='code', n=limit, offset=offset, reverse=reverse, date=date, year=year, month=month, place=place, report=report, must_have_recording=has_recording)  # List sermons by sermon code
+        list_sermons(list_by='code', n=limit, offset=offset, reverse=reverse, date=date, date_from=date_from, date_to=date_to, year=year, month=month, place=place, report=report, must_have_recording=has_recording)  # List sermons by sermon code
 
 

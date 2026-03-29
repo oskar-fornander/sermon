@@ -117,7 +117,7 @@ def sermon_exists(code: str, conn = None) -> True|False:
         raise DatabaseError(f"Databasfel: {e}")
 
 
-def query_sermons(sort: str = 'code', limit: int = 0, offset: int = 0, query: str = None, date: str = None, year: int = None, month: int = None, place: str = None, report: str = None, must_have_recording: bool = False):
+def query_sermons(sort: str = 'code', limit: int = 0, offset: int = 0, query: str = None, date: str = None, date_from: str = None, date_to: str = None, year: int = None, month: int = None, place: str = None, report: str = None, must_have_recording: bool = False):
     """Make a query for sermons"""
 
     if sort == 'date':  # When listed by date the service date must be included form the service table
@@ -167,6 +167,27 @@ def query_sermons(sort: str = 'code', limit: int = 0, offset: int = 0, query: st
         """)
         for _ in range(9):  # Make sure to add as many parameters (the same search term) as there are queries above
             params.append(f"%{query.lower()}%")  # Make search case insensitive also for åäö with .lower() and LOWER()
+
+    # Filter by start and end date (always)
+    if not (date_from and date_to):
+        raise DatabaseError("Inga datum angivna för filtrering")
+    if sort == 'date':
+        conditions.append("""
+        strftime('%Y-%m-%d', service.date) >= ?
+        AND strftime('%Y-%m-%d', service.date) <= ?
+        """)
+    else:  # code
+        conditions.append("""
+        EXISTS (
+            SELECT 1 FROM service
+            WHERE service.sermon_id = sermon.id
+            AND strftime('%Y-%m-%d', service.date) >= ?
+            AND strftime('%Y-%m-%d', service.date) <= ?
+        )
+        """)
+    params.append(date_from)
+    params.append(date_to)
+
 
     if date:  # Filter by ISO date: YYYY-MM-DD
         if sort == 'date':

@@ -1,12 +1,13 @@
 
+import datetime
 from app.db import query_sermons, query_services, list_sermon_codes, list_service_dates, get_sermon_code_by_service_date
 from app.services.sermon_draft import load_sermon_as_draft
 from app.presentation.sermon_list import render_sermon_list
 from app.errors import ValidationError
-from app.utils import parse_month, PATTERN
+from app.utils import parse_month, PATTERN, validate_date
 
 
-def list_sermons(list_by='code', n=0, offset=0, reverse = False, date = None, year = None, month = None, place = None, report = None, must_have_recording = False):
+def list_sermons(list_by='code', n=0, offset=0, reverse = False, date = None, date_from = None, date_to = None, year = None, month = None, place = None, report = None, must_have_recording = False):
     """List sermons by code or date"""
 
     month_index = parse_month(month)
@@ -21,7 +22,22 @@ def list_sermons(list_by='code', n=0, offset=0, reverse = False, date = None, ye
     if list_by not in ('code', 'date'):
         raise ValidationError(f"Invalid value of argument list_by: {list_by} Must be 'code' or 'date'")
 
-    result = query_sermons(sort=list_by, limit=n, offset=offset, query = None, date=date, year=year, month=month_index, place=place, report=report, must_have_recording=must_have_recording)
+    # Validate --from and --to dates
+    if date_from:
+        validate_date(date_from)  # If dates are not in ISO format YYYY-MM-DD an error is raised
+    if date_to:
+        validate_date(date_to)
+    if date_from and date_to and date_from > date_to:
+        #raise ValidationError('Datumfel: --from måste vara före --to')  # Raise an error if in wrong order
+        date_from, date_to = date_to, date_from  # Simply swap them?
+    if not date_from:
+        date_from = '1900-01-01'  # Universal start date for filtering search in database
+    if not date_to:
+        date_to = datetime.date.today().strftime('%Y-%m-%d')  # Universal end date
+
+
+    result = query_sermons(sort=list_by, limit=n, offset=offset, query = None, date=date, date_from=date_from, date_to=date_to, year=year, month=month_index, place=place, report=report, must_have_recording=must_have_recording)
+
 
     from app.presentation.common import console
     console.print([r['code'] for r in result])

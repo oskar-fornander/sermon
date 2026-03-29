@@ -16,6 +16,8 @@ def search(
         search_term: str, 
         limit: int = typer.Option(0, '--limit', '-n', help='Begränsa sökresultatet till antal predikningar (0 = ingen begränsning)'),
         offset: int = typer.Option(0, '--offset', help='Offset från senaste predikan'),
+        date_from: str = typer.Option('', '--from', help='Visa predikningar senare än detta datum'),
+        date_to: str = typer.Option('', '--to', help='Visa predikningar före detta datum'),
         sort: Literal['code', 'date'] = typer.Option('code', '--sort', help="Sortera efter predikokod 'code' eller datum 'date'"),
         reverse: bool = typer.Option(False, '--reverse', '-r', help='Omvänd sortering'),
 
@@ -35,9 +37,7 @@ def search(
         offset = 0  # No offset in search
 
     if sort == 'date':
-        search_sermons(search_term=search_term, list_by='date', n=limit, offset=offset, reverse=reverse, year=year, month=month, place=place, report=report, must_have_recording=has_recording)  # List sermons by service dates
+        search_sermons(search_term=search_term, list_by='date', n=limit, offset=offset, reverse=reverse, date_from=date_from, date_to=date_to, year=year, month=month, place=place, report=report, must_have_recording=has_recording)  # List sermons by service dates
     else:
-        search_sermons(search_term=search_term, list_by='code', n=limit, offset=offset, reverse=reverse, year=year, month=month, place=place, report=report, must_have_recording=has_recording)  # List sermons by sermon code
-
-
+        search_sermons(search_term=search_term, list_by='code', n=limit, offset=offset, reverse=reverse, date_from=date_from, date_to=date_to, year=year, month=month, place=place, report=report, must_have_recording=has_recording)  # List sermons by sermon code
 
