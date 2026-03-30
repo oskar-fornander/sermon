@@ -117,7 +117,7 @@ def sermon_exists(code: str, conn = None) -> True|False:
         raise DatabaseError(f"Databasfel: {e}")
 
 
-def query_sermons(sort: str = 'code', limit: int = 0, offset: int = 0, query: str = None, date: str = None, date_from: str = None, date_to: str = None, year: int = None, month: int = None, place: str = None, report: str = None, must_have_recording: bool = False):
+def query_sermons(sort: str = 'code', limit: int = 0, offset: int = 0, query: [str] = [], date: str = None, date_from: str = None, date_to: str = None, year: int = None, month: int = None, place: str = None, report: str = None, must_have_recording: bool = False):
     """Make a query for sermons"""
 
     if sort == 'date':  # When listed by date the service date must be included form the service table
@@ -136,7 +136,8 @@ def query_sermons(sort: str = 'code', limit: int = 0, offset: int = 0, query: st
     params = []
 
     if query:  # Search query
-        conditions.append("""
+        for term in query:  # search for each term if more than one
+            conditions.append("""
             (
                 LOWER(sermon.title) LIKE ?
                 OR LOWER(sermon.context) LIKE ?
@@ -169,9 +170,9 @@ def query_sermons(sort: str = 'code', limit: int = 0, offset: int = 0, query: st
                     AND LOWER(bible_reference.reference_text) LIKE ?
                 )
             )
-        """)
-        for _ in range(10):  # Make sure to add as many parameters (the same search term) as there are queries above
-            params.append(f"%{query.lower()}%")  # Make search case insensitive also for åäö with .lower() and LOWER()
+            """)
+            for _ in range(10):  # Make sure to add as many parameters (the same search term) as there are queries above
+                params.append(f"%{term.lower()}%")  # Make search case insensitive also for åäö with .lower() and LOWER()
 
     sub_conditions = []  # These are used for EXISTS() when query for service
     sub_params = []
@@ -225,8 +226,8 @@ def query_sermons(sort: str = 'code', limit: int = 0, offset: int = 0, query: st
             params.append(year)
             params.append(month)
         else:  # code
-            sub_conditions.append("strftime('%Y', service.date) LIKE ?")
-            sub_conditions.append("CAST(strftime('%m', service.date) AS INTEGER) LIKE ?")
+            sub_conditions.append("strftime('%Y', service.date) LIKE ? ")
+            sub_conditions.append("CAST(strftime('%m', service.date) AS INTEGER) LIKE ? ")
             sub_params.append(year)
             sub_params.append(month)
 

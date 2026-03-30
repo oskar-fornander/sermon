@@ -1,6 +1,6 @@
 
 import typer
-from typing import Optional, Literal
+from typing import Optional, Literal, List
 from app.presentation.common import clear_screen
 from app.services.search_sermons import search_sermons
 
@@ -8,12 +8,13 @@ from app.services.search_sermons import search_sermons
 # No search with regular expressions.
 # Implement in the future? 
 #   sermon search title:nåd
-#   Search multiple words with AND: sermon search "nåd tro" -> nåd AND tro
+
 
 
 
 def search(
-        search_term: str, 
+        #query: str, 
+        query: List[str] = typer.Argument(),
         limit: int = typer.Option(0, '--limit', '-n', help='Begränsa sökresultatet till antal predikningar (0 = ingen begränsning)'),
         offset: int = typer.Option(0, '--offset', help='Offset från senaste predikan'),
         date_from: str = typer.Option('', '--from', help='Visa predikningar senare än detta datum'),
@@ -31,13 +32,12 @@ def search(
     """Sök bland predikningarna"""
 
     clear_screen()
-    print(f"Sök på '{search_term}' bland predikningarna")
 
     if limit == 0:
         offset = 0  # No offset in search
 
     if sort == 'date':
-        search_sermons(search_term=search_term, list_by='date', n=limit, offset=offset, reverse=reverse, date_from=date_from, date_to=date_to, year=year, month=month, place=place, report=report, must_have_recording=has_recording)  # List sermons by service dates
+        search_sermons(query=query, list_by='date', n=limit, offset=offset, reverse=reverse, date_from=date_from, date_to=date_to, year=year, month=month, place=place, report=report, must_have_recording=has_recording)  # List sermons by service dates
     else:
-        search_sermons(search_term=search_term, list_by='code', n=limit, offset=offset, reverse=reverse, date_from=date_from, date_to=date_to, year=year, month=month, place=place, report=report, must_have_recording=has_recording)  # List sermons by sermon code
+        search_sermons(query=query, list_by='code', n=limit, offset=offset, reverse=reverse, date_from=date_from, date_to=date_to, year=year, month=month, place=place, report=report, must_have_recording=has_recording)  # List sermons by sermon code
 

@@ -7,8 +7,11 @@ from app.presentation.common import console
 from app.utils import parse_month, validate_date
 
 
-def search_sermons(search_term = '', list_by='code', n=0, offset=0, reverse = False, date_from = None, date_to = None, year = None, month = None, place = None, report = None, must_have_recording = False):  # List sermons by sermon code
+def search_sermons(query = [], list_by='code', n=0, offset=0, reverse = False, date_from = None, date_to = None, year = None, month = None, place = None, report = None, must_have_recording = False):  # List sermons by sermon code
     """Search and filter the sermons."""
+
+    search_text = ', '.join(["'[key]" + s + "[/key]'" for s in query])
+    console.print(f"Sök på {search_text} bland predikningarna")
 
     month_index = parse_month(month)
 
@@ -25,14 +28,13 @@ def search_sermons(search_term = '', list_by='code', n=0, offset=0, reverse = Fa
         date_from, date_to = date_to, date_from  # Simply swap them?
 
 
-    result = query_sermons(sort=list_by, limit=n, offset=offset, query=search_term, date_from=date_from, date_to=date_to, year=year, month=month_index, place=place, report=report, must_have_recording=must_have_recording)
+    result = query_sermons(sort=list_by, limit=n, offset=offset, query=query, date_from=date_from, date_to=date_to, year=year, month=month_index, place=place, report=report, must_have_recording=must_have_recording)
 
 
-    from app.presentation.common import console
     console.print([r['code'] for r in result])
 
     # Build descriptive text to show above table
-    desc = f"Sökresultat för sökning på: [key]{search_term}[/key]\n"
+    desc = f"Sökresultat för sökning på: {search_text}\n"
     desc += f"Träff i {len(result)} predikningar\n"
     if n > 0:  # If not show all (n=0 means --all)
         desc += f"Begränsat till {n} träffar"
