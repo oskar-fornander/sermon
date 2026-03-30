@@ -163,9 +163,14 @@ def query_sermons(sort: str = 'code', limit: int = 0, offset: int = 0, query: st
                     WHERE resource.sermon_id = sermon.id
                     AND LOWER(resource.notes) LIKE ?
                 )
+                OR EXISTS (
+                    SELECT 1 FROM bible_reference
+                    WHERE bible_reference.sermon_id = sermon.id
+                    AND LOWER(bible_reference.reference_text) LIKE ?
+                )
             )
         """)
-        for _ in range(9):  # Make sure to add as many parameters (the same search term) as there are queries above
+        for _ in range(10):  # Make sure to add as many parameters (the same search term) as there are queries above
             params.append(f"%{query.lower()}%")  # Make search case insensitive also for åäö with .lower() and LOWER()
 
     sub_conditions = []  # These are used for EXISTS() when query for service
