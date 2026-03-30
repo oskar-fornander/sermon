@@ -7,7 +7,7 @@ from app.presentation.common import console
 from app.utils import parse_month, validate_date
 
 
-def search_sermons(query = [], list_by='code', n=0, offset=0, reverse = False, date_from = None, date_to = None, year = None, month = None, place = None, report = None, must_have_recording = False):  # List sermons by sermon code
+def search_sermons(query = [], list_by='code', n=0, offset=0, reverse = False, bible_only = False, date_from = None, date_to = None, year = None, month = None, place = None, report = None, must_have_recording = False):  # List sermons by sermon code
     """Search and filter the sermons."""
 
     search_text = ', '.join(["'[key]" + s + "[/key]'" for s in query])
@@ -28,7 +28,7 @@ def search_sermons(query = [], list_by='code', n=0, offset=0, reverse = False, d
         date_from, date_to = date_to, date_from  # Simply swap them?
 
 
-    result = query_sermons(sort=list_by, limit=n, offset=offset, query=query, date_from=date_from, date_to=date_to, year=year, month=month_index, place=place, report=report, must_have_recording=must_have_recording)
+    result = query_sermons(sort=list_by, limit=n, offset=offset, query=query, bible_only=bible_only, date_from=date_from, date_to=date_to, year=year, month=month_index, place=place, report=report, must_have_recording=must_have_recording)
 
 
     console.print([r['code'] for r in result])

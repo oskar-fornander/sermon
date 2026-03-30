@@ -50,6 +50,15 @@ def render_sermon_list(title='Predikoarkiv', content='', sermons=[], dates=[], o
                 service = ', '.join([s.date for s in sermon.services][::-1]) #Show all services in descending order
             table.add_row(sermon.code, sermon.title, service, manuscript, recording, resource, sermon.report)
 
+# Test: extra row spanning all rows to show search result in list
+#        if i % 2 == 0:
+#            table.add_section()
+#            table.add_row(
+#                    Panel('text text text text text text text text text     text ', style='', box=box.ROUNDED, padding=0), '', '', '', '', '', ''  
+#                    )
+#            table.add_section()
+            
+
 
     body = Group(f"\n[info]{content}[/info]", table)
     last_sermon = sermons[-1].code if len(sermons) > 0 else 'P000'

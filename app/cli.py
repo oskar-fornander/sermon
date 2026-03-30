@@ -48,7 +48,7 @@ app = typer.Typer(
 command_groups = ('Överblick & sök', 'Innehållshantering', 'Export & underhåll')  # Headings for command groups - only for user friendly readability
 
 # Single commands
-app.command(rich_help_panel=command_groups[0])(search)
+app.command(rich_help_panel=command_groups[0], no_args_is_help=True)(search)
 app.command(rich_help_panel=command_groups[0])(show)
 app.command(rich_help_panel=command_groups[1])(new)
 app.command(rich_help_panel=command_groups[1])(edit)
@@ -56,10 +56,10 @@ app.command(rich_help_panel=command_groups[2])(delete)
 app.command(rich_help_panel=command_groups[2])(backup)
 
 # Sub commands 
-app.add_typer(list_commands.app, name = 'list', rich_help_panel=command_groups[0])
-app.add_typer(open_commands.app, name = 'open', rich_help_panel=command_groups[1])
-app.add_typer(export_commands.app, name = 'export', rich_help_panel=command_groups[2])
-app.add_typer(files_commands.app, name = 'files', rich_help_panel=command_groups[2])
+app.add_typer(list_commands.app, name='list', rich_help_panel=command_groups[0])
+app.add_typer(open_commands.app, name='open', rich_help_panel=command_groups[1])
+app.add_typer(export_commands.app, name='export', rich_help_panel=command_groups[2])
+app.add_typer(files_commands.app, name='files', rich_help_panel=command_groups[2])
 
 
 

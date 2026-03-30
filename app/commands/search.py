@@ -7,7 +7,10 @@ from app.services.search_sermons import search_sermons
 
 # No search with regular expressions.
 # Implement in the future? 
-#   sermon search title:nåd
+#   sermon search title:nåd - probably not.
+
+# Show snippets of search resut in list
+# Let user type code of sermon to show sermon with highlighted search resuts.
 
 
 
@@ -15,6 +18,7 @@ from app.services.search_sermons import search_sermons
 def search(
         #query: str, 
         query: List[str] = typer.Argument(),
+        bible_only: bool = typer.Option(False, '--bible', help='Sök endast bland bibelreferenser'),
         limit: int = typer.Option(0, '--limit', '-n', help='Begränsa sökresultatet till antal predikningar (0 = ingen begränsning)'),
         offset: int = typer.Option(0, '--offset', help='Offset från senaste predikan'),
         date_from: str = typer.Option('', '--from', help='Visa predikningar senare än detta datum'),
@@ -37,7 +41,7 @@ def search(
         offset = 0  # No offset in search
 
     if sort == 'date':
-        search_sermons(query=query, list_by='date', n=limit, offset=offset, reverse=reverse, date_from=date_from, date_to=date_to, year=year, month=month, place=place, report=report, must_have_recording=has_recording)  # List sermons by service dates
+        search_sermons(query=query, list_by='date', n=limit, offset=offset, reverse=reverse, bible_only=bible_only, date_from=date_from, date_to=date_to, year=year, month=month, place=place, report=report, must_have_recording=has_recording)  # List sermons by service dates
     else:
-        search_sermons(query=query, list_by='code', n=limit, offset=offset, reverse=reverse, date_from=date_from, date_to=date_to, year=year, month=month, place=place, report=report, must_have_recording=has_recording)  # List sermons by sermon code
+        search_sermons(query=query, list_by='code', n=limit, offset=offset, reverse=reverse, bible_only=bible_only, date_from=date_from, date_to=date_to, year=year, month=month, place=place, report=report, must_have_recording=has_recording)  # List sermons by sermon code
 
