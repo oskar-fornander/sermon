@@ -10,7 +10,7 @@ Privat predikoregister för mina predikningar.
 - podcast-funktion?
 - Snygg och säker felhantering
 - ...
-- 
+- Lägga ner webbversionen
 
 ## uv
 

@@ -25,7 +25,7 @@ def clear_screen():
     os.system("cls" if os.name == "nt" else "clear")
 
 
-def render_info_panel(title: str, content: str='', subtitle: str=''):
+def render_info_panel(title: str, content: str='', subtitle: str='', blank_line = True):
     """Renders a small panel with title and maybe content."""
     print()
     console.print(
@@ -37,7 +37,8 @@ def render_info_panel(title: str, content: str='', subtitle: str=''):
             box=box.ROUNDED 
         )
     )
-    print()
+    if blank_line:
+        print()
 
 
 def user_input(title, description='', default=None, choices=None, pattern=None, allow_empty=True, invalid_choices=[], blank_line=True):

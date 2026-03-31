@@ -1,9 +1,11 @@
 
 import datetime
+import re
 from app.db import query_sermons
 from app.services.sermon_draft import load_sermon_as_draft
 from app.presentation.sermon_list import render_sermon_list
-from app.presentation.common import console
+from app.presentation.sermon_card import render_sermon_card
+from app.presentation.common import console, user_confirmation, user_input, render_info_panel, clear_screen
 from app.utils import parse_month, validate_date
 
 
@@ -31,7 +33,7 @@ def search_sermons(query = [], list_by='code', n=0, offset=0, reverse = False, b
     result = query_sermons(sort=list_by, limit=n, offset=offset, query=query, bible_only=bible_only, date_from=date_from, date_to=date_to, year=year, month=month_index, place=place, report=report, must_have_recording=must_have_recording)
 
 
-    console.print([r['code'] for r in result])
+    #console.print([r['code'] for r in result])
 
     # Build descriptive text to show above table
     desc = f"Sökresultat för sökning på: {search_text}\n"
@@ -60,13 +62,33 @@ def search_sermons(query = [], list_by='code', n=0, offset=0, reverse = False, b
 
     sermons = []
     dates = []
+    codes = []
     for r in result:
+        codes.append(r['code'])
         sermons.append(load_sermon_as_draft(r['code']))  # Get sermons as sermondDraft objects and store in a list
     if list_by == 'date':  # Dates for the services to show must be included when listed by date
         for r in result:
             dates.append(r['date'])
 
-    render_sermon_list(title='Predikoarkiv – sökresultat', content=desc, sermons=sermons, dates=dates, order_by=list_by, reverse=reverse)
+
+    pattern = re.compile(r'(^P?\d{3}$|^[qa]$)', re.IGNORECASE)  # Sermon codes or abort
+    while True:
+        render_sermon_list(title='Predikoarkiv – sökresultat', content=desc, sermons=sermons, dates=dates, order_by=list_by, reverse=reverse)
+
+        render_info_panel('Granska sökresultatet', 'Ange kod för en predikan att granska närmre eller q för att avbryta.', '...', blank_line = False)
+        code = ''
+        while code not in codes:
+            code = user_input('Predikokod', pattern=pattern, blank_line=True).upper()
+            if code == 'Q':  # Quit
+                return
+            if code[0] != 'P':  # Make sure code is in correct format
+                code = 'P' + code
+
+        clear_screen()
+        render_sermon_card(sermons[codes.index(code)]) 
+        while not user_confirmation('Fortsätta?', default=True, blank_line=False):
+            pass
+        clear_screen()
 
 
 
