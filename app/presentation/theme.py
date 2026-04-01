@@ -22,6 +22,7 @@ custom_theme = Theme ({
     'key': 'bold yellow',
     'code': 'honeydew2 bold italic',
     'notes': 'dim',
+    'highlight': 'bold yellow',
     'tip': 'bold dim',
     'alert': 'red bold',
     'edited': 'dark_orange',
