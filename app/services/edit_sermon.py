@@ -126,12 +126,16 @@ def interactive_edit_sermon(sermon_draft, pending_file_deletions = None):
             new_value = editor(sermon_draft.code, option, current_value)  # Get new value with the desired editor function
 
         # Update value
-        if new_value is not None:  # Must test if equal to None since an empty list will evaluate to False/None if not tested explicitly. But removing the last resource will result in an empty list.
+        if (new_value == current_value) or (new_value == '-' and current_value is None):
+            console.print(f"No changes: {field_name}")
+        elif new_value is not None:  # Must test if equal to None since an empty list will evaluate to False/None if not tested explicitly. But removing the last resource will result in an empty list.
             if new_value == '-':  # Leave field empty (if allowed)
                 if field_name in ['context', 'bible_references', 'introduction', 'message', 'notes', 'report', 'related_sermons']:  # Only these fields may be empty
                     setattr(sermon_draft, field_name, None)  # Clear value in sermon draft
                     if field_name == 'related_sermons':
                         setattr(sermon_draft, 'related_sermons', [])  # Must be an empty list
+                    edited.append(field_name)
+                    console.print(f"Updated: {field_name}")
                 else:
                     console.print('Detta fält får inte vara tomt')
                     time.sleep(1)
