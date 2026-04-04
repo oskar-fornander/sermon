@@ -117,7 +117,7 @@ def sermon_exists(code: str, conn = None) -> True|False:
         raise DatabaseError(f"Databasfel: {e}")
 
 
-def query_sermons(sort: str = 'code', limit: int = 0, offset: int = 0, query: [str] = [], bible_only: bool = False, date: str = None, date_from: str = None, date_to: str = None, year: int = None, month: int = None, place: str = None, report: str = None, must_have_recording: bool = False):
+def query_sermons(sort: str = 'code', limit: int = 0, query: [str] = [], bible_only: bool = False, date: str = None, date_from: str = None, date_to: str = None, year: int = None, month: int = None, place: str = None, report: str = None, must_have_recording: bool = False):
     """Make a query for sermons"""
 
     if sort == 'date':  # When listed by date the service date must be included form the service table
@@ -287,10 +287,6 @@ def query_sermons(sort: str = 'code', limit: int = 0, offset: int = 0, query: [s
     if limit:  # Limit the number of hits to show?
         sql += "\n        LIMIT ?"
         params.append(limit)
-        if offset:
-            sql += "\n        OFFSET ?"
-            params.append(offset)
-
 
     print(sql)
     print(params)

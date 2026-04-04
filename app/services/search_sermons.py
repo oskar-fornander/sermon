@@ -9,7 +9,7 @@ from app.presentation.common import console, user_confirmation, user_input, rend
 from app.utils import parse_month, validate_date, parse_sermon_code
 
 
-def search_sermons(query = [], list_by='code', n=0, offset=0, reverse = False, bible_only = False, date_from = None, date_to = None, year = None, month = None, place = None, report = None, must_have_recording = False):  # List sermons by sermon code
+def search_sermons(query = [], list_by='code', n=0, reverse = False, bible_only = False, date_from = None, date_to = None, year = None, month = None, place = None, report = None, must_have_recording = False):  # List sermons by sermon code
     """Search and filter the sermons."""
 
     search_text = ', '.join(["'[key]" + s + "[/key]'" for s in query])
@@ -30,7 +30,7 @@ def search_sermons(query = [], list_by='code', n=0, offset=0, reverse = False, b
         date_from, date_to = date_to, date_from  # Simply swap them?
 
 
-    result = query_sermons(sort=list_by, limit=n, offset=offset, query=query, bible_only=bible_only, date_from=date_from, date_to=date_to, year=year, month=month_index, place=place, report=report, must_have_recording=must_have_recording)
+    result = query_sermons(sort=list_by, limit=n, query=query, bible_only=bible_only, date_from=date_from, date_to=date_to, year=year, month=month_index, place=place, report=report, must_have_recording=must_have_recording)
 
 
     #console.print([r['code'] for r in result])
@@ -39,10 +39,7 @@ def search_sermons(query = [], list_by='code', n=0, offset=0, reverse = False, b
     desc = f"Sökresultat för sökning på: {search_text}\n"
     desc += f"Träff i {len(result)} predikningar\n"
     if n > 0:  # If not show all (n=0 means --all)
-        desc += f"Begränsat till {n} träffar"
-        if offset > 0:
-            desc += f" (offset: {offset})"
-        desc += '. '
+        desc += f"Begränsat till {n} träffar. "
     if list_by == 'date':
         desc += "Listade efter datum"
     else:
