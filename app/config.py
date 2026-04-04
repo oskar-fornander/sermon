@@ -4,6 +4,7 @@ import sys
 from pathlib import Path
 import yaml
 import sqlite3
+import logging
 from app.presentation.common import console
 
 
@@ -26,6 +27,9 @@ DEFAULT_CONFIG = {
         "html": "html"
     }
 }
+
+logging.getLogger('pypdf').setLevel(logging.ERROR)  # Hide non critical error messages
+
 
 def init_environment():
     """Initialize the environment"""

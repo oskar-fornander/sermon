@@ -125,6 +125,8 @@ def render_sermon_card(sermon_draft, preview=False, menu=[], edited_fields=[], q
     body = Group(*elements)
     title = f"[title][key]{sermon_draft.code}[/key] ─── {sermon_title}[/title]"
     subtitle = f"[tip]Tips:[/] [code]sermon --help[/]"
+    if query:
+        subtitle = f""  # Subtitle for search result
     style = ''
     if preview:  # Other title and subtitle if it is a preview that is shown
         title = f"[title][reverse] FÖRHANDSGRANSKNING [/reverse] {get_menu_index('Predikokod')}[key]{edited.get('code', '')}{sermon_draft.code}{edited_.get('code', '')}[/key] ─── {get_menu_index('Rubrik')}{edited.get('title', '')}{sermon_draft.title}{edited_.get('title', '')}[/title]"

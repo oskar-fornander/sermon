@@ -124,7 +124,7 @@ def get_audio_length(path: str) -> str:
 def get_pdf_pages(path: str) -> str:
     """Get number of pages in a pdf document"""
     try:
-        reader = PdfReader(path)
+        reader = PdfReader(path, strict=False)
         num_pages = len(reader.pages)
         if num_pages < 2:
             return f"{num_pages} sida"
