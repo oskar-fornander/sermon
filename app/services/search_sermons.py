@@ -77,7 +77,7 @@ def search_sermons(query = [], list_by='code', n=0, offset=0, reverse = False, b
         if len(sermons) < 1:
             return
 
-        render_info_panel('Granska sökresultatet', 'Ange kod för en predikan att granska eller q för att avbryta.', '', blank_line = False)
+        render_info_panel('Granska sökresultatet', 'Ange kod för en predikan att granska eller [key]q[/key] för att avbryta.', '', blank_line = False)
         code = ''
         while code not in codes:
             code = user_input('Predikokod', pattern=pattern, blank_line=True)
@@ -88,6 +88,7 @@ def search_sermons(query = [], list_by='code', n=0, offset=0, reverse = False, b
                 return
             if code[0] != 'P':  # Make sure code is in correct format
                 code = 'P' + code
+            console.print(f"Predikan [error]{code}[/error] finns inte i listan med sökresultat.")
 
         clear_screen()
         render_sermon_card(sermons[codes.index(code)], query=query) 
