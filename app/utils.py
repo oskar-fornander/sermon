@@ -9,6 +9,7 @@ from datetime import datetime, date, timedelta
 import re
 from app.presentation.common import ICON, console
 from app.errors import ValidationError
+from app.db import get_last_sermon_code
 
 
 PATTERN = {}  # Patterns to check validity of user inputs when creating and editing a sermon
@@ -20,6 +21,25 @@ PATTERN['manuscript'] = re.compile(r'^P\d{3}[abcde]?\.(pdf|PDF)$')  # Manuscript
 PATTERN['recording'] = re.compile(r'^20\d{2}-(0[1-9]|1[0-2])-(0[1-9]|[12][0-9]|3[0-1])_Predikan.*\..{3}$')  # Recording 2026-01-25_Predikan.mp3 but also 2026-01-25_Predikan_2.mp4 and others variants
 PATTERN['file_name'] = re.compile(r'^.+\..{3}$')  # Generic file name
 PATTERN['url'] = re.compile(r'^https?\:\/\/')  # URL http(s)://...
+
+
+
+def parse_sermon_code(code: str, raiseError = True) -> str:
+    """Try parsing the input as a sermon code."""
+    if PATTERN['code'].match(code):  # A valid code: P001
+        return code
+    for c in code:  # Invalid characters in code (spaces accepted)?
+        if c not in 'Pp0123456789 ':
+            if raiseError:
+                raise ValidationError(f"Ange predikokod i korrekt format, t.ex. [key]{get_last_sermon_code()}[/key]")
+            return None
+    code = ''.join([c for c in code if c in '0123456789'])  # Extract only digits from code
+    if code == '' or len(code) > 3:
+        if raiseError:
+            raise ValidationError(f"Ange predikokod i korrekt format, t.ex. [key]{get_last_sermon_code()}[/key]")
+        return None
+    code = 'P' + f"00{code}"[-3:]  # Padding zeros and leadning P
+    return code
 
 
 

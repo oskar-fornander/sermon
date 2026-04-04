@@ -1,7 +1,7 @@
 
 import time
 from app.config import PATH_MANUSCRIPTS, PATH_RECORDINGS, PATH_RESOURCES
-from app.utils import get_last_sunday, PATTERN
+from app.utils import get_last_sunday, PATTERN, parse_sermon_code
 from app.db import get_last_sermon_code, get_all_sermon_codes, update_sermon_from_draft
 from app.services.sermon_draft import load_sermon_as_draft, deep_copy, equal_drafts
 from app.services.delete_sermon import PendingFileDeletions
@@ -14,6 +14,9 @@ from app.presentation.edit_sermon import render_edit_menu, user_edit_short_text,
 def edit_sermon(sermon_code: str):
     """Launch interactive edit of the sermon."""
     #console.print(f"interactive edit: {sermon_code}")
+
+    sermon_code = parse_sermon_code(sermon_code)  # Make sure code is in correct format or raise error
+
     sermon_draft = load_sermon_as_draft(sermon_code)
     pending_file_deletions = PendingFileDeletions()  # Files waiting for deletion after edit
     #print(sermon_draft)

@@ -7,12 +7,15 @@ from app.config import PATH_MANUSCRIPTS, PATH_RECORDINGS, PATH_RESOURCES
 from app.db import delete_sermon_from_database
 from app.services.sermon_draft import load_sermon_as_draft
 from app.presentation.common import console, clear_screen, render_info_panel, user_input, user_confirmation, user_choice
+from app.utils import parse_sermon_code
 
 
 # Delete sermon from database
 
 def delete_sermon(sermon_code: str):
     """Delete sermon"""
+
+    sermon_code = parse_sermon_code(sermon_code)  # Make sure code is in correct format or raise error
 
     draft = load_sermon_as_draft(sermon_code)  # Load draft before user confirmations - this will throw an error if the sermon does not exist
     sermon_id = draft.id  # internal database id for this sermon

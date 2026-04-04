@@ -6,7 +6,7 @@ from app.services.sermon_draft import load_sermon_as_draft
 from app.presentation.sermon_list import render_sermon_list
 from app.presentation.sermon_card import render_sermon_card
 from app.presentation.common import console, user_confirmation, user_input, render_info_panel, clear_screen
-from app.utils import parse_month, validate_date
+from app.utils import parse_month, validate_date, parse_sermon_code
 
 
 def search_sermons(query = [], list_by='code', n=0, offset=0, reverse = False, bible_only = False, date_from = None, date_to = None, year = None, month = None, place = None, report = None, must_have_recording = False):  # List sermons by sermon code
@@ -80,14 +80,12 @@ def search_sermons(query = [], list_by='code', n=0, offset=0, reverse = False, b
         render_info_panel('Granska sökresultatet', 'Ange kod för en predikan att granska eller [key]q[/key] för att avbryta.', '', blank_line = False)
         code = ''
         while code not in codes:
-            code = user_input('Predikokod', pattern=pattern, blank_line=True)
+            code = user_input('Predikokod', pattern=pattern, allow_empty=False, blank_line=True)
+            if code in 'Qq':  # Quit
+                return
+            code = parse_sermon_code(code, raiseError=False)  # Make sure code is in correct format or none
             if not code:
                 continue
-            code = code.upper()
-            if code == 'Q':  # Quit
-                return
-            if code[0] != 'P':  # Make sure code is in correct format
-                code = 'P' + code
             console.print(f"Predikan [error]{code}[/error] finns inte i listan med sökresultat.")
 
         clear_screen()
@@ -96,6 +94,10 @@ def search_sermons(query = [], list_by='code', n=0, offset=0, reverse = False, b
             pass
         clear_screen()
 
+
+    
+
+    
 
 
 
