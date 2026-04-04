@@ -4,13 +4,14 @@ from app.services.list_sermons import list_sermons
 from app.presentation.common import clear_screen
 from app.errors import ValidationError
 
+default_limit = 10  # How many sermons to list
 
 app = typer.Typer(help = 'Lista de senaste predikningarna', invoke_without_command=True)
 #   sermon list [--limit N] [--all] [--date] [--reverse]
 
 @app.callback()
 def sermon_listing_function(
-        limit: int = typer.Option(10, '--limit', '-n', help='Antal predikningar att visa'),
+        limit: int = typer.Option(default_limit, '--limit', '-n', help='Antal predikningar att visa'),
         all: bool = typer.Option(False, '--all', help='Visa alla predikningar'), 
         date_from: str = typer.Option('', '--from', help='Visa predikningar senare än detta datum'),
         date_to: str = typer.Option('', '--to', help='Visa predikningar före detta datum'),
