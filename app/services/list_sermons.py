@@ -7,7 +7,7 @@ from app.errors import ValidationError
 from app.utils import parse_month, PATTERN, validate_date
 
 
-def list_sermons(list_by='code', n=0, offset=0, reverse = False, date = None, date_from = None, date_to = None, year = None, month = None, place = None, report = None, must_have_recording = False):
+def list_sermons(list_by='code', n=0, reverse = False, date = None, date_from = None, date_to = None, year = None, month = None, place = None, report = None, must_have_recording = False):
     """List sermons by code or date"""
 
     month_index = parse_month(month)
@@ -29,7 +29,7 @@ def list_sermons(list_by='code', n=0, offset=0, reverse = False, date = None, da
         date_from, date_to = date_to, date_from  # Simply swap them?
 
 
-    result = query_sermons(sort=list_by, limit=n, offset=offset, query = None, date=date, date_from=date_from, date_to=date_to, year=year, month=month_index, place=place, report=report, must_have_recording=must_have_recording)
+    result = query_sermons(sort=list_by, limit=n, query = None, date=date, date_from=date_from, date_to=date_to, year=year, month=month_index, place=place, report=report, must_have_recording=must_have_recording)
 
 
     from app.presentation.common import console
@@ -39,8 +39,6 @@ def list_sermons(list_by='code', n=0, offset=0, reverse = False, date = None, da
     desc = f"Alla ({len(result)}) predikningar"
     if n > 0:  # If not show all (n=0 means --all)
         desc = f"De {min(n, len(result))} senaste predikningarna"
-        if offset > 0:
-            desc += f" (offset: {offset})"
     if list_by == 'date':
         desc += " listade efter datum."
     else:
@@ -48,8 +46,6 @@ def list_sermons(list_by='code', n=0, offset=0, reverse = False, date = None, da
     desc += '\nAntal: '
     desc += str(n) if n > 0 else 'alla'
     desc += '\n'
-    if offset > 0:
-        desc += f"{offset=}"
     if date_from and date_to:
         desc += f"Period: {date_from} – {date_to}"
     elif date_from:
