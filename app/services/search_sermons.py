@@ -70,7 +70,7 @@ def search_sermons(query = [], list_by='code', n=0, reverse = False, bible_only 
 
     #pattern = re.compile(r'(^P?\d{3}$|^[qa]$)', re.IGNORECASE)  # Sermon codes or abort
     while True:
-        render_sermon_list(title='Predikoarkiv – sökresultat', content=desc, sermons=sermons, dates=dates, order_by=list_by, reverse=reverse)
+        render_sermon_list(title='Predikoarkiv – sökresultat', content=desc, subtitle = None, sermons=sermons, dates=dates, order_by=list_by, reverse=reverse)
         if len(sermons) < 1:
             return
 
