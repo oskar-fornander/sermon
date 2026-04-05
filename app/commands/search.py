@@ -7,11 +7,8 @@ from app.services.search_sermons import search_sermons
 
 # No search with regular expressions.
 # Implement in the future? 
+#   sermon search tro hopp -kärlek => tro AND hopp AND NOT kärlek
 #   sermon search title:nåd - probably not.
-
-# Show snippets of search resut in list
-# Let user type code of sermon to show sermon with highlighted search resuts.
-
 
 
 
