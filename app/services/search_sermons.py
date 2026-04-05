@@ -68,7 +68,7 @@ def search_sermons(query = [], list_by='code', n=0, reverse = False, bible_only 
             dates.append(r['date'])
 
 
-    pattern = re.compile(r'(^P?\d{3}$|^[qa]$)', re.IGNORECASE)  # Sermon codes or abort
+    #pattern = re.compile(r'(^P?\d{3}$|^[qa]$)', re.IGNORECASE)  # Sermon codes or abort
     while True:
         render_sermon_list(title='Predikoarkiv – sökresultat', content=desc, sermons=sermons, dates=dates, order_by=list_by, reverse=reverse)
         if len(sermons) < 1:
@@ -77,7 +77,7 @@ def search_sermons(query = [], list_by='code', n=0, reverse = False, bible_only 
         render_info_panel('Granska sökresultatet', 'Ange kod för en predikan att granska eller [key]q[/key] för att avbryta.', '', blank_line = False)
         code = ''
         while code not in codes:
-            code = user_input('Predikokod', pattern=pattern, allow_empty=True, blank_line=True)
+            code = user_input('Predikokod', allow_empty=True, blank_line=True)
             if not code:  # Quit by hitting return
                 return
             if code in 'Qq':  # Quit
