@@ -124,7 +124,9 @@ def interactive_edit_sermon(sermon_draft, pending_file_deletions = None):
         elif option == 'Omdöme':  # Special case: report. Limit options to valid reports
             new_value = user_edit_short_text(sermon_draft.code, 'Omdöme', current_value, choices=['A', 'B', 'C', '-'])
         elif option in ['Manus', 'Inspelning', 'Resurs']:  # These editors can delete files
-            new_value = editor(sermon_draft.code, option, current_value, pending_file_deletions)  # Get new value with the desired editor function
+            new_value = editor(sermon_draft.code, option, [deep_copy(d) for d in current_value], pending_file_deletions)  # Get new value with the desired editor function. Note: a deep copy of all drafts must be made to make the comparison below work as intended.
+        elif option == 'Gudstjänst':
+            new_value = editor(sermon_draft.code, option, deep_copy(current_value))  # Get new value with the desired editor function. Must make a deep copy of the draft.
         else:  # All other fields than sermon code
             new_value = editor(sermon_draft.code, option, current_value)  # Get new value with the desired editor function
 
@@ -149,5 +151,6 @@ def interactive_edit_sermon(sermon_draft, pending_file_deletions = None):
         else:
             console.print(f"Not updated: {field_name}")
         #time.sleep(1)
+
 
 

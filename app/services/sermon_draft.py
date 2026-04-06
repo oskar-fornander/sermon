@@ -233,12 +233,12 @@ def validate_sermon_draft(draft: SermonDraft):
 
 
 
-def deep_copy(draft: SermonDraft):
+def deep_copy(draft):
     """Make a deep copy of a sermon draft."""
     return copy.deepcopy(draft)
 
 
-def equal_drafts(draft1: SermonDraft, draft2: SermonDraft):
+def equal_drafts(draft1, draft2):
     """Compare if the two drafts are equal or not"""
     d1 = asdict(draft1)
     d2 = asdict(draft2)
