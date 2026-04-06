@@ -73,19 +73,22 @@ def open_recording(sermon_code: str):
     if len(recordings) > 1:
         txt = ''
         for i, r in enumerate(recordings):
-            txt += f"\n[key]{i + 1}.[/key] [title]{r['file_name']}[/title] ({r['type']}) ({r['date']}) "
+            link = r['file_name'] or r['external_url']
+            txt += f"\n[key]{i + 1}.[/key] [title]{r['date']}[/title] {link} ({r['type']}) "
             if r['notes']:
                 txt += f"[notes]({r['notes']})[/notes]"
         console.print(txt + '\n[key]q.[/key] [title]Avbryt[/title]\n')
-        i =  user_choice(title='Välj manus att öppna', options=[str(i) for i in range(1, len(recordings) + 1)] + ['q'])
+        i =  user_choice(title='Välj inspelning att öppna', options=[str(i) for i in range(1, len(recordings) + 1)] + ['q'])
         if i == 'q':
             return
     
-    file_name = recordings[int(i) - 1]['file_name']
-    path = PATH_RESOURCES / file_name
+    recording = recordings[int(i) - 1]
+
+    file_name  = ''
+    path = PATH_RECORDINGS / file_name
 
     if not Path.is_file(path):
-        raise FileError(f"Filen [link_style][link=file://{PATH_RESOURCES}]{PATH_RESOURCES}[/link]/{file_name}[/link_style] saknas.")
+        raise FileError(f"Filen [link_style][link=file://{PATH_RECORDINGS}]{PATH_RECORDINGS}[/link]/{file_name}[/link_style] saknas.")
 
     console.print(f"Öppnar [link=file://{path}]{file_name}[/link] med {APP_PDF} ...")
 
@@ -116,7 +119,7 @@ def open_resource(sermon_code: str):
             if r['notes']:
                 txt += f"[notes]({r['notes']})[/notes]"
         console.print(txt + '\n[key]q.[/key] [title]Avbryt[/title]\n')
-        i =  user_choice(title='Välj manus att öppna', options=[str(i) for i in range(1, len(resources) + 1)] + ['q'])
+        i =  user_choice(title='Välj resurs att öppna', options=[str(i) for i in range(1, len(resources) + 1)] + ['q'])
         if i == 'q':
             return
     
