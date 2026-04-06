@@ -1,6 +1,7 @@
 import typer
 from app.services.open import open_manuscript, open_recording, open_resource
 
+#sermon open manuscript P378
 
 app = typer.Typer(help = 'Öppna manuskript, inspelning eller resurs för en predikan', no_args_is_help=True)
 
