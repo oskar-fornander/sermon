@@ -1,24 +1,25 @@
 import typer
-from app.presentation.common import clear_screen
+from app.services.open import open_manuscript, open_recording, open_resource
+
 
 app = typer.Typer(help = 'Öppna manuskript, inspelning eller resurs för en predikan', no_args_is_help=True)
 
 
 @app.command('manuscript')
-def open_manuscript(sermon_code: str):
+def _open_manuscript(sermon_code: str):
     """Öppna manuskript till predikan"""
-    print(f"Öppna manuscript till predikan {sermon_code}")
+    open_manuscript(sermon_code)
 
 
 @app.command('recording')
-def open_recording(sermon_code: str):
+def _open_recording(sermon_code: str):
     """Öppna inspelning till predikan"""
-    print(f"Öppna inspelning till predikan {sermon_code}")
+    open_recording(sermon_code)
 
 
 @app.command('resource')
-def open_resource(sermon_code: str):
+def _open_resource(sermon_code: str):
     """Öppna resurs till predikan"""
-    print(f"Öppna resurs till predikan {sermon_code}")
+    open_resource(sermon_code)
 
 

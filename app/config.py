@@ -15,6 +15,9 @@ CONFIG = None
 ARCHIVE_ROOT, PATH_DATABASE, DB_FILE  = None, None, None
 PATH_BACKUP, PATH_MANUSCRIPTS, PATH_RECORDINGS, PATH_RESOURCES, PATH_HTML = None, None, None, None, None
 
+APP_PDF, APP_AUDIO, APP_VIDEO, APP_URL = None, None, None, None
+
+
 DEFAULT_CONFIG = {
     "root": str(Path.home() / "predikan" / "archive"),
     "database": "sermon.db",
@@ -25,6 +28,12 @@ DEFAULT_CONFIG = {
         "recordings": "files/recordings",
         "resources": "files/resources",
         "html": "html"
+    },
+    "apps": {
+        "pdf": "Preview",
+        "audio": "QuickTime Player",
+        "video": "QuickTime Player",
+        "browser": "Safari"
     }
 }
 
@@ -37,6 +46,7 @@ def init_environment():
 
     try:
         define_paths()  # Define paths for all files and folders
+        define_apps()  # Define default apps
     except Exception as error:
         raise RuntimeError(f"Ett fel uppstod i uppstarten: {error}")
         sys.exit(1)
@@ -92,7 +102,15 @@ def define_paths():
     PATH_RESOURCES.mkdir(parents=True, exist_ok=True)
     PATH_HTML.mkdir(parents=True, exist_ok=True)
 
-
+def define_apps():
+    """Define default apps to use to open resources"""
+    global APP_PDF, APP_AUDIO, APP_VIDEO, APP_URL
+    if not CONFIG:
+        load_config()
+    APP_PDF = CONFIG.get('apps', {}).get('pdf') or None
+    APP_AUDIO = CONFIG.get('apps', {}).get('audio') or None
+    APP_VIDEO = CONFIG.get('apps', {}).get('video') or None
+    APP_URL = CONFIG.get('apps', {}).get('browser') or None
 
 
 def ensure_database():

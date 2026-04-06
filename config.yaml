@@ -12,4 +12,10 @@ paths:
   resources: files/resources
   html: html
 
+apps:
+  pdf: Preview
+  audio: QuickTime Player
+  video: QuickTime Player
+
+
 
