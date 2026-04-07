@@ -37,12 +37,13 @@ def open_manuscript(sermon_code: str):
     if not Path.is_file(path):
         raise FileError(f"Filen [link_style][link=file://{PATH_MANUSCRIPTS}]{PATH_MANUSCRIPTS}[/link]/{file_name}[/link_style] saknas.")
 
-    console.print(f"Öppnar [link=file://{path}]{file_name}[/link] med {APP_PDF} ...")
 
     try:
         if APP_PDF:
+            console.print(f"Öppnar [link=file://{path}]{file_name}[/link] med {APP_PDF} ...")
             subprocess.run(['open', '-a', APP_PDF, path])
         else:
+            console.print(f"Öppnar [link=file://{path}]{file_name}[/link] ...")
             subprocess.run(['open', path])
     except Exception:
         raise FileError(f"Det gick inte att öppna filen {path}")
@@ -54,17 +55,6 @@ def open_recording(sermon_code: str):
     console.print(f"Öppna inspelning till predikan {sermon_code}")
 
     recordings = get_recordings_for_sermon(sermon_code)
-
-# I am here ...
-
-
-
-
-
-
-
-
-
 
     if not recordings:
         raise FileError(f"Det finns ingen inspelning till predikan {sermon_code}.")
@@ -83,22 +73,46 @@ def open_recording(sermon_code: str):
             return
     
     recording = recordings[int(i) - 1]
+    file_name = recording['file_name']
+    external_url = recording['external_url']
 
-    file_name  = ''
-    path = PATH_RECORDINGS / file_name
+    if file_name:  # Open file
+        path = PATH_RECORDINGS / file_name
 
-    if not Path.is_file(path):
-        raise FileError(f"Filen [link_style][link=file://{PATH_RECORDINGS}]{PATH_RECORDINGS}[/link]/{file_name}[/link_style] saknas.")
+        if not Path.is_file(path):
+            raise FileError(f"Filen [link_style][link=file://{PATH_RECORDINGS}]{PATH_RECORDINGS}[/link]/{file_name}[/link_style] saknas.")
 
-    console.print(f"Öppnar [link=file://{path}]{file_name}[/link] med {APP_PDF} ...")
-
-    try:
-        if APP_PDF:
-            subprocess.run(['open', '-a', APP_PDF, path])
+        if recording['type'] == 'audio':
+            APP = APP_AUDIO
+        elif recording['type'] == 'video':
+            APP = APP_VIDEO
         else:
-            subprocess.run(['open', path])
-    except Exception:
-        raise FileError(f"Det gick inte att öppna filen {path}")
+            raise FileError('Inte angiven filtyp: audio eller video')
+
+        try:
+            if APP:
+                console.print(f"Öppnar [link=file://{path}]{file_name}[/link] med {APP} ...")
+                subprocess.run(['open', '-a', APP, path])
+            else:
+                console.print(f"Öppnar [link=file://{path}]{file_name}[/link] ...")
+                subprocess.run(['open', path])
+        except Exception:
+            raise FileError(f"Det gick inte att öppna filen {path}")
+
+    elif external_url:  # Open external url
+        try:
+            if APP_URL:
+                console.print(f"Öppnar [link={external_url}]{external_url}[/link] med {APP_URL} ...")
+                subprocess.run(['open', '-a', APP, external_url])
+            else:
+                console.print(f"Öppnar [link={external_url}]{file_name}[/link] ...")
+                subprocess.run(['open', external_url])
+        except Exception:
+            raise FileError(f"Det gick inte att öppna länken {external_url}")
+
+    else:
+        raise FileError('Ingen fil eller extern url finns.')
+
 
 
 def open_resource(sermon_code: str):
@@ -129,12 +143,13 @@ def open_resource(sermon_code: str):
     if not Path.is_file(path):
         raise FileError(f"Filen [link_style][link=file://{PATH_RESOURCES}]{PATH_RESOURCES}[/link]/{file_name}[/link_style] saknas.")
 
-    console.print(f"Öppnar [link=file://{path}]{file_name}[/link] med {APP_PDF} ...")
 
     try:
         if APP_PDF:
+            console.print(f"Öppnar [link=file://{path}]{file_name}[/link] med {APP_PDF} ...")
             subprocess.run(['open', '-a', APP_PDF, path])
         else:
+            console.print(f"Öppnar [link=file://{path}]{file_name}[/link] ...")
             subprocess.run(['open', path])
     except Exception:
         raise FileError(f"Det gick inte att öppna filen {path}")
