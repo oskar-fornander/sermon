@@ -14,6 +14,7 @@ dependencies = [
     "send2trash>=1.8",
     "mutagen>=1.47.0",
     "pypdf>=4.0.0",
+    "requests",
 ]
 
 [project.scripts]

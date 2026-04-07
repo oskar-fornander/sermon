@@ -8,7 +8,7 @@ app = typer.Typer(help = 'Öppna manuskript, inspelning eller resurs för en pre
 
 @app.command('manuscript')
 def _open_manuscript(sermon_code: str):
-    """Öppna manuskript till predikan"""
+    """Öppna manus till predikan"""
     open_manuscript(sermon_code)
 
 

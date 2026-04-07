@@ -1,11 +1,12 @@
 #app/services/open.py
 import subprocess
 from pathlib import Path
+import requests
 from app.utils import parse_sermon_code
 from app.presentation.common import clear_screen, console, user_choice
 from app.config import APP_PDF, APP_AUDIO, APP_VIDEO, APP_URL, PATH_MANUSCRIPTS, PATH_RECORDINGS, PATH_RESOURCES
 from app.db import get_manuscripts_for_sermon, get_recordings_for_sermon, get_resources_for_sermon
-from app.errors import FileError
+from app.errors import FileError, ValidationError
 
 
 
@@ -100,10 +101,12 @@ def open_recording(sermon_code: str):
             raise FileError(f"Det gick inte att öppna filen {path}")
 
     elif external_url:  # Open external url
+        if not url_is_ok(external_url):
+            raise ValidationError(f"Länken verkar vara trasig: [link={external_url}]{external_url}[/link]")
         try:
             if APP_URL:
                 console.print(f"Öppnar [link={external_url}]{external_url}[/link] med {APP_URL} ...")
-                subprocess.run(['open', '-a', APP, external_url])
+                subprocess.run(['open', '-a', APP_URL, external_url])
             else:
                 console.print(f"Öppnar [link={external_url}]{file_name}[/link] ...")
                 subprocess.run(['open', external_url])
@@ -143,7 +146,6 @@ def open_resource(sermon_code: str):
     if not Path.is_file(path):
         raise FileError(f"Filen [link_style][link=file://{PATH_RESOURCES}]{PATH_RESOURCES}[/link]/{file_name}[/link_style] saknas.")
 
-
     try:
         if APP_PDF:
             console.print(f"Öppnar [link=file://{path}]{file_name}[/link] med {APP_PDF} ...")
@@ -156,28 +158,12 @@ def open_resource(sermon_code: str):
 
 
 
+def url_is_ok(url: str) -> bool:
+    try:
+        r = requests.head(url, allow_redirects=True, timeout=3)
+        return r.status_code < 400
+    except requests.RequestException:
+        return False
 
 
-## add a service layer ...
-#
-#    #välj om det finns flera inspelningar/filer: 1. datum, 2. datum, etc.
-#
-#    # Ange fel om ingen fil ska finnas
-#    # Ange fel om fil saknas på disk
-#
-#    # audio or video?
-#
-#    path = ''
-#    subprocess.run(['open', '-a', APP_AUDIO, path])
-#    #om ingen app:
-#    subprocess.run(['open', path])
-#
-#
-#    if APP_PDF:
-#        subprocess.run(['open', '-a', APP_PDF, path])
-#    else:
-#        subprocess.run(['open', path])
-#
-#
-#
-#
+
