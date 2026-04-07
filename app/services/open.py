@@ -154,7 +154,7 @@ def open_resource(sermon_code: str):
         elif APP_AUDIO and ('.wav' in file_name or '.mp3' in file_name):
             console.print(f"Öppnar [link=file://{path}]{file_name}[/link] med {APP_AUDIO} ...")
             subprocess.run(['open', '-a', APP_AUDIO, path])
-        elif APP_VIDEO and ('.mp4' in file_name):
+        elif APP_VIDEO and ('.mp4' in file_name or '.mov' in file_name):
             console.print(f"Öppnar [link=file://{path}]{file_name}[/link] med {APP_VIDEO} ...")
             subprocess.run(['open', '-a', APP_VIDEO, path])
         else:
