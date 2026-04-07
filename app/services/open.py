@@ -147,9 +147,16 @@ def open_resource(sermon_code: str):
         raise FileError(f"Filen [link_style][link=file://{PATH_RESOURCES}]{PATH_RESOURCES}[/link]/{file_name}[/link_style] saknas.")
 
     try:
-        if APP_PDF:
+# This could be improoved ...
+        if APP_PDF and ('.pdf' in file_name or '.jpg' in file_name or '.png' in file_name):
             console.print(f"Öppnar [link=file://{path}]{file_name}[/link] med {APP_PDF} ...")
             subprocess.run(['open', '-a', APP_PDF, path])
+        elif APP_AUDIO and ('.wav' in file_name or '.mp3' in file_name):
+            console.print(f"Öppnar [link=file://{path}]{file_name}[/link] med {APP_AUDIO} ...")
+            subprocess.run(['open', '-a', APP_AUDIO, path])
+        elif APP_VIDEO and ('.mp4' in file_name):
+            console.print(f"Öppnar [link=file://{path}]{file_name}[/link] med {APP_VIDEO} ...")
+            subprocess.run(['open', '-a', APP_VIDEO, path])
         else:
             console.print(f"Öppnar [link=file://{path}]{file_name}[/link] ...")
             subprocess.run(['open', path])
