@@ -112,8 +112,9 @@ def render_sermon_card(sermon_draft, preview=False, menu=[], edited_fields=[], q
         elements[-1] += ' – '  # Add at end of line if no data to show
     for resource in resources:
         resource_title = resource.title or resource.file_name  # Use file name if no title exists
+        file_extension = resource.file_name[resource.file_name.rfind('.'):]
         link = get_file_link(config.PATH_RESOURCES, resource.file_name, title=resource_title)
-        elements.append(f"{TAB_ + 12 * ' '}{link}")
+        elements.append(f"{TAB_ + 12 * ' '}{link} [notes]({file_extension})[/notes]")
         if resource.notes:
             resource_notes = resource.notes
             if query:  # Highlight search result
