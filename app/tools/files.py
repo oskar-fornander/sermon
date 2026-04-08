@@ -27,6 +27,7 @@ def check_files():
 
         missing_files = db_files - disk_files
         unused_files = disk_files - db_files
+        unused_files = [f for f in unused_files if f[0] != '.']  # Ignore hidden files (starting with a dot)
 
         missing_files = [f"[key]{codes_by_filenames[x]}:[/key] {x}" for x in missing_files]
         missing_files.sort()
@@ -36,8 +37,6 @@ def check_files():
         render_info_panel(f"{file_type.upper()}: Saknade filer", '; '.join(missing_files))
         render_info_panel(f"{file_type.upper()}: Oanvända filer", '; '.join(unused_files))
 
-# Add: links to files and folders
-# Add folders in lists?
 
 
 def list_files(path: Path):
