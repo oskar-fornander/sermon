@@ -18,7 +18,9 @@ def export_html():
     env = Environment(loader=FileSystemLoader('app/templates'))
     template = env.get_template('sermon.html.j2')
 
-    html = template.render(sermons=sermons)
+    html = template.render(
+        sermons=sermons
+    )
 
     with open(PATH_HTML / 'sermon.html', 'w', encoding='utf-8') as f:
         f.write(html)

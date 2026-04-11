@@ -5,20 +5,40 @@
         <meta charset="utf-8">
         <title>Predikoregister – Oskar Fornander</title>
         <style>
-            /* Standard css for base template */
-            {% include "standard/poster.css" %}
-
-            /* Extra css specific for template */
-            {% block style %}
-            {% endblock %}
+            /* Style for html page */
+            {% include "sermon.css" %}
         </style>
     </head>
     <body>
-        <header></header>
+        <header>
 
-    <main ...
+        </header>
+        <main>
 
+            <h1>Predikoregister – Oskar Fornander</h1>
 
-        <footer></footer>
+            <table id="sermon">
+                <thead>
+                    <tr>
+                        <th onclick="sortTable(0)">Kod</th>
+                        ...
+
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for s in sermons %}
+                    <tr>
+                        <td>{{ s.code }}</td>
+                        ...
+
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+
+        </main>
+        <footer>
+            <div>©Oskar Fornander 2026</div>
+        </footer>
     </body>
 </html>
