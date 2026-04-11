@@ -29,7 +29,7 @@ def list_sermons(list_by='code', n=0, reverse = False, date = None, date_from = 
         date_from, date_to = date_to, date_from  # Simply swap them?
 
 
-    result = query_sermons(sort=list_by, limit=n, query = None, date=date, date_from=date_from, date_to=date_to, year=year, month=month_index, place=place, report=report, must_have_recording=must_have_recording)
+    result = query_sermons(sort=list_by, limit=n, query=[], date=date, date_from=date_from, date_to=date_to, year=year, month=month_index, place=place, report=report, must_have_recording=must_have_recording)
 
 
     from app.presentation.common import console
