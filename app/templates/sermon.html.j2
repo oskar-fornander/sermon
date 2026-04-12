@@ -21,7 +21,8 @@
                 <thead>
                     <tr>
                         <th onclick="sortTable(0)">Kod</th>
-                        ...
+                        <th onclick="sortTable(1)">Titel</th>
+                        <th onclick="sortTable(2)">Datum</th>
 
                     </tr>
                 </thead>
@@ -29,7 +30,8 @@
                     {% for s in sermons %}
                     <tr>
                         <td>{{ s.code }}</td>
-                        ...
+                        <td>{{ s.title }}</td>
+                        <td>{{ s.date }}</td>
 
                     </tr>
                     {% endfor %}

@@ -1,5 +1,78 @@
 /* sermon.css */
 
+*, *::before, *::after {
+    box-sizing: border-box;
+    /*outline: 0.25pt solid rgba(255, 0, 0, 0.2); }*/
+}
+
+
+:root {
+    --font-standard: Menlo, Monaco, 'Courier New', sans-serif;
+    --font-size: 12pt;
+
+    --padding: 1rem;
+    --padding-cell: 0.5rem;
+
+
+}
+
+
+
+html, body {
+    margin: 0;
+    padding: 0;
+}
+
+
+body {
+
+    font-family: var(--font-standard);
+    font-size: var(--font-size);
+    padding: var(--padding);
+}
+
+
+
+table, th, td, tr {
+    border: 1px solid black;
+}
+
+
+
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+th, td {
+  padding: var(--padding-cell);
+  border-bottom: 1px solid #ddd;
+  text-align: left;
+}
+
+th {
+  cursor: pointer;
+  background: #f5f5f5;
+}
+
+
+
+
+
+
+input {
+  width: 100%;
+  padding: 8px;
+  margin-bottom: 1rem;
+}
+
+a {
+  text-decoration: none;
+  margin-right: 5px;
+}
+
+
 
 
 
