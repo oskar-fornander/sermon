@@ -20,18 +20,20 @@
             <table id="sermon" data-sort-direction="DESC" data-sort-column="0">
                 <thead>
                     <tr>
-                        <th onclick="sortTable(0)">Kod</th>
-                        <th onclick="sortTable(1)">Titel</th>
-                        <th onclick="sortTable(2)">Datum</th>
+                        <th class="code" onclick="sortTable(0)">Kod</th>
+                        <th class="title" onclick="sortTable(1)">Titel</th>
+                        <th class="date" onclick="sortTable(2)">Datum</th>
+                        <th class="all-dates hidden" onclick="sortTable(2)">Datum</th>
 
                     </tr>
                 </thead>
                 <tbody>
                     {% for s in sermons %}
                     <tr>
-                        <td>{{ s.code }}</td>
-                        <td>{{ s.title }}</td>
-                        <td>{{ s.date }}</td>
+                        <td class="code">{{ s.code }}</td>
+                        <td class="title">{{ s.title }}</td>
+                        <td class="date">{{ s.date }}</td>
+                        <td class="all-dates hidden">{{ ', '.join(s.all_dates) }}</td>
 
                     </tr>
                     {% endfor %}

@@ -32,6 +32,11 @@ body {
 }
 
 
+.hidden {
+    text-decoration: line-through;
+    background-color: orange;
+}
+
 
 table, th, td, tr {
     border: 1px solid black;
@@ -55,8 +60,6 @@ th {
   cursor: pointer;
   background: #f5f5f5;
 }
-
-
 
 
 

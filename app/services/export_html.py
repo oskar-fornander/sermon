@@ -1,5 +1,6 @@
 #app/services/export_html.py
 from dataclasses import dataclass, asdict
+from typing import List
 from jinja2 import Environment, FileSystemLoader
 from app.db import query_sermons
 from app.config import PATH_HTML
@@ -10,6 +11,7 @@ from app.presentation.common import console
 @dataclass
 class SermonDraftWithDate(SermonDraft):  # Extend SermonDraft to include date
     date: str = None
+    all_dates: List[str] = None
 
 
 
@@ -27,12 +29,16 @@ def export_html():
                 date = s.manuscripts[0].date
             except Exception:
                 date = ''
-            sermon = SermonDraftWithDate(**asdict(s), date=date)  # Add date to object by extending it to a new dataclass
+            sermon = SermonDraftWithDate(**asdict(s), date=date, all_dates=[])  # Add date to object by extending it to a new dataclass
             sermons.append(sermon)
         else:
+            all_dates = []
             for service in s.services:  # Add date for each service. There may be duplicates if a sermon has more than one service
-                date = service.date
-                sermon = SermonDraftWithDate(**asdict(s), date=date)  # Add date to object by extending it to a new dataclass
+                all_dates.append(service.date)  # Save all dates for a sermon in each instance of that sermon
+            all_dates.sort()
+            all_dates = all_dates[::-1]  # Sort dates in reversed order
+            for date in all_dates:
+                sermon = SermonDraftWithDate(**asdict(s), date=date, all_dates=all_dates)  # Add date to object by extending it to a new dataclass
                 sermons.append(sermon)
 
     #console.print(sermons[0])
