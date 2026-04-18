@@ -17,7 +17,7 @@
 
             <h1>Predikoregister – Oskar Fornander</h1>
 
-            <table id="sermon">
+            <table id="sermon" data-sort-direction="DESC" data-sort-column="0">
                 <thead>
                     <tr>
                         <th onclick="sortTable(0)">Kod</th>
@@ -42,5 +42,8 @@
         <footer>
             <div>©Oskar Fornander 2026</div>
         </footer>
+        <script type="text/javascript">
+            {% include "sermon.js" %}
+        </script>
     </body>
 </html>

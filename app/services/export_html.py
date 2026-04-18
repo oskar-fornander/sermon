@@ -17,16 +17,25 @@ class SermonDraftWithDate(SermonDraft):  # Extend SermonDraft to include date
 def export_html():
     """Export the full sermon database as a html page."""
 
-    data = query_sermons(sort='date', limit=0)  # Get all sermons in a list
-
-# Hämta med sort='code' istället och lägg till nya objekt för varje service och sortera sedan?
-
+    data = query_sermons(sort='code', limit=0)  # Get all sermons in a list by code
     sermons = []
-    for s in data:
-        sermon = load_sermon_as_draft(s['code'])  # Make a SermonDraft object from each sermon. There may be duplicates if a sermon has more than one service
-        sermon = SermonDraftWithDate(**asdict(sermon), date=s['date'])  # Add date to object by extending it to a new dataclass
-        sermons.append(sermon)  # as SermonDrafts
-    console.print(sermons[0])
+    for d in data:
+        s = load_sermon_as_draft(d['code'])  # Make a SermonDraft object from each sermon. 
+
+        if len(s.services) == 0:  # Special case: no service, use date from  manuscript instead
+            try:
+                date = s.manuscripts[0].date
+            except Exception:
+                date = ''
+            sermon = SermonDraftWithDate(**asdict(s), date=date)  # Add date to object by extending it to a new dataclass
+            sermons.append(sermon)
+        else:
+            for service in s.services:  # Add date for each service. There may be duplicates if a sermon has more than one service
+                date = service.date
+                sermon = SermonDraftWithDate(**asdict(s), date=date)  # Add date to object by extending it to a new dataclass
+                sermons.append(sermon)
+
+    #console.print(sermons[0])
 
     # Build html page:
     env = Environment(loader=FileSystemLoader('app/templates'))
