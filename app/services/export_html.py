@@ -26,7 +26,7 @@ def export_html():
 
         if len(s.services) == 0:  # Special case: no service, use date from  manuscript instead
             try:
-                date = s.manuscripts[0].date
+                date = f"({s.manuscripts[0].date})"
             except Exception:
                 date = ''
             sermon = SermonDraftWithDate(**asdict(s), date=date, all_dates=[])  # Add date to object by extending it to a new dataclass
@@ -41,7 +41,7 @@ def export_html():
                 sermon = SermonDraftWithDate(**asdict(s), date=date, all_dates=all_dates)  # Add date to object by extending it to a new dataclass
                 sermons.append(sermon)
 
-    #console.print(sermons[0])
+    console.print(sermons[0])
 
     # Build html page:
     env = Environment(loader=FileSystemLoader('app/templates'))

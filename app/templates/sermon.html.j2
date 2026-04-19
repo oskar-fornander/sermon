@@ -17,25 +17,40 @@
 
             <h1>Predikoregister – Oskar Fornander</h1>
 
-            <table id="sermon" data-sort-direction="DESC" data-sort-column="0">
+            <div id="search">
+                <input id="searchInput" type="text" placeholder="Sök ..." />
+                <div id="searchResult"></div>
+            </div>
+
+            <table id="sermon" data-sort-direction="ASC" data-sort-column="0">
                 <thead>
                     <tr>
-                        <th class="code" onclick="sortTable(0)">Kod</th>
+                        <th class="code desc" onclick="sortTable(0)">Kod</th>
                         <th class="title" onclick="sortTable(1)">Titel</th>
-                        <th class="date" onclick="sortTable(2)">Datum</th>
-                        <th class="all-dates hidden" onclick="sortTable(2)">Datum</th>
+                        <th class="date hidden" onclick="sortTable(2)">Datum</th>
+                        <th class="all-dates" onclick="sortTable(2)">Datum</th>
+                        <th class="bible-references" onclick="sortTable()">Bibelreferenser</th>
+
 
                     </tr>
                 </thead>
                 <tbody>
                     {% for s in sermons %}
                     <tr>
-                        <td class="code">{{ s.code }}</td>
+                        <td class="code" onclick="toggleData('{{ s.code }}')">{{ s.code }}</td>
                         <td class="title">{{ s.title }}</td>
-                        <td class="date">{{ s.date }}</td>
-                        <td class="all-dates hidden">{{ ', '.join(s.all_dates) }}</td>
+                        <td class="date hidden">{{ s.date }}</td>
+                        <td class="all-dates">{{ ', '.join(s.all_dates) }}</td>
+                        <td class="bible-references">{{ ', '.join(s.bible_references) }}</td>
 
                     </tr>
+                    <!--
+                    <tr id="" class="details">
+                        <td colspan="5">
+                            Detaljer ... {{ s.code }}
+                        </td>
+                    </tr>
+                    -->
                     {% endfor %}
                 </tbody>
             </table>

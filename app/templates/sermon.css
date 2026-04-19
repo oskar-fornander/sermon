@@ -34,7 +34,10 @@ body {
 
 .hidden {
     text-decoration: line-through;
-    background-color: orange;
+    display: none;
+}
+.search-hidden {
+    display: none;
 }
 
 
@@ -48,6 +51,7 @@ table, th, td, tr {
 table {
   width: 100%;
   border-collapse: collapse;
+  margin: 2rem 0;
 }
 
 th, td {
@@ -65,21 +69,47 @@ th.asc, th.desc {
 
 }
 th.asc::after {
-    content: '\25B2';
+    content: '\25B2';  /*Arrow up*/
     margin-left: 0.5rem;
 
 }
 th.desc::after {
-    content: '\25BC';
+    content: '\25BC'; /*Arrow down*/
     margin-left: 0.5rem;
 }
 
+td.code {
+    cursor: pointer;
+}
 
 
 input {
-  width: 100%;
-  padding: 8px;
-  margin-bottom: 0.5rem;
+    width: 100%;
+    padding: 1rem;
+}
+
+#search {
+    position: relative;
+    width: 100%;
+    margin: 1rem 0;
+    padding: 0;
+}
+#searchInput {
+    border-color: blue;
+    border-radius: 1rem;
+    font-size: 1.5rem;
+}
+#searchResult {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    padding-right: 1rem;
+    position: absolute;
+    right: 0;
+    top: 0;
+    bottom: 0;
+    font-size: 1.5rem;
+    color: #777;
 }
 
 a {
