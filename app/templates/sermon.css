@@ -61,13 +61,25 @@ th {
   background: #f5f5f5;
 }
 
+th.asc, th.desc {
+
+}
+th.asc::after {
+    content: '\25B2';
+    margin-left: 0.5rem;
+
+}
+th.desc::after {
+    content: '\25BC';
+    margin-left: 0.5rem;
+}
 
 
 
 input {
   width: 100%;
   padding: 8px;
-  margin-bottom: 1rem;
+  margin-bottom: 0.5rem;
 }
 
 a {

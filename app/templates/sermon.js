@@ -10,6 +10,13 @@ function sortTable(column) {
     } 
     table.setAttribute('data-sort-column', column);
     table.setAttribute('data-sort-direction', asc ? 'ASC': 'DESC');
+    let tableHeads = table.querySelectorAll('th');
+    for (let i = 0; i < tableHeads.length; i++) {
+        classes = tableHeads[i].className;
+        tableHeads[i].className = classes.replace(/(asc|desc)/ig, '');
+    }
+    console.log(column);
+    table.querySelector('thead > tr > th:nth-child(' + (column + 1) + ')').className += asc? ' asc': ' desc';
 
     rows.sort((a, b) => {  // Start by sorting by code
         const A = a.cells[0].innerText;
