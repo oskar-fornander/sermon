@@ -14,6 +14,7 @@
 
         </header>
         <main>
+            {% set ns = namespace(index=0) %}
 
             <h1>Predikoregister – Oskar Fornander</h1>
 
@@ -36,7 +37,7 @@
                 </thead>
                 <tbody>
                     {% for s in sermons %}
-                    <tr>
+                    <tr id="{{ ns.index }}">
                         <td class="code" onclick="toggleData('{{ s.code }}')">{{ s.code }}</td>
                         <td class="title">{{ s.title }}</td>
                         <td class="date hidden">{{ s.date }}</td>
@@ -44,13 +45,13 @@
                         <td class="bible-references">{{ ', '.join(s.bible_references) }}</td>
 
                     </tr>
-                    <!--
-                    <tr id="" class="details">
-                        <td colspan="5">
+                    <tr id="details-{{ ns.index }}" class="details">
+                        <td></td>
+                        <td colspan="3">
                             Detaljer ... {{ s.code }}
                         </td>
                     </tr>
-                    -->
+                    {% set ns.index = ns.index + 1 %}
                     {% endfor %}
                 </tbody>
             </table>

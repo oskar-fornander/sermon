@@ -7,6 +7,14 @@ function sortTable(column) {
 
     let table = document.querySelector('table#sermon');
     let rows = Array.from(table.rows).slice(1);  // All rows in sermon table but the heading
+    let rowsDetails = [];
+    let i = 1;
+    while (i < rows.length) {
+        rowsDetails.push(rows.splice(i, 1)[0]);  // Extract all detail rows from list. Since they all come sorted as every other this simple loop will do the trick. Add extra safety?
+        i += 1;
+    }
+    table.querySelector('tbody').innerHTML = '';
+
     let heading = table.rows[0];
     let sortColumn = table.getAttribute('data-sort-column');  // Last column sorted
     let asc = false;  // Descending sort order as default
@@ -24,12 +32,12 @@ function sortTable(column) {
     table.querySelector('thead > tr > th:nth-child(' + (column + 1) + ')').classList.add(classname);  // Adds arrow up or down to indicate sorting order and column
 
     rows.sort((a, b) => {  // Start by sorting by code
-        const A = a.cells[0].innerText;
-        const B = b.cells[0].innerText;
+        const A = a.id;
+        const B = b.id;
         if (A == B) {
-            return a.cells[2].innerText < b.cells[2].innerText;  // Sort by date if codes are equal
+            return a.cells[2].innerText > b.cells[2].innerText;  // Sort by date if codes are equal
         }
-        return A < B;
+        return A > B;
     });
     rows.sort((a, b) => {  // Sort rows by column
         const A = a.cells[column].innerText.replace(/[^abcdefghijklmnopqrstuvwxyzåäö0123456789]/ig, ''); // Ignore special characters in sorting
@@ -65,6 +73,15 @@ function sortTable(column) {
             row.cells[3].classList.remove('hidden');
         }
         table.tBodies[0].appendChild(row);  // Add rows back in table (also hidden rows!)
+        
+        const index = row.id;  // The index given as id in html template
+        rowDetails = rowsDetails.find(row => row.id == 'details-' + index);  // Find corresponding details row
+        if (row.classList.contains('hidden')) {  // Make details row hidde/visible as corresponding main row
+            rowDetails.classList.add('hidden');
+        } else {
+            rowDetails.classList.remove('hidden');
+        }
+        table.tBodies[0].appendChild(rowDetails);  // Add rows back in table (also hidden rows!)
     }
 
 }
@@ -82,6 +99,8 @@ function searchSermons() {
     const searchInput = document.getElementById("searchInput");
     let filter = searchInput.value.toLowerCase();
     let rows = document.querySelectorAll("table#sermon tbody tr");
+
+// Fixa filtreringen med detaljraderna!!!!
 
     let hits = 0;
     rows.forEach(row => {
