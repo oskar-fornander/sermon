@@ -1,11 +1,13 @@
 
+const table = document.querySelector('table#sermon');
+const searchInput = document.getElementById("searchInput");
+
 sortTable(0);  // Make sure to sort it from start
 document.querySelector('#searchInput').focus();
 
 function sortTable(column) {
     if (column === undefined) return;
 
-    let table = document.querySelector('table#sermon');
     let rows = Array.from(table.rows).slice(1);  // All rows in sermon table but the heading
     let rowsDetails = [];
     let i = 1;
@@ -32,8 +34,8 @@ function sortTable(column) {
     table.querySelector('thead > tr > th:nth-child(' + (column + 1) + ')').classList.add(classname);  // Adds arrow up or down to indicate sorting order and column
 
     rows.sort((a, b) => {  // Start by sorting by code
-        const A = a.id;
-        const B = b.id;
+        const A = a.dataset.index;
+        const B = b.dataset.index;
         if (A == B) {
             return a.cells[2].innerText > b.cells[2].innerText;  // Sort by date if codes are equal
         }
@@ -74,8 +76,8 @@ function sortTable(column) {
         }
         table.tBodies[0].appendChild(row);  // Add rows back in table (also hidden rows!)
         
-        const index = row.id;  // The index given as id in html template
-        rowDetails = rowsDetails.find(row => row.id == 'details-' + index);  // Find corresponding details row
+        const index = row.dataset.index;  // The index given as id in html template
+        rowDetails = rowsDetails.find(row => row.dataset.index == index);  // Find corresponding details row
         if (row.classList.contains('hidden')) {  // Make details row hidde/visible as corresponding main row
             rowDetails.classList.add('hidden');
         } else {
@@ -84,11 +86,13 @@ function sortTable(column) {
         table.tBodies[0].appendChild(rowDetails);  // Add rows back in table (also hidden rows!)
     }
 
+    if (searchInput.value) searchSermons(); //Update search result if any
 }
 
 function toggleData(sermonCode) {
 
     console.log(sermonCode);
+    //use index instead
 
 }
 
@@ -96,25 +100,39 @@ function toggleData(sermonCode) {
 document.getElementById("searchInput").addEventListener("keyup", searchSermons);
 
 function searchSermons() {
-    const searchInput = document.getElementById("searchInput");
+    
+// This function can most certainly be optimized!
+
     let filter = searchInput.value.toLowerCase();
-    let rows = document.querySelectorAll("table#sermon tbody tr");
+    let rows = Array.from(table.rows).slice(1);  // All rows in sermon table but the heading
 
-// Fixa filtreringen med detaljraderna!!!!
+    if (filter == '') {  //If no search string
+        rows.forEach(row => {
+            row.classList.remove('search-hidden');
+        });
+        return;
+    }
 
+    rows = rows.map((x) => {  // Hide all rows with no hit
+        x.classList.add('search-hidden');
+        return x;
+    });
     let hits = 0;
     rows.forEach(row => {
         let text = row.innerText.toLowerCase();
-        row.style.display = text.includes(filter) ? "" : "none";
-        if (text.includes(filter)) {
-            row.classList.remove('search-hidden');
-            if (!row.classList.contains('hidden')) hits += 1;  // Count only shown sermons
-        } else {
-            row.classList.add('search-hidden');
+        if (text.includes(filter)) {  // a hit
+            if (!row.classList.contains('hidden')) {
+                hits += 1;
+            }
+            const index = row.dataset.index;
+            table.querySelector("tr[data-index='" + index + "']").classList.remove('search-hidden');  // Show both main row and deatils row
+            table.querySelector("tr.details[data-index='" + index + "']").classList.remove('search-hidden');
         }
     });
+
     const searchResult = document.getElementById("searchResult");
-    searchResult.innerHTML = hits + " träffar";
+    searchResult.innerHTML = hits > 1? hits + ' träffar': hits + ' träff';
+
 }
 
 

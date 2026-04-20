@@ -37,7 +37,7 @@
                 </thead>
                 <tbody>
                     {% for s in sermons %}
-                    <tr id="{{ ns.index }}">
+                    <tr data-index="{{ ns.index }}">
                         <td class="code" onclick="toggleData('{{ s.code }}')">{{ s.code }}</td>
                         <td class="title">{{ s.title }}</td>
                         <td class="date hidden">{{ s.date }}</td>
@@ -45,7 +45,7 @@
                         <td class="bible-references">{{ ', '.join(s.bible_references) }}</td>
 
                     </tr>
-                    <tr id="details-{{ ns.index }}" class="details">
+                    <tr data-index="{{ ns.index }}" class="details">
                         <td></td>
                         <td colspan="3">
                             Detaljer ... {{ s.code }}
