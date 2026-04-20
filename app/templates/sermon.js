@@ -1,9 +1,22 @@
 
 const table = document.querySelector('table#sermon');
 const searchInput = document.getElementById("searchInput");
+const searchResult = document.getElementById("searchResult");
+let lastFilter = '';
 
+
+document.getElementById("searchInput").addEventListener("keyup", searchSermons);
 sortTable(0);  // Make sure to sort it from start
 document.querySelector('#searchInput').focus();
+
+
+
+function toggleData(sermonCode) {
+
+    console.log(sermonCode);
+    //use index instead
+
+}
 
 function sortTable(column) {
     if (column === undefined) return;
@@ -86,55 +99,72 @@ function sortTable(column) {
         table.tBodies[0].appendChild(rowDetails);  // Add rows back in table (also hidden rows!)
     }
 
-    if (searchInput.value) searchSermons(); //Update search result if any
+    searchSermons(); //Update search result
 }
 
-function toggleData(sermonCode) {
-
-    console.log(sermonCode);
-    //use index instead
-
-}
-
-
-document.getElementById("searchInput").addEventListener("keyup", searchSermons);
 
 function searchSermons() {
     
 // This function can most certainly be optimized!
 
+    showHits();
+
     let filter = searchInput.value.toLowerCase();
+    if (filter == lastFilter) return;  // Save some work in vain
+    lastFilter = filter;
+
     let rows = Array.from(table.rows).slice(1);  // All rows in sermon table but the heading
 
     if (filter == '') {  //If no search string
         rows.forEach(row => {
-            row.classList.remove('search-hidden');
+            row.classList.remove('search-hidden');  // show all
         });
+        showHits();
+        highlight('');  // remove all highlights
         return;
     }
 
-    rows = rows.map((x) => {  // Hide all rows with no hit
+    rows.forEach((x) => {  // Hide all rows with no hit
         x.classList.add('search-hidden');
-        return x;
     });
-    let hits = 0;
+
     rows.forEach(row => {
         let text = row.innerText.toLowerCase();
         if (text.includes(filter)) {  // a hit
-            if (!row.classList.contains('hidden')) {
-                hits += 1;
-            }
             const index = row.dataset.index;
             table.querySelector("tr[data-index='" + index + "']").classList.remove('search-hidden');  // Show both main row and deatils row
             table.querySelector("tr.details[data-index='" + index + "']").classList.remove('search-hidden');
         }
     });
 
-    const searchResult = document.getElementById("searchResult");
-    searchResult.innerHTML = hits > 1? hits + ' träffar': hits + ' träff';
-
+    showHits();
+    highlight(filter);  // Mark search result with highlighting
 }
 
+function showHits() {
+    let hits = table.querySelectorAll("tr:not(.details, .hidden, .search-hidden, .heading)").length;
+    searchResult.innerHTML = hits == 1? hits + ' träff': hits + ' träffar';
+}
+
+function highlight(txt) {
+    //...txt... ->  ...<span class="highlight">txt</span>...
+    rows = Array.from(table.rows).slice(1);
+
+    if (txt.trim().length == 0) txt = '';
+    let regex = RegExp.escape(txt);  // Escape string 
+    //console.log(regex);
+    regex = new RegExp(`(${regex})`, "gi");
+
+    rows.forEach(row => {
+        row.querySelectorAll("td").forEach(cell => {
+            cell.innerHTML = cell.innerHTML.replace(/\<span class\=\"highlight\"\>(.*?)\<\/span\>/g, "$1");  // Clear highlighting
+
+            if (!txt) return;  // Nothing to highlight
+
+            cell.innerHTML = cell.innerHTML.replace(regex, '<span class="highlight">$1</span>');  // Set highlighting
+        });
+    });
+}
 
 
 

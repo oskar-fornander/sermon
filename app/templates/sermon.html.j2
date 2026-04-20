@@ -25,14 +25,12 @@
 
             <table id="sermon" data-sort-direction="ASC" data-sort-column="0">
                 <thead>
-                    <tr>
+                    <tr class="heading">
                         <th class="code desc" onclick="sortTable(0)">Kod</th>
                         <th class="title" onclick="sortTable(1)">Titel</th>
                         <th class="date hidden" onclick="sortTable(2)">Datum</th>
                         <th class="all-dates" onclick="sortTable(2)">Datum</th>
                         <th class="bible-references" onclick="sortTable()">Bibelreferenser</th>
-
-
                     </tr>
                 </thead>
                 <tbody>
@@ -43,10 +41,9 @@
                         <td class="date hidden">{{ s.date }}</td>
                         <td class="all-dates">{{ ', '.join(s.all_dates) }}</td>
                         <td class="bible-references">{{ ', '.join(s.bible_references) }}</td>
-
                     </tr>
                     <tr data-index="{{ ns.index }}" class="details">
-                        <td></td>
+                        <td class="invisible"></td>
                         <td colspan="3">
                             Detaljer ... {{ s.code }}
                         </td>

@@ -32,6 +32,9 @@ body {
 }
 
 
+.invisible {
+    visibility: hidden;
+}
 .hidden {
     text-decoration: line-through;
     display: none;
@@ -39,6 +42,15 @@ body {
 .search-hidden {
     display: none;
 }
+.highlight {
+    font-weight: bold;
+    background-color: yellow;
+    border-top: 1px solid #ddd;
+    border-left: 1px solid #ddd;
+    border-right: 1px solid #bbb;
+    border-bottom: 1px solid #bbb;
+}
+
 
 
 table, th, td, tr {
@@ -80,6 +92,10 @@ th.desc::after {
 
 td.code {
     cursor: pointer;
+}
+
+tr.details {
+
 }
 
 
