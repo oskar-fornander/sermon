@@ -12,6 +12,7 @@ CONFIG_DIR = Path.home() / ".config" / "sermon"  # This is the absolute path to 
 CONFIG_FILE = CONFIG_DIR / "config.yaml"
 
 CONFIG = None
+USER = None
 ARCHIVE_ROOT, PATH_DATABASE, DB_FILE  = None, None, None
 PATH_BACKUP, PATH_MANUSCRIPTS, PATH_RECORDINGS, PATH_RESOURCES, PATH_HTML = None, None, None, None, None
 
@@ -19,6 +20,7 @@ APP_PDF, APP_AUDIO, APP_VIDEO, APP_URL = None, None, None, None
 
 
 DEFAULT_CONFIG = {
+    "user": "",
     "root": str(Path.home() / "predikan" / "archive"),
     "database": "sermon.db",
     "paths": {
@@ -42,9 +44,11 @@ logging.getLogger('pypdf').setLevel(logging.ERROR)  # Hide non critical error me
 
 def init_environment():
     """Initialize the environment"""
+    global USER
     load_config()  # Load config.yaml
 
     try:
+        USER = CONFIG.get('user') or ''
         define_paths()  # Define paths for all files and folders
         define_apps()  # Define default apps
     except Exception as error:

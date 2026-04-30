@@ -3,7 +3,7 @@ from dataclasses import dataclass, asdict
 from typing import List
 from jinja2 import Environment, FileSystemLoader
 from app.db import query_sermons
-from app.config import PATH_HTML
+from app.config import PATH_HTML, USER
 from app.services.sermon_draft import load_sermon_as_draft, SermonDraft
 from app.presentation.common import console
 
@@ -48,7 +48,8 @@ def export_html():
     template = env.get_template('sermon.html.j2')
 
     html = template.render(
-        sermons=sermons
+        sermons=sermons,
+        user=USER
     )
 
     file = PATH_HTML / 'sermon.html'

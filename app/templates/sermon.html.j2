@@ -3,7 +3,7 @@
 <html lang="sv">
     <head>
         <meta charset="utf-8">
-        <title>Predikoregister – Oskar Fornander</title>
+        <title>Predikoregister – {{ user }}</title>
         <style>
             /* Style for html page */
             {% include "sermon.css" %}
@@ -16,7 +16,7 @@
         <main>
             {% set ns = namespace(index=0) %}
 
-            <h1>Predikoregister – Oskar Fornander</h1>
+            <h1>Predikoregister – {{ user }}</h1>
 
             <div id="search">
                 <input id="searchInput" type="text" placeholder="Sök ..." />
