@@ -1,5 +1,7 @@
 # config.yaml - configurations for sermon
 
+user: Oskar Fornander
+
 root: ~/Oskar/predikan/archive  # Absolute path to sermon archive. See README.md for file structure.
 
 database: sermon.db  # SQLite database file
