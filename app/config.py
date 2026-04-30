@@ -12,7 +12,7 @@ CONFIG_DIR = Path.home() / ".config" / "sermon"  # This is the absolute path to 
 CONFIG_FILE = CONFIG_DIR / "config.yaml"
 
 CONFIG = None
-USER = None
+USER = ''
 ARCHIVE_ROOT, PATH_DATABASE, DB_FILE  = None, None, None
 PATH_BACKUP, PATH_MANUSCRIPTS, PATH_RECORDINGS, PATH_RESOURCES, PATH_HTML = None, None, None, None, None
 
