@@ -110,6 +110,17 @@ tr.details.force-expanded {
 }
 
 
+div.detail-row {
+    margin-bottom: 0.5rem;
+}
+div.detail-row > span {
+    font-weight: bold;
+}
+
+
+
+
+
 input {
     width: 100%;
     padding: 1rem;
