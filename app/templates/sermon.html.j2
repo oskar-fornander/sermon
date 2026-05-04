@@ -19,7 +19,7 @@
             <h1>Predikoregister – {{ user }}</h1>
 
             <div id="search">
-                <input id="searchInput" type="text" placeholder="Sök ..." />
+                <input id="searchInput" type="search" placeholder="Sök ..." />
                 <div id="searchResult"></div>
             </div>
 
@@ -36,13 +36,13 @@
                 <tbody>
                     {% for s in sermons %}
                     <tr data-index="{{ ns.index }}">
-                        <td class="code" onclick="toggleData('{{ s.code }}')">{{ s.code }}</td>
+                        <td class="code" onclick="toggleData('{{ ns.index }}')">{{ s.code }}</td>
                         <td class="title">{{ s.title }}</td>
                         <td class="date hidden">{{ s.date }}</td>
                         <td class="all-dates">{{ ', '.join(s.all_dates) }}</td>
                         <td class="bible-references">{{ ', '.join(s.bible_references) }}</td>
                     </tr>
-                    <tr data-index="{{ ns.index }}" class="details">
+                    <tr data-index="{{ ns.index }}" class="details collapsed">
                         <td class="invisible"></td>
                         <td colspan="3">
                             Detaljer ... {{ s.code }}
@@ -55,7 +55,7 @@
 
         </main>
         <footer>
-            <div>©Oskar Fornander 2026</div>
+            <div>© Oskar Fornander 2026</div>
         </footer>
         <script type="text/javascript">
             {% include "sermon.js" %}

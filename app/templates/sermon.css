@@ -92,10 +92,21 @@ th.desc::after {
 
 td.code {
     cursor: pointer;
+    font-weight: bold;
 }
 
 tr.details {
 
+}
+
+tr.duplicate {
+    display: none;
+}
+tr.details.collapsed {
+    display: none;
+}
+tr.details.force-expanded {
+    display: table-row!important;
 }
 
 
@@ -103,29 +114,42 @@ input {
     width: 100%;
     padding: 1rem;
 }
-
 #search {
     position: relative;
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
     width: 100%;
     margin: 1rem 0;
     padding: 0;
 }
 #searchInput {
+    width: 100%;
     border-color: blue;
     border-radius: 1rem;
     font-size: 1.5rem;
+    padding: 1rem 2rem;
 }
 #searchResult {
+    width: auto;
     display: flex;
     flex-direction: column;
     justify-content: center;
-    padding-right: 1rem;
-    position: absolute;
-    right: 0;
-    top: 0;
-    bottom: 0;
+    margin-left: 2rem;
     font-size: 1.5rem;
     color: #777;
+    white-space: nowrap;
+}
+#searchClear {
+    position: absolute;
+    left: 0.5rem;
+    top: 0.5rem;
+    height: 3.0rem;
+    width: 3.0rem;
+    background-color: #aaa;
+    border: none;
+    border-radius: 50%;
+
 }
 
 a {

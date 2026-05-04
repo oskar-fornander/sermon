@@ -5,32 +5,43 @@ const searchResult = document.getElementById("searchResult");
 let lastFilter = '';
 
 
-document.getElementById("searchInput").addEventListener("keyup", searchSermons);
+let heading, rows, rowsSermons, rowsDetails;
+setup();
 sortTable(0);  // Make sure to sort it from start
+document.getElementById("searchInput").addEventListener("input", searchSermons);
 document.querySelector('#searchInput').focus();
 
 
 
-function toggleData(sermonCode) {
-
-    console.log(sermonCode);
-    //use index instead
-
+function setup() {
+    allRows = Array.from(table.rows);  // All rows in sermon table but the heading
+    rows = Array.from(table.rows).slice(1);  // All rows in sermon table but the heading
+    heading = allRows.shift();  // Only heading row
+    rowsSermons = [];  // Only main sermon rows
+    rowsDetails = [];  // Only details rows
+    while (allRows.length > 0) {
+        if (allRows[0].classList.contains('details')) {
+            rowsDetails.push(allRows.shift());
+        } else {
+            rowsSermons.push(allRows.shift());
+        }
+    }
 }
+
+function toggleData(index) {
+    // Show/hide details of a sermon
+    rowDetails = rowsDetails.find(row => row.dataset.index == index);  // Find corresponding details row
+    if (rowDetails.classList.contains('force-expanded')) return;
+    rowDetails.classList.toggle('collapsed');
+}
+
 
 function sortTable(column) {
     if (column === undefined) return;
 
-    let rows = Array.from(table.rows).slice(1);  // All rows in sermon table but the heading
-    let rowsDetails = [];
-    let i = 1;
-    while (i < rows.length) {
-        rowsDetails.push(rows.splice(i, 1)[0]);  // Extract all detail rows from list. Since they all come sorted as every other this simple loop will do the trick. Add extra safety?
-        i += 1;
-    }
+
     table.querySelector('tbody').innerHTML = '';
 
-    let heading = table.rows[0];
     let sortColumn = table.getAttribute('data-sort-column');  // Last column sorted
     let asc = false;  // Descending sort order as default
     if (column == sortColumn) {  // second click in same column
@@ -46,7 +57,7 @@ function sortTable(column) {
     classname = asc? 'asc': 'desc';
     table.querySelector('thead > tr > th:nth-child(' + (column + 1) + ')').classList.add(classname);  // Adds arrow up or down to indicate sorting order and column
 
-    rows.sort((a, b) => {  // Start by sorting by code
+    rowsSermons.sort((a, b) => {  // Start by sorting by code
         const A = a.dataset.index;
         const B = b.dataset.index;
         if (A == B) {
@@ -54,7 +65,7 @@ function sortTable(column) {
         }
         return A > B;
     });
-    rows.sort((a, b) => {  // Sort rows by column
+    rowsSermons.sort((a, b) => {  // Sort rows by column
         const A = a.cells[column].innerText.replace(/[^abcdefghijklmnopqrstuvwxyzåäö0123456789]/ig, ''); // Ignore special characters in sorting
         const B = b.cells[column].innerText.replace(/[^abcdefghijklmnopqrstuvwxyzåäö0123456789]/ig, '');
         return asc? A.localeCompare(B): B.localeCompare(A);
@@ -69,28 +80,35 @@ function sortTable(column) {
     }
 
     lastCode = '';
-    for (let i = 0; i < rows.length; i++) {
-        const row = rows[i];
+    for (let i = 0; i < rowsSermons.length; i++) {
+        const row = rowsSermons[i];
         const code = row.querySelector('.code').innerText;
+
+        const index = row.dataset.index;  // The index given as id in html template
+        rowDetails = rowsDetails.find(r => r.dataset.index == index);  // Find corresponding details row
+
         row.classList.remove('hidden');
+        row.classList.remove('duplicate');
+        rowDetails.classList.remove('hidden');
+        rowDetails.classList.remove('duplicate');
         if (column != 2) {  // Sort not by date
             if  (code == lastCode) {
-                row.classList.add('hidden');  // Hide duplicates when sorted by code or title
+                row.classList.add('duplicate');  // Hide duplicates when sorted by code or title
+                rowDetails.classList.add('duplicate');
             }
         }
         lastCode = code;
 
         if (column == 2) {  // Sort by date
-            row.cells[2].classList.remove('hidden');
+            row.cells[2].classList.remove('hidden');  // Hide and show the correct date column
             row.cells[3].classList.add('hidden');
         } else {
             row.cells[2].classList.add('hidden');
             row.cells[3].classList.remove('hidden');
         }
+
         table.tBodies[0].appendChild(row);  // Add rows back in table (also hidden rows!)
         
-        const index = row.dataset.index;  // The index given as id in html template
-        rowDetails = rowsDetails.find(row => row.dataset.index == index);  // Find corresponding details row
         if (row.classList.contains('hidden')) {  // Make details row hidde/visible as corresponding main row
             rowDetails.classList.add('hidden');
         } else {
@@ -103,29 +121,34 @@ function sortTable(column) {
 }
 
 
+function clearSearch() {
+    searchInput.innerHTML = '';
+    searchInput.focus();
+}
+
 function searchSermons() {
     
 // This function can most certainly be optimized!
 
-    showHits();
+    showNumberOfHits();
 
     let filter = searchInput.value.toLowerCase();
     if (filter == lastFilter) return;  // Save some work in vain
     lastFilter = filter;
 
-    let rows = Array.from(table.rows).slice(1);  // All rows in sermon table but the heading
-
     if (filter == '') {  //If no search string
         rows.forEach(row => {
             row.classList.remove('search-hidden');  // show all
+            row.classList.remove('force-expanded');
         });
-        showHits();
+        showNumberOfHits();
         highlight('');  // remove all highlights
         return;
     }
 
     rows.forEach((x) => {  // Hide all rows with no hit
         x.classList.add('search-hidden');
+        x.classList.remove('force-expanded');
     });
 
     rows.forEach(row => {
@@ -134,15 +157,16 @@ function searchSermons() {
             const index = row.dataset.index;
             table.querySelector("tr[data-index='" + index + "']").classList.remove('search-hidden');  // Show both main row and deatils row
             table.querySelector("tr.details[data-index='" + index + "']").classList.remove('search-hidden');
+            if (row.classList.contains('details') && !row.classList.contains('duplicate')) row.classList.add('force-expanded');  // Force the details row to be visible if the serach hit is here
         }
     });
 
-    showHits();
+    showNumberOfHits();
     highlight(filter);  // Mark search result with highlighting
 }
 
-function showHits() {
-    let hits = table.querySelectorAll("tr:not(.details, .hidden, .search-hidden, .heading)").length;
+function showNumberOfHits() {
+    let hits = table.querySelectorAll("tr:not(.details, .hidden, .search-hidden, .duplicate, .heading)").length;
     searchResult.innerHTML = hits == 1? hits + ' träff': hits + ' träffar';
 }
 
