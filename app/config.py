@@ -41,6 +41,9 @@ DEFAULT_CONFIG = {
 
 logging.getLogger('pypdf').setLevel(logging.ERROR)  # Hide non critical error messages
 
+def get_user():
+    init_environment()
+    return USER
 
 def init_environment():
     """Initialize the environment"""

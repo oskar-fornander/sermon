@@ -3,7 +3,7 @@
 import sys
 import traceback
 from app.errors import SermonError
-from app.config import CONFIG, DB_FILE
+from app.config import CONFIG, DB_FILE, USER, get_user
 from app.config import init_environment
 from app.presentation.common import render_info_panel, clear_screen
 import typer
@@ -39,7 +39,7 @@ from app.commands.backup import backup
 
 app = typer.Typer(
         cls=OrderedGroup, 
-        help = 'Predikoarkiv',
+        help = f"Predikoarkiv: {get_user()}    [© Oskar Fornander 2026]",
         no_args_is_help=True,
         add_completion=False
 )
