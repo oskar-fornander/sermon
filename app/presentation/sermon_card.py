@@ -56,20 +56,6 @@ def render_sermon_card(sermon_draft, preview=False, menu=[], edited_fields=[], q
     elements.append(f"[title]{get_menu_index('Omdöme')}{edited.get('report', '')}Omdöme:{edited_.get('report', '')}[/title] {report}")
     elements.append(f"[title]{get_menu_index('Relaterad predikan')}{edited.get('related_sermons', '')}Relaterad predikan:{edited_.get('related_sermons', '')}[/title] {related_sermons}")
 
-    # Add services
-    elements.append(f"[title]{get_menu_index('Gudstjänst')}{edited.get('services', '')}Gudstjänst:[/]")
-    services = sermon_draft.services
-    if not services:
-        elements[-1] += ' – '  # Add at end of line if no data to show
-    for service in services:
-        elements.append(f"{TAB_}{service.date}  {service.place}")
-        if service.notes:
-            service_notes = service.notes
-            if query:  # Highlight search result
-                for q in query:
-                    service_notes = highlight_search_hits(service_notes, q)
-            elements[-1] += f"{TAB_}[notes]• {service_notes}[/notes]"  # Add notes at end of the same line
-
     # Add manuscripts
     elements.append(f"[title]{get_menu_index('Manus')}{edited.get('manuscripts', '')}Manus:[/]")
     manuscripts = sermon_draft.manuscripts
@@ -85,6 +71,37 @@ def render_sermon_card(sermon_draft, preview=False, menu=[], edited_fields=[], q
                     manuscript_notes = highlight_search_hits(manuscript_notes, q)
             elements[-1] += f"{TAB_}[notes]• {manuscript_notes}[/notes]"  # Add notes at end of the same line
             #elements.append(f"{TAB_ + ' ' * 12}[notes]• {manuscript['notes']}[/notes]")
+
+    # Add resources
+    resources = sermon_draft.resources
+    elements.append(f"[title]{get_menu_index('Resurs')}{edited.get('resources', '')}Resurs:[/]")
+    if not resources:
+        elements[-1] += ' – '  # Add at end of line if no data to show
+    for resource in resources:
+        resource_title = resource.title or resource.file_name  # Use file name if no title exists
+        file_extension = resource.file_name[resource.file_name.rfind('.'):]
+        link = get_file_link(config.PATH_RESOURCES, resource.file_name, title=resource_title)
+        elements.append(f"{TAB_ + 12 * ' '}{link} [notes]({file_extension})[/notes]")
+        if resource.notes:
+            resource_notes = resource.notes
+            if query:  # Highlight search result
+                for q in query:
+                    resource_notes = highlight_search_hits(resource_notes, q)
+            elements[-1] += f"{TAB_}[notes]• {resource_notes}[/notes]"  # Add notes at end of the same line
+
+    # Add services
+    elements.append(f"[title]{get_menu_index('Gudstjänst')}{edited.get('services', '')}Gudstjänst:[/]")
+    services = sermon_draft.services
+    if not services:
+        elements[-1] += ' – '  # Add at end of line if no data to show
+    for service in services:
+        elements.append(f"{TAB_}{service.date}  {service.place}")
+        if service.notes:
+            service_notes = service.notes
+            if query:  # Highlight search result
+                for q in query:
+                    service_notes = highlight_search_hits(service_notes, q)
+            elements[-1] += f"{TAB_}[notes]• {service_notes}[/notes]"  # Add notes at end of the same line
 
     # Add recordings
     recordings = sermon_draft.recordings
@@ -104,23 +121,6 @@ def render_sermon_card(sermon_draft, preview=False, menu=[], edited_fields=[], q
                 for q in query:
                     recording_notes = highlight_search_hits(recording_notes, q)
             elements[-1] += f"{TAB_}[notes]• {recording_notes}[/notes]"  # Add notes at end of the same line
-
-    # Add resources
-    resources = sermon_draft.resources
-    elements.append(f"[title]{get_menu_index('Resurs')}{edited.get('resources', '')}Resurs:[/]")
-    if not resources:
-        elements[-1] += ' – '  # Add at end of line if no data to show
-    for resource in resources:
-        resource_title = resource.title or resource.file_name  # Use file name if no title exists
-        file_extension = resource.file_name[resource.file_name.rfind('.'):]
-        link = get_file_link(config.PATH_RESOURCES, resource.file_name, title=resource_title)
-        elements.append(f"{TAB_ + 12 * ' '}{link} [notes]({file_extension})[/notes]")
-        if resource.notes:
-            resource_notes = resource.notes
-            if query:  # Highlight search result
-                for q in query:
-                    resource_notes = highlight_search_hits(resource_notes, q)
-            elements[-1] += f"{TAB_}[notes]• {resource_notes}[/notes]"  # Add notes at end of the same line
 
 
     body = Group(*elements)

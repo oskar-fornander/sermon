@@ -54,10 +54,10 @@ def interactive_edit_sermon(sermon_draft, pending_file_deletions = None):
         'Kommentar': ('notes', user_edit_short_text),
         'Omdöme': ('report', user_edit_short_text),
         'Relaterad predikan': ('related_sermons', user_edit_short_text_list),
-        'Gudstjänst': ('services', user_edit_services),
         'Manus': ('manuscripts', user_edit_manuscripts),
-        'Inspelning': ('recordings', user_edit_recordings),
-        'Resurs': ('resources', user_edit_resources)
+        'Resurs': ('resources', user_edit_resources),
+        'Gudstjänst': ('services', user_edit_services),
+        'Inspelning': ('recordings', user_edit_recordings)
     }
     menu = list(EDIT_FIELDS.keys())  # A list of all menu options based on keys in dict
     edited = []  # Keep track of the edited fields to show in format

@@ -48,10 +48,15 @@
                             <div class="detail-row"><span>Sammanhang:</span> {{ s.context }}</div>
                             <div class="detail-row"><span>Introduktion:</span> {{ s.introduction }}</div>
                             <div class="detail-row"><span>Budskap:</span> {{ s.message }}</div>
-                            <div class="detail-row"><span>Omdöme:</span> {{ s.report }}</div>
                             <div class="detail-row"><span>Kommentar:</span> {{ s.notes }}</div>
-                            <div class="detail-row"><span> – </span>manus – inspelning - resurs - Gudstjänst </div>
+                            <div class="detail-row"><span>Omdöme:</span> {{ s.report }}</div>
                             <div class="detail-row"><span>Relaterad predikan:</span> {{ s.related_sermons }}</div>
+                            <div class="detail-row"><span> – </span>manus – inspelning - resurs - Gudstjänst </div>
+
+                            <div class="detail-row"><span>Gudstjänst:</span> {{ s.service }}</div>
+
+
+
                         </td>
                     </tr>
                     {% set ns.index = ns.index + 1 %}
