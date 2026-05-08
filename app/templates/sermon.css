@@ -113,10 +113,47 @@ tr.details.force-expanded {
 div.detail-row {
     margin-bottom: 0.5rem;
 }
-div.detail-row > span {
+div.detail-row > span:first-child {
     font-weight: bold;
 }
 
+
+span.date {
+    
+}
+span.file-name {
+    display: inline-block;
+    font-weight: bold;
+    max-width: 20rem;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    overflow-inline: clip;
+}
+span.title {
+    font-weight: bold;
+}
+span.place {
+
+}
+span.notes, span.type {
+    color: #777;
+}
+span.notes::before {
+    content: '(';
+}
+span.notes::after {
+    content: ')';
+}
+span.notes:empty::before, span.notes:empty::after {
+    content: '';
+}
+a, a:visited {
+    color: black;
+    text-decoration: underline;
+}
+a:hover {
+    background-color: yellow;
+}
 
 
 
@@ -162,13 +199,6 @@ input {
     border-radius: 50%;
 
 }
-
-a {
-  text-decoration: none;
-  margin-right: 5px;
-}
-
-
 
 
 
