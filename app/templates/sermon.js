@@ -26,6 +26,15 @@ function setup() {
             rowsSermons.push(allRows.shift());
         }
     }
+
+    rows.forEach(row => {
+        let cells = row.cells;
+        for (let i = 0; i < cells.length; i++) {
+            cell = cells[i];
+            cell.dataset.original = cell.innerHTML;  // Save text for each row to more easily restore after highlighting
+        }
+    });
+
 }
 
 function toggleData(index) {
@@ -136,13 +145,14 @@ function searchSermons() {
     if (filter == lastFilter) return;  // Save some work in vain
     lastFilter = filter;
 
+    clearHighlight();  // remove all highlights
+
     if (filter == '') {  //If no search string
         rows.forEach(row => {
             row.classList.remove('search-hidden');  // show all
             row.classList.remove('force-expanded');
         });
         showNumberOfHits();
-        highlight('');  // remove all highlights
         return;
     }
 
@@ -152,17 +162,17 @@ function searchSermons() {
     });
 
     rows.forEach(row => {
-        let text = row.innerText.toLowerCase();
+        let text = row.textContent.toLowerCase();
         if (text.includes(filter)) {  // a hit
             const index = row.dataset.index;
             table.querySelector("tr[data-index='" + index + "']").classList.remove('search-hidden');  // Show both main row and deatils row
             table.querySelector("tr.details[data-index='" + index + "']").classList.remove('search-hidden');
             if (row.classList.contains('details') && !row.classList.contains('duplicate')) row.classList.add('force-expanded');  // Force the details row to be visible if the serach hit is here
+            highlight(index, filter);
         }
     });
 
     showNumberOfHits();
-    highlight(filter);  // Mark search result with highlighting
 }
 
 function showNumberOfHits() {
@@ -170,21 +180,42 @@ function showNumberOfHits() {
     searchResult.innerHTML = hits == 1? hits + ' träff': hits + ' träffar';
 }
 
-function highlight(txt) {
-    //...txt... ->  ...<span class="highlight">txt</span>...
-    rows = Array.from(table.rows).slice(1);
 
+function clearHighlight() {
+    // Clear highlight in all rows
+    rows.forEach(row => {
+        let cells = row.cells;
+        for (let i = 0; i < cells.length; i++) {
+            cell = cells[i];
+            cell.innerHTML = cell.dataset.original;  // Restore original text content
+        }
+    });
+}
+
+function highlight(index, txt) {
+    //...txt... ->  ...<span class="highlight">txt</span>...
+
+    console.log(txt);
     if (txt.trim().length == 0) txt = '';
+    if (!txt) return;  // Nothing to highlight
     let regex = RegExp.escape(txt);  // Escape string 
     //console.log(regex);
-    regex = new RegExp(`(${regex})`, "gi");
+    regex = new RegExp(`((?<!\<\/?)${regex})`, "gi");
+
+    // Exclude: <span>, </span>, &nbsp; etc.!!!!
+    //
+    //
+    //TODO
+    //
+    //
+    //
+
+    let row = table.querySelector("tr[data-index='" + index + "']");
+    let rowDetails = table.querySelector("tr.details[data-index='" + index + "']");
+    let rows = [row, rowDetails];
 
     rows.forEach(row => {
         row.querySelectorAll("td").forEach(cell => {
-            cell.innerHTML = cell.innerHTML.replace(/\<span class\=\"highlight\"\>(.*?)\<\/span\>/g, "$1");  // Clear highlighting
-
-            if (!txt) return;  // Nothing to highlight
-
             cell.innerHTML = cell.innerHTML.replace(regex, '<span class="highlight">$1</span>');  // Set highlighting
         });
     });
