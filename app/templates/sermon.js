@@ -137,17 +137,19 @@ function clearSearch() {
 
 function searchSermons() {
     
-// This function can most certainly be optimized!
-
-    showNumberOfHits();
-
     let filter = searchInput.value.toLowerCase();
+
     if (filter == lastFilter) return;  // Save some work in vain
     lastFilter = filter;
 
+    let regex = RegExp.escape(filter);  // Escape string 
+    regex = new RegExp(`(${regex})`, "gi");
+
+    showNumberOfHits();
+
     clearHighlight();  // remove all highlights
 
-    if (filter == '') {  //If no search string
+    if (filter.trim() == '' || filter.length < 3) {  //If no search string + avoid searching single letters
         rows.forEach(row => {
             row.classList.remove('search-hidden');  // show all
             row.classList.remove('force-expanded');
@@ -163,12 +165,14 @@ function searchSermons() {
 
     rows.forEach(row => {
         let text = row.textContent.toLowerCase();
-        if (text.includes(filter)) {  // a hit
+        if (text.match(regex)) {  // a hit
             const index = row.dataset.index;
-            table.querySelector("tr[data-index='" + index + "']").classList.remove('search-hidden');  // Show both main row and deatils row
-            table.querySelector("tr.details[data-index='" + index + "']").classList.remove('search-hidden');
+            const rowSermon = table.querySelector("tr[data-index='" + index + "']");
+            const rowDetails = table.querySelector("tr.details[data-index='" + index + "']");
+            rowSermon.classList.remove('search-hidden');  // Show both main row and deatils row
+            rowDetails.classList.remove('search-hidden');
             if (row.classList.contains('details') && !row.classList.contains('duplicate')) row.classList.add('force-expanded');  // Force the details row to be visible if the serach hit is here
-            highlight(index, filter);
+            highlight([rowSermon, rowDetails], regex);
         }
     });
 
@@ -192,35 +196,36 @@ function clearHighlight() {
     });
 }
 
-function highlight(index, txt) {
+function highlight(rows, regex) {
     //...txt... ->  ...<span class="highlight">txt</span>...
 
-    console.log(txt);
-    if (txt.trim().length == 0) txt = '';
-    if (!txt) return;  // Nothing to highlight
-    let regex = RegExp.escape(txt);  // Escape string 
-    //console.log(regex);
-    regex = new RegExp(`((?<!\<\/?)${regex})`, "gi");
-
-    // Exclude: <span>, </span>, &nbsp; etc.!!!!
-    //
-    //
-    //TODO
-    //
-    //
-    //
-
-    let row = table.querySelector("tr[data-index='" + index + "']");
-    let rowDetails = table.querySelector("tr.details[data-index='" + index + "']");
-    let rows = [row, rowDetails];
-
     rows.forEach(row => {
-        row.querySelectorAll("td").forEach(cell => {
-            cell.innerHTML = cell.innerHTML.replace(regex, '<span class="highlight">$1</span>');  // Set highlighting
+        const walker = document.createTreeWalker(row, NodeFilter.SHOW_TEXT, null, false);  // Create a node tree walker to visit only text nodes
+        let currentNode;
+        const nodesToProcess = [];
+        while (currentNode = walker.nextNode()) {
+            if (currentNode.textContent.match(regex)) {
+                nodesToProcess.push(currentNode);
+            }
+        }
+        nodesToProcess.forEach(node => {
+            const parent = node.parentNode;
+            const parts = node.textContent.split(regex);
+            const fragment = document.createDocumentFragment();
+
+            parts.forEach(part => {
+              if (part.match(regex)) {
+                const span = document.createElement('span');
+                span.className = 'highlight';  // Set highlighting on new element
+                span.textContent = part;
+                fragment.appendChild(span);
+              } else if (part !== "") {
+                fragment.appendChild(document.createTextNode(part));
+              }
+            });
+            parent.replaceChild(fragment, node);
         });
     });
 }
-
-
 
 
