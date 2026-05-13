@@ -8,8 +8,8 @@ let lastFilter = '';
 let heading, rows, rowsSermons, rowsDetails;
 setup();
 sortTable(0);  // Make sure to sort it from start
-document.getElementById("searchInput").addEventListener("input", searchSermons);
-document.querySelector('#searchInput').focus();
+searchInput.addEventListener("input", searchSermons);
+searchInput.focus();
 
 
 
@@ -129,13 +129,14 @@ function sortTable(column) {
     searchSermons(); //Update search result
 }
 
-
 function clearSearch() {
     searchInput.innerHTML = '';
     searchInput.focus();
 }
 
 function searchSermons() {
+
+    //Add feature: combined search: nåd + sanning
     
     let filter = searchInput.value.toLowerCase();
 
@@ -150,6 +151,7 @@ function searchSermons() {
     clearHighlight();  // remove all highlights
 
     if (filter.trim() == '' || filter.length < 3) {  //If no search string + avoid searching single letters
+        searchInput.classList.add('inactive');
         rows.forEach(row => {
             row.classList.remove('search-hidden');  // show all
             row.classList.remove('force-expanded');
@@ -157,6 +159,7 @@ function searchSermons() {
         showNumberOfHits();
         return;
     }
+    searchInput.classList.remove('inactive');
 
     rows.forEach((x) => {  // Hide all rows with no hit
         x.classList.add('search-hidden');
