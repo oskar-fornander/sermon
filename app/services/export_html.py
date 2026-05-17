@@ -6,13 +6,13 @@ from app.db import query_sermons
 from app.config import PATH_HTML, USER
 from app.services.sermon_draft import load_sermon_as_draft, SermonDraft
 from app.presentation.common import console
+from app.services.upload import upload_file
 
 
 @dataclass
 class SermonDraftWithDate(SermonDraft):  # Extend SermonDraft to include date
     date: str = None
     all_dates: List[str] = None
-
 
 
 
@@ -50,10 +50,6 @@ def export_html():
         sermon.related_sermons = ', '.join(sermon.related_sermons) or '–'
 
 
-
-
-    console.print(sermons[0])
-
     # Build html page:
     env = Environment(loader=FileSystemLoader('app/templates'))
     template = env.get_template('sermon.html.j2')
@@ -70,6 +66,14 @@ def export_html():
     console.print(f"Export till html är klart: [link=file://{file}]{file}[/link]")
 
 
+    # Upload file with sftp
+    try:
+        remote_path = upload_file(file)
+        console.print(f"Uppladdad till: [link={remote_path}]{remote_path}[/link]")
+    except Exception as e:
+        raise RuntimeError(f"Uppladdning med sftp misslyckades: {e}")
+
+    
 
 
 
