@@ -36,6 +36,14 @@ DEFAULT_CONFIG = {
         "audio": "QuickTime Player",
         "video": "QuickTime Player",
         "browser": "Safari"
+    },
+    "sftp": {
+        "host": "",
+        "port": "",
+        "username": "",
+        "password": "",
+        "key_file": "",
+        "remote_path": ""
     }
 }
 
