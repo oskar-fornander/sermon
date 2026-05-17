@@ -22,10 +22,11 @@
                 <input id="searchInput" class="inactive" type="search" placeholder="Sök ..." />
                 <div id="searchResult"></div>
             </div>
+            <div id="searchInstruction">Tips: Sök på ett eller flera ord, andvänd "..." för fras och -ord för att exkludera ord.</div>
 
             <table id="sermon" data-sort-direction="ASC" data-sort-column="0">
                 <thead>
-                    <tr class="heading">
+                    <tr>
                         <th class="code desc" onclick="sortTable(0)">Kod</th>
                         <th class="title" onclick="sortTable(1)">Titel</th>
                         <th class="date hidden" onclick="sortTable(2)">Datum</th>
@@ -45,33 +46,33 @@
                     <tr data-index="{{ ns.index }}" class="details collapsed">
                         <td class="invisible"></td>
                         <td colspan="3">
-                            <div class="detail-row"><span>Sammanhang:</span> {{ s.context }}</div>
-                            <div class="detail-row"><span>Introduktion:</span> {{ s.introduction }}</div>
-                            <div class="detail-row"><span>Budskap:</span> {{ s.message }}</div>
-                            <div class="detail-row"><span>Kommentar:</span> {{ s.notes }}</div>
-                            <div class="detail-row"><span>Omdöme:</span> {{ s.report }}</div>
-                            <div class="detail-row"><span>Relaterad predikan:</span> {{ s.related_sermons }}</div>
+                            <div class="detail-row"><span class="no-search">Sammanhang:</span> {{ s.context }}</div>
+                            <div class="detail-row"><span class="no-search">Introduktion:</span> {{ s.introduction }}</div>
+                            <div class="detail-row"><span class="no-search">Budskap:</span> {{ s.message }}</div>
+                            <div class="detail-row"><span class="no-search">Kommentar:</span> {{ s.notes }}</div>
+                            <div class="detail-row"><span class="no-search">Omdöme:</span> {{ s.report }}</div>
+                            <div class="detail-row"><span class="no-search">Relaterad predikan:</span> {{ s.related_sermons }}</div>
 
-                            <div class="detail-row">
-                                <span>Manus:</span>{% if not s.manuscripts[0] %} –{% endif %}
+                            <div class="detail-row no-search">
+                                <span class="no-search">Manus:</span>{% if not s.manuscripts[0] %} –{% endif %}
                                 {% for x in s.manuscripts %}
                                 <br/>&nbsp;&nbsp;&nbsp;&nbsp;<span class="date">{{ x.date }}</span> <span class="file-name"><a href="../files/manuscripts/{{x.file_name}}">{{ x.file_name }}</a></span>  <span class="notes">{{ x.notes or '' }}</span>
                                 {% endfor %}
                             </div>
                             <div class="detail-row">
-                                <span>Resurs:</span>{% if not s.resources[0] %} –{% endif %}
+                                <span class="no-search">Resurs:</span>{% if not s.resources[0] %} –{% endif %}
                                 {% for x in s.resources %}
                                 <br/>&nbsp;&nbsp;&nbsp;&nbsp;<span class="title"><a href="../files/resources/{{ x.file_name }}">{{ x.title }}</a></span>  <span class="notes">{{ x.notes or '' }}</span>
                                 {% endfor %}
                             </div>
                             <div class="detail-row">
-                                <span>Gudstjänst:</span>{% if not s.services[0] %} –{% endif %}
+                                <span class="no-search">Gudstjänst:</span>{% if not s.services[0] %} –{% endif %}
                                 {% for x in s.services %}
                                 <br/>&nbsp;&nbsp;&nbsp;&nbsp;<span class="date">{{ x.date }}</span> <span class="place">{{ x.place }}</span>  <span class="notes">{{ x.notes or '' }}</span>
                                 {% endfor %}
                             </div>
-                            <div class="detail-row">
-                                <span>Inspelning:</span>{% if not s.recordings[0] %} –{% endif %}
+                            <div class="detail-row no-search">
+                                <span class="no-search">Inspelning:</span>{% if not s.recordings[0] %} –{% endif %}
                                 {% for x in s.recordings %}
                                     {% if x.file_name %}
                                         <br/>&nbsp;&nbsp;&nbsp;&nbsp;<span class="date">{{ x.date }}</span> <span class="file-name"><a href="../files/recordings/{{ x.file_name }}">{{ x.file_name }}</a></span>  <span class="type">({{ x.type }})</span> <span class="notes">{{ x.notes or '' }}</span>

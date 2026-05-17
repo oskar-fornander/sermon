@@ -191,16 +191,9 @@ input {
     color: #777;
     white-space: nowrap;
 }
-#searchClear {
-    position: absolute;
-    left: 0.5rem;
-    top: 0.5rem;
-    height: 3.0rem;
-    width: 3.0rem;
-    background-color: #aaa;
-    border: none;
-    border-radius: 50%;
-
+#searchInstruction {
+    font-size: 0.75rem;
+    opacity: 0.5;
 }
 
 
