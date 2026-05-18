@@ -288,8 +288,8 @@ def query_sermons(sort: str = 'code', limit: int = 0, query: [str] = [], bible_o
         sql += "\n        LIMIT ?"
         params.append(limit)
 
-    print(sql)
-    print(params)
+    #console.print(sql)  # DEBUG: show the search performed in database
+    #console.print(params)
 
     conn = get_connection()
     cur = conn.cursor()
