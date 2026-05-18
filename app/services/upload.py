@@ -19,7 +19,7 @@ def upload_file(local_path):
             "-i", key_file,
             "-P", SFTP_PORT,
             str(local_path),
-            f"{SFTP_USER}@{SFTP_HOST}:{SFTP_REMOTE_PATH}"
+            f"{SFTP_USER}@{SFTP_HOST}:{SFTP_REMOTE_PATH.rstrip('/')}/index.html"
         ],
         capture_output=True,
         text=True
@@ -28,7 +28,7 @@ def upload_file(local_path):
     if result.returncode != 0:
         raise RuntimeError(f"SCP failed:\n{result.stderr}")
 
-    url = SFTP_URL.rstrip('/') + '/' + Path(local_path).name
+    #url = SFTP_URL.rstrip('/') + '/' + Path(local_path).name
 
-    return url
+    return SFTP_URL
 
