@@ -13,6 +13,7 @@ CONFIG_FILE = CONFIG_DIR / "config.yaml"
 
 CONFIG = None
 USER = ''
+CLOUD_PROVIDER, CLOUD_MANUSCRIPTS, CLOUD_RECORDINGS, CLOUD_RESOURCES = None, None, None, None 
 ARCHIVE_ROOT, PATH_DATABASE, DB_FILE  = None, None, None
 PATH_BACKUP, PATH_MANUSCRIPTS, PATH_RECORDINGS, PATH_RESOURCES, PATH_HTML = None, None, None, None, None
 SFTP_HOST, SFTP_PORT, SFTP_USER, SFTP_KEY, SFTP_REMOTE_PATH, SFTP_URL = None, None, None, None, None, None
@@ -31,6 +32,14 @@ DEFAULT_CONFIG = {
         "recordings": "files/recordings",
         "resources": "files/resources",
         "html": "html"
+    },
+    "cloud": {
+        "provider": "",
+        "urls": {
+            "manuscripts": "",
+            "recordings": "",
+            "resources": ""
+        }
     },
     "apps": {
         "pdf": "Preview",
@@ -62,6 +71,7 @@ def init_environment():
     try:
         USER = CONFIG.get('user') or ''
         define_paths()  # Define paths for all files and folders
+        define_cloud()  # Define paths for cloud service (used in exported html file)
         define_apps()  # Define default apps
         define_sftp()  # Define settings for sftp connection
     except Exception as error:
@@ -118,6 +128,21 @@ def define_paths():
     PATH_RECORDINGS.mkdir(parents=True, exist_ok=True)
     PATH_RESOURCES.mkdir(parents=True, exist_ok=True)
     PATH_HTML.mkdir(parents=True, exist_ok=True)
+
+def define_cloud():
+    """Define paths to cloud where files are saved"""
+    global CLOUD_PROVIDER, CLOUD_MANUSCRIPTS, CLOUD_RECORDINGS, CLOUD_RESOURCES
+
+    if not CONFIG:
+        load_config()
+
+    app_cloud = CONFIG.get('cloud', {})
+    CLOUD_PROVIDER = app_cloud.get('provider')
+    urls = app_cloud.get('urls', {})
+    CLOUD_MANUSCRIPTS = urls.get('manuscripts')
+    CLOUD_RECORDINGS = urls.get('recordings')
+    CLOUD_RESOURCES = urls.get('resources')
+
 
 def define_apps():
     """Define default apps to use to open resources"""

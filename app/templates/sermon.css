@@ -95,8 +95,12 @@ td.code {
     font-weight: bold;
 }
 
-tr.details {
+tr * {
+    font-size: 1rem;
+}
 
+tr.details * {
+    font-size: 0.8rem;
 }
 
 tr.duplicate {
@@ -154,6 +158,12 @@ a, a:visited {
 a:hover {
     background-color: yellow;
 }
+/*
+a::before {
+    content: "\2197";
+    margin-right: 0.5rem;
+}
+*/
 
 
 

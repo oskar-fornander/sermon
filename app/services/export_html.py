@@ -3,7 +3,7 @@ from dataclasses import dataclass, asdict
 from typing import List
 from jinja2 import Environment, FileSystemLoader
 from app.db import query_sermons
-from app.config import PATH_HTML, USER
+from app.config import PATH_HTML, USER, CLOUD_PROVIDER, CLOUD_MANUSCRIPTS, CLOUD_RECORDINGS, CLOUD_RESOURCES 
 from app.services.sermon_draft import load_sermon_as_draft, SermonDraft
 from app.presentation.common import console
 from app.services.upload import upload_file
@@ -14,6 +14,14 @@ class SermonDraftWithDate(SermonDraft):  # Extend SermonDraft to include date
     date: str = None
     all_dates: List[str] = None
 
+@dataclass
+class Cloud:
+    provider: str
+    manuscripts: str
+    recordings: str
+    resources: str
+
+cloud = Cloud(provider=CLOUD_PROVIDER, manuscripts=CLOUD_MANUSCRIPTS, recordings=CLOUD_RECORDINGS, resources=CLOUD_RESOURCES)
 
 
 def export_html():
@@ -54,22 +62,36 @@ def export_html():
     env = Environment(loader=FileSystemLoader('app/templates'))
     template = env.get_template('sermon.html.j2')
 
-    html = template.render(
+    # One for local use:
+    html_local = template.render(
         sermons=sermons,
-        user=USER
+        user=USER,
+        mode='local',
+        cloud=cloud
     )
 
-    file = PATH_HTML / 'sermon.html'
-    with open(file, 'w', encoding='utf-8') as f:
-        f.write(html)
+    file_local = PATH_HTML / 'sermon.local.html'
+    with open(file_local, 'w', encoding='utf-8') as f:
+        f.write(html_local)
 
-    console.print(f"Export till html är klart: [link=file://{file}]{file}[/link]")
+    console.print(f"Export till html är klart: [link=file://{file_local}]{file_local}[/link]")
 
+    # And one for online use:
     console.print('Laddar upp ...')
+    html_web = template.render(  
+        sermons=sermons,
+        user=USER,
+        mode='webb',
+        cloud=cloud
+    )
+
+    file_web = PATH_HTML / 'sermon.web.html'
+    with open(file_web, 'w', encoding='utf-8') as f:
+        f.write(html_web)
 
     # Upload file with sftp
     try:
-        remote_path = upload_file(file)
+        remote_path = upload_file(file_web)
         console.print(f"Uppladdad till: [link={remote_path}]{remote_path}[/link]")
     except Exception as e:
         raise RuntimeError(f"Uppladdning med sftp misslyckades: {e}")

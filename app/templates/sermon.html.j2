@@ -56,13 +56,23 @@
                             <div class="detail-row no-search">
                                 <span class="no-search">Manus:</span>{% if not s.manuscripts[0] %} –{% endif %}
                                 {% for x in s.manuscripts %}
-                                <br/>&nbsp;&nbsp;&nbsp;&nbsp;<span class="date">{{ x.date }}</span> <span class="file-name"><a href="../files/manuscripts/{{x.file_name}}">{{ x.file_name }}</a></span>  <span class="notes">{{ x.notes or '' }}</span>
+                                {% if mode == 'local' %}
+                                <br/>&nbsp;&nbsp;&nbsp;&nbsp;<span class="date">{{ x.date }}</span> <span class="file-name"><a href="../files/manuscripts/{{x.file_name}}" target="_blank">{{ x.file_name }}</a></span> <span class="notes">{{ x.notes or '' }}</span>
+                                {% else %}
+                                <br/>&nbsp;&nbsp;&nbsp;&nbsp;<span class="date">{{ x.date }}</span> <span class="file-name">{{ x.file_name }}</span> <span class="notes">{{ x.notes or '' }}</span>
+                                &#x2197;<a href="{{ cloud.manuscripts }}" target="_blank">Öppna i {{ cloud.provider }}</a>
+                                {% endif %}
                                 {% endfor %}
                             </div>
                             <div class="detail-row">
                                 <span class="no-search">Resurs:</span>{% if not s.resources[0] %} –{% endif %}
                                 {% for x in s.resources %}
-                                <br/>&nbsp;&nbsp;&nbsp;&nbsp;<span class="title"><a href="../files/resources/{{ x.file_name }}">{{ x.title }}</a></span>  <span class="notes">{{ x.notes or '' }}</span>
+                                {% if mode == 'local' %}
+                                <br/>&nbsp;&nbsp;&nbsp;&nbsp;<span class="title"><a href="../files/resources/{{ x.file_name }}" target="_blank">{{ x.title }}</a></span>  <span class="notes">{{ x.notes or '' }}</span>
+                                {% else %}
+                                <br/>&nbsp;&nbsp;&nbsp;&nbsp;<span class="title">{{ x.title }}</span>  <span class="notes">{{ x.notes or '' }}</span>
+                                &#x2197;<a href="{{ cloud.resources }}" target="_blank">Öppna i {{ cloud.provider }}</a>
+                                {% endif %}
                                 {% endfor %}
                             </div>
                             <div class="detail-row">
@@ -74,11 +84,16 @@
                             <div class="detail-row no-search">
                                 <span class="no-search">Inspelning:</span>{% if not s.recordings[0] %} –{% endif %}
                                 {% for x in s.recordings %}
-                                    {% if x.file_name %}
-                                        <br/>&nbsp;&nbsp;&nbsp;&nbsp;<span class="date">{{ x.date }}</span> <span class="file-name"><a href="../files/recordings/{{ x.file_name }}">{{ x.file_name }}</a></span>  <span class="type">({{ x.type }})</span> <span class="notes">{{ x.notes or '' }}</span>
-                                    {% elif x.external_url %}
-                                        <br/>&nbsp;&nbsp;&nbsp;&nbsp;<span class="date">{{ x.date }}</span> <span class="file-name"><a href="{{ x.external_url }}">{{ x.external_url }}</a></span>  <span class="type">({{ x.type }})</span> <span class="notes">{{ x.notes or '' }}</span>
+                                {% if x.file_name %}
+                                    {% if mode == 'local' %}
+                                    <br/>&nbsp;&nbsp;&nbsp;&nbsp;<span class="date">{{ x.date }}</span> <span class="file-name"><a href="../files/recordings/{{ x.file_name }}" target="_blank">{{ x.file_name }}</a></span>  <span class="type">({{ x.type }})</span> <span class="notes">{{ x.notes or '' }}</span>
+                                    {% else %}
+                                    <br/>&nbsp;&nbsp;&nbsp;&nbsp;<span class="date">{{ x.date }}</span> <span class="file-name">{{ x.file_name }}</span>  <span class="type">({{ x.type }})</span> <span class="notes">{{ x.notes or '' }}</span>
+                                    &#x2197;<a href="{{ cloud.recordings }}" target="_blank">Öppna i {{ cloud.provider }}</a>
                                     {% endif %}
+                                {% elif x.external_url %}
+                                    <br/>&nbsp;&nbsp;&nbsp;&nbsp;<span class="date">{{ x.date }}</span> <span class="file-name"><a href="{{ x.external_url }}" target="_blank">{{ x.external_url }}</a></span>  <span class="type">({{ x.type }})</span> <span class="notes">{{ x.notes or '' }}</span>
+                                {% endif %}
                                 {% endfor %}
                             </div>
                         </td>
