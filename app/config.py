@@ -15,7 +15,7 @@ CONFIG = None
 USER = ''
 ARCHIVE_ROOT, PATH_DATABASE, DB_FILE  = None, None, None
 PATH_BACKUP, PATH_MANUSCRIPTS, PATH_RECORDINGS, PATH_RESOURCES, PATH_HTML = None, None, None, None, None
-SFTP_HOST, SFTP_PORT, SFTP_USER, SFTP_PASSWORD, SFTP_KEY, SFTP_REMOTE_PATH = None, None, None, None, None, None
+SFTP_HOST, SFTP_PORT, SFTP_USER, SFTP_KEY, SFTP_REMOTE_PATH, SFTP_URL = None, None, None, None, None, None
 
 APP_PDF, APP_AUDIO, APP_VIDEO, APP_URL = None, None, None, None
 
@@ -42,9 +42,9 @@ DEFAULT_CONFIG = {
         "host": "",
         "port": "",
         "username": "",
-        "password": "",
         "key_file": "",
-        "remote_path": ""
+        "remote_path": "",
+        "public_url": ""
     }
 }
 
@@ -132,16 +132,16 @@ def define_apps():
 
 def define_sftp():
     """Define settings for sftp connection"""
-    global SFTP_HOST, SFTP_PORT, SFTP_USER, SFTP_PASSWORD, SFTP_KEY, SFTP_REMOTE_PATH
+    global SFTP_HOST, SFTP_PORT, SFTP_USER, SFTP_KEY, SFTP_REMOTE_PATH, SFTP_URL
     if not CONFIG:
         load_config()
     sftp_config = CONFIG.get('sftp', {})
     SFTP_HOST = sftp_config.get('host')
-    SFTP_PORT = sftp_config.get('port', 22)
+    SFTP_PORT = str(sftp_config.get('port', 22))
     SFTP_USER = sftp_config.get('username')
-    SFTP_PASSWORD = sftp_config.get('password')
     SFTP_KEY = sftp_config.get('key_file')
     SFTP_REMOTE_PATH = sftp_config.get('remote_path')
+    SFTP_URL = sftp_config.get('public_url')
 
 def ensure_database():
     """Create database file if non-existing"""

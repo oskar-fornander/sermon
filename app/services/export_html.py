@@ -65,6 +65,7 @@ def export_html():
 
     console.print(f"Export till html är klart: [link=file://{file}]{file}[/link]")
 
+    console.print('Laddar upp ...')
 
     # Upload file with sftp
     try:
