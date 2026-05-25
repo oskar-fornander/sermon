@@ -3,6 +3,8 @@ const table = document.querySelector('table#sermon');
 const searchInput = document.getElementById("searchInput");
 const searchResult = document.getElementById("searchResult");
 let lastQuery = '';
+let matches = [];
+let currentIndex = -1;
 
 
 let heading, rows, rowsSermons, rowsDetails;
@@ -18,6 +20,19 @@ searchInput.addEventListener("input", () => {  // This works as a debounce
   }, 500);
 });
 
+document.addEventListener("keydown", (e) => {
+    const isInput = document.activeElement.tagName === "INPUT";  // Skip when typning in input
+
+    if (e.key === "Enter") {  // next: Enter, previous: shift + Enter
+        e.preventDefault();
+        goToMatch(e.shiftKey ? -1 : 1);
+    }
+
+    if (!isInput && (e.key === "/")) {  // Focus on search field: /
+        e.preventDefault();
+        searchInput.focus();
+    }
+});
 
 
 function setup() {
@@ -245,6 +260,10 @@ function searchSermons() {
     });
 
     showNumberOfHits();
+    
+    //Loop between highlighted search hits
+    matches = Array.from(document.querySelectorAll('.highlight'));
+    currentIndex = -1;
 }
 
 function showNumberOfHits() {
@@ -271,7 +290,10 @@ function highlight(rows, regex) {
     const excludeNode = (node) => {
         let el = node.parentElement;
         while (el) {
-            if (el.classList && el.classList.contains('no-search')) return true;
+            if (el.classList) {
+                if (el.classList.contains('no-search')) return true;
+                if (el.classList.contains('highlight')) return true;  // exclude already highlighted text
+            }
             el = el.parentElement;
         }
         return false;
@@ -298,4 +320,20 @@ function highlight(rows, regex) {
         });
     });
 }
+
+function goToMatch(direction = 1) {
+    if (matches.length === 0) return;
+
+    currentIndex = (currentIndex + direction + matches.length) % matches.length;
+
+    const el = matches[currentIndex];
+
+    el.scrollIntoView({ behavior: "smooth", block: "center" });  // scroll to 
+
+    matches.forEach(e => e.classList.remove("active-match"));  // mark as active
+    el.classList.add("active-match");
+}
+
+
+
 
