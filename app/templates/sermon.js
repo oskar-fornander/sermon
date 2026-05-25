@@ -155,6 +155,7 @@ function searchSermons() {
     //
     
     let query = searchInput.value.trim().toLowerCase();
+    const queryUnmodified = query;
 
     if (query == lastQuery) return;  // Save some work in vain
     lastQuery = query;
@@ -167,7 +168,22 @@ function searchSermons() {
     showNumberOfHits();
     clearHighlight();  // remove all highlights
 
-    if (query.trim() == '' || query.length < 3 || unclosedQuotes) {  //If no search string + avoid searching single letters
+    let phrases = query.match(/['"]([^'"]+)['"]/g) || [];  // Extract phrases in quotes
+    phrases = phrases.map(p => p.replace(/['"]/g, ""));
+    query = query.replace(/['"]([^'"]+)['"]/g, "");  // Remove phrases from query
+
+    let terms = query.split(/\s+/);  // Other terms in query
+    let must = [];
+    let mustNot = [];
+    terms.forEach(t => {
+      if (t.startsWith("-")) {
+        mustNot.push(t.slice(1));  // a word to exclude
+      } else if (t) {
+        must.push(t);  // a word to AND
+      }
+    });
+
+    if (queryUnmodified.trim() == '' || queryUnmodified.length < 3 || unclosedQuotes || must.length + phrases.length == 0) {  //If no search string + avoid searching single letters
         searchInput.classList.add('inactive');
         rows.forEach(row => {
             row.classList.remove('search-hidden');  // show all
@@ -185,20 +201,6 @@ function searchSermons() {
     });
 
 
-    let phrases = query.match(/['"]([^'"]+)['"]/g) || [];  // Extract phrases in quotes
-    phrases = phrases.map(p => p.replace(/['"]/g, ""));
-    query = query.replace(/['"]([^'"]+)['"]/g, "");  // Remove phrases from query
-
-    let terms = query.split(/\s+/);  // Other terms in query
-    let must = [];
-    let mustNot = [];
-    terms.forEach(t => {
-      if (t.startsWith("-")) {
-        mustNot.push(t.slice(1));  // a word to exclude
-      } else if (t) {
-        must.push(t);  // a word to AND
-      }
-    });
 
     // Make regular expression of each term
     const makeRegExp = (x) => {
