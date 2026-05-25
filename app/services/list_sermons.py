@@ -5,6 +5,7 @@ from app.services.sermon_draft import load_sermon_as_draft
 from app.presentation.sermon_list import render_sermon_list
 from app.errors import ValidationError
 from app.utils import parse_month, PATTERN, validate_date
+from app.presentation.common import console
 
 
 def list_sermons(list_by='code', n=0, reverse = False, date = None, date_from = None, date_to = None, year = None, month = None, place = None, report = None, must_have_recording = False):
@@ -32,8 +33,7 @@ def list_sermons(list_by='code', n=0, reverse = False, date = None, date_from = 
     result = query_sermons(sort=list_by, limit=n, query=[], date=date, date_from=date_from, date_to=date_to, year=year, month=month_index, place=place, report=report, must_have_recording=must_have_recording)
 
 
-    from app.presentation.common import console
-    console.print([r['code'] for r in result])
+    #console.print([r['code'] for r in result])
 
     # Build descriptive text to show above table
     desc = f"Alla ({len(result)}) predikningar"
