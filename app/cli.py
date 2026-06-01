@@ -12,7 +12,7 @@ from typer.core import TyperGroup
 COMMAND_ORDER = [
     'list', 'search', 'show',               # Group 0
     'new', 'edit', 'open',                  # Group 1
-    'export', 'files', 'backup', 'delete'   # Group 2
+    'export', 'podcast', 'files', 'backup', 'delete'   # Group 2
 ]
 
 class OrderedGroup(TyperGroup):
@@ -27,6 +27,7 @@ init_environment()
 
 from app.commands import list as list_commands
 from app.commands import export as export_commands
+from app.commands import podcast as podcast_commands
 from app.commands import open as open_commands
 from app.commands.edit import edit
 from app.commands import files as files_commands
@@ -59,6 +60,7 @@ app.command(rich_help_panel=command_groups[2])(backup)
 app.add_typer(list_commands.app, name='list', rich_help_panel=command_groups[0])
 app.add_typer(open_commands.app, name='open', rich_help_panel=command_groups[1])
 app.add_typer(export_commands.app, name='export', rich_help_panel=command_groups[2])
+app.add_typer(podcast_commands.app, name='podcast', rich_help_panel=command_groups[2])
 app.add_typer(files_commands.app, name='files', rich_help_panel=command_groups[2])
 
 
