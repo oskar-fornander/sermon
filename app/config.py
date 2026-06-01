@@ -15,8 +15,10 @@ CONFIG = None
 USER = ''
 CLOUD_PROVIDER, CLOUD_MANUSCRIPTS, CLOUD_RECORDINGS, CLOUD_RESOURCES = None, None, None, None 
 ARCHIVE_ROOT, PATH_DATABASE, DB_FILE  = None, None, None
-PATH_BACKUP, PATH_MANUSCRIPTS, PATH_RECORDINGS, PATH_RESOURCES, PATH_HTML = None, None, None, None, None
+PATH_BACKUP, PATH_MANUSCRIPTS, PATH_RECORDINGS, PATH_RESOURCES, PATH_HTML, PATH_PODCAST = None, None, None, None, None, None
 SFTP_HOST, SFTP_PORT, SFTP_USER, SFTP_KEY, SFTP_REMOTE_PATH, SFTP_URL = None, None, None, None, None, None
+PODCAST_FEED, PODCAST_AUDIO, PODCAST_COVER = None, None, None
+PODCAST_FEED, PODCAST_AUDIO, PODCAST_COVER, PODCAST_TITLE, PODCAST_DESCRIPTION, PODCAST_AUTHOR, PODCAST_MAX_DAYS = None, None, None, None, None, None, None 
 
 APP_PDF, APP_AUDIO, APP_VIDEO, APP_URL = None, None, None, None
 
@@ -31,7 +33,8 @@ DEFAULT_CONFIG = {
         "manuscripts": "files/manuscripts",
         "recordings": "files/recordings",
         "resources": "files/resources",
-        "html": "html"
+        "html": "html",
+        "podcast": "podcast"
     },
     "cloud": {
         "provider": "",
@@ -54,8 +57,19 @@ DEFAULT_CONFIG = {
         "key_file": "",
         "remote_path": "",
         "public_url": ""
+    },
+    "podcast": {
+        "base_url": "",
+        "feed_path": "",
+        "audio_path": "",
+        "cover_image": "",
+        "title": "",
+        "description": "",
+        "author": "",
+        "max_days": "60"
     }
 }
+
 
 logging.getLogger('pypdf').setLevel(logging.ERROR)  # Hide non critical error messages
 
@@ -103,7 +117,7 @@ def load_config():
 
 def define_paths():
     """Define some file paths"""
-    global DB_FILE, BASE_DIR, PATH_DATABASE, PATH_BACKUP, ARCHIVE_ROOT, PATH_MANUSCRIPTS, PATH_RECORDINGS, PATH_RESOURCES, PATH_HTML
+    global DB_FILE, BASE_DIR, PATH_DATABASE, PATH_BACKUP, ARCHIVE_ROOT, PATH_MANUSCRIPTS, PATH_RECORDINGS, PATH_RESOURCES, PATH_HTML, PATH_PODCAST
     if not CONFIG:
         load_config()
 
@@ -121,6 +135,7 @@ def define_paths():
     PATH_RECORDINGS = ARCHIVE_ROOT / CONFIG['paths']['recordings']
     PATH_RESOURCES = ARCHIVE_ROOT / CONFIG['paths']['resources']
     PATH_HTML = ARCHIVE_ROOT / CONFIG['paths']['html']
+    PATH_PODCAST = ARCHIVE_ROOT / CONFIG['paths']['podcast']
 
     PATH_DATABASE.mkdir(parents=True, exist_ok=True)  # Make sure these directories exist
     PATH_BACKUP.mkdir(parents=True, exist_ok=True)
@@ -167,6 +182,25 @@ def define_sftp():
     SFTP_KEY = sftp_config.get('key_file')
     SFTP_REMOTE_PATH = sftp_config.get('remote_path')
     SFTP_URL = sftp_config.get('public_url')
+
+def define_podcast():
+    """Define paths and settings for podcast"""
+    global PODCAST_FEED, PODCAST_AUDIO, PODCAST_COVER, PODCAST_TITLE, PODCAST_DESCRIPTION, PODCAST_AUTHOR, PODCAST_MAX_DAYS
+    if not CONFIG:
+        load_config()
+    podcast_config = CONFIG.get('podcast', {})
+    podcast_url = podcast_config.get('base_url').rstrip('/')
+
+    PODCAST_FEED = f"{podcast_url}/{podcast_config.get('feed_path').rstrip('/')}"
+    PODCAST_AUDIO = f"{podcast_url}/{podcast_config.get('audio_path').rstrip('/')}"
+    PODCAST_COVER = f"{podcast_url}/{podcast_config.get('cover_image')}"
+
+    PODCAST_TITLE = podcast_config.get('title')
+    PODCAST_DESCRIPTION = podcast_config.get('description')
+    PODCAST_AUTHOR = podcast_config.get('author')
+
+    PODCAST_MAX_DAYS = podcast_config.get('max_days')
+
 
 def ensure_database():
     """Create database file if non-existing"""
