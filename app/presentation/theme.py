@@ -30,6 +30,7 @@ custom_theme = Theme ({
     'selected': 'reverse',
     'not_selected': 'dim',
     'link_style': 'dim',    # Add this theme to links like this: [link=http...][link_style]link_text[/link_style][/link]
+    'disabled': 'dim',
     'error': 'orange3'
 })
 
