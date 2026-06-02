@@ -1,11 +1,12 @@
 #app/services/podcast.py
 
 from dataclasses import dataclass
+from pathlib import Path
 #from typing import List
 from jinja2 import Environment, FileSystemLoader
 from app.errors import NotFoundError, FileError
-from app.utils import parse_sermon_code
-from app.config import USER, PODCAST_FEED, PODCAST_AUDIO, PODCAST_COVER, PODCAST_TITLE, PODCAST_DESCRIPTION, PODCAST_AUTHOR, PODCAST_MAX_DAYS
+from app.utils import parse_sermon_code, PATTERN
+from app.config import USER, PATH_RECORDINGS, PODCAST_FEED, PODCAST_AUDIO, PODCAST_COVER, PODCAST_TITLE, PODCAST_DESCRIPTION, PODCAST_AUTHOR, PODCAST_MAX_DAYS
 from app.services.sermon_draft import load_sermon_as_draft
 from app.presentation.common import console, user_input
 
@@ -18,14 +19,53 @@ class Episode:
     pub_date: str
     url: str
     size: int
+    path: Path
 
 
-def upload_sermon_to_podcast(sermon_code: str):
-    """Export sermon to podcast."""
+
+def publish_episode(data: str):
+    """Publish an episode to the podcast."""
+
+    # 1. Prepare episode object to publish
+    # 2. update local feed.xml
+    #       - Read from local feed.xml
+    #       - Extract all items
+    #       - Remove items that shall not remain
+    #       - Add new item
+    #       - Sort
+    #       - Render a new feed.xml
+    #       - Save locally
+    # 3. upload mp3
+    # 4. upload feed.xml
+
+
+    # 1. Determine if data is a sermon code or external file and build an episode object to publish
+    file = Path(data).expanduser().resolve()  # Get absolute path if data is a filename, relative or absolute path
+    console.print(file)
+    if PATTERN['code'].match(data) or PATTERN['code'].match('P' + data):  # Clearly a sermon code
+        episode = episode_from_sermon(data)
+    elif '.' in data:  # Probably a file name
+        if not file.is_file():
+            raise FileError(f"Filen {file} hittades inte.")
+        episode = episode_from_file(data)
+    else:
+        raise NotFoundError(f"'{data}' är varken en existerande fil eller en giltig predikokod.")
+
+
+    # 2. Update feed.xml by adding the new episode
+
+    # episode ...
+
+
+
+
+
+def episode_from_sermon(sermon_code: str) -> Episode:
+    """Make episode object from sermon in database."""
 
     sermon_code = parse_sermon_code(sermon_code)  # Make sure code is in correct format or raise error
     sermon_draft = load_sermon_as_draft(sermon_code)
-    console.print(sermon_draft)
+    #console.print(sermon_draft)
 
     # There might be none or more than one recording ...
     recordings = sermon_draft.recordings
@@ -63,53 +103,46 @@ def upload_sermon_to_podcast(sermon_code: str):
         if service.date == date:
             place = service.place
 
+    mp3_path = PATH_RECORDINGS / file_name
+    if not mp3_path.is_file():
+        raise FileError(f"Filen {mp3_path} saknas.")
+    size = Path(mp3_path).stat().st_size
 
-    
-    
-    
-# hämta path data från config ...
-
-    
-
-
-
-
-
-
+    # Make an episode object
     episode = Episode(
         title=f"Predikan: {sermon_draft.title} | {USER}, {date}",
         description=f"{sermon_draft.introduction} | {place}, {date}",
         pub_date=date,
         url=f"{PODCAST_AUDIO}/{file_name}",
-        size=0
-            )
+        size=size,
+        path=mp3_path)
+
+    return episode
 
 
 
-def upload_item_to_podcast():
-    pass
-    
+def episode_from_file(file_name: str) -> Episode:
+    """Make episode object from external file and user input."""
 
-def upload_podcast_episode():
+    title = ''
+    description = ''
+    date = ''  # in the correct format!
 
-
-
-
-
-# 1. uppdatera lokal feed.xml
-#       . Läs befintlig feed.xml
-#       . Extrahera alla items
-#       . Rensa bort sådant som ska bort
-#       . Lägg till nytt item
-#       . Sortera
-#       . Rendera om hela feed.xml med Jinja
-#       . sparar den lokalt
-# 2. ladda upp mp3
-# 3. ladda upp feed.xml
+    path = Path(file_name).expanduser().resolve()  # Get absolute path if data is a filename, relative or absolute path
+    size = Path(path).stat().st_size
 
 
+    # Make an episode object
+    episode = Episode(
+        title=title;
+        description=description,
+        pub_date=date,
+        url=f"{PODCAST_AUDIO}/{file_name}",
+        size=size,
+        path=path)
 
-    console.print('TODO: Skriv kod för att exportera som podcast.')
+    return episode
+
 
 
 
