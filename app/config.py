@@ -88,6 +88,7 @@ def init_environment():
         define_cloud()  # Define paths for cloud service (used in exported html file)
         define_apps()  # Define default apps
         define_sftp()  # Define settings for sftp connection
+        define_podcast()  # Define settings and paths for podcast
     except Exception as error:
         raise RuntimeError(f"Ett fel uppstod i uppstarten: {error}")
         sys.exit(1)
