@@ -134,7 +134,7 @@ def episode_from_file(file_name: str) -> Episode:
 
     # Make an episode object
     episode = Episode(
-        title=title;
+        title=title,
         description=description,
         pub_date=date,
         url=f"{PODCAST_AUDIO}/{file_name}",
