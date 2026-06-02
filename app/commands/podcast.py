@@ -1,32 +1,48 @@
 import typer
 from app.presentation.common import clear_screen
-from app.services.podcast import upload_sermon_to_podcast
+from app.services.podcast import publish_episode
 
 
 app = typer.Typer(help = 'Hantera podcast för predikningar och externt material', no_args_is_help=True)
 
 
 @app.command()
-def view():
+def list():
     """Få en överblick över tillgängliga avsnitt."""
     print("Få en överblick över tillgängliga avsnitt.")
     pass
 
 
 @app.command()
-def publish():
-    """Publicera ett podcastavsnitt med extern fil."""
-    print("Publicera ett podcastavsnitt med extern fil.")
+def publish(sermon_code: str):
+    """Publicera ett podcastavsnitt med en exporterad predikan eller extern fil."""
+    print(f"Exportera predikan {sermon_code} som podcast.")
+    publish_episode(sermon_code)
+    # Equivalent commands for publishing sermon in database:
+    #   sermon export podcast P382
+    #   sermon podcast publish P382
+    # This command also publishes other files:
+    #   sermon podcast publish andakt.mp3
 
+
+@app.command()
+def remove():
+    """Radera ett avsnitt i podcasten."""
     pass
 
 
 @app.command()
-def upload(sermon_code: str):
-    """Exportera en predikan som podcast."""
-    print(f"Exportera predikan {sermon_code} som podcast.")
-    upload_sermon_to_podcast(sermon_code)
-    # Equivalent commands:
-    #   sermon export podcast P382
-    #   sermon podcast upload P382
+def update():
+    """Uppdatera ett avsnitt i podcasten."""
+    pass
+
+
+
+@app.command()
+def prune():
+    """Rensar gamla avsnitt från podcasten."""
+    pass
+
+
+
 

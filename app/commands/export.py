@@ -1,7 +1,7 @@
 import typer
 from app.presentation.common import clear_screen
 from app.services.export_html import export_html
-from app.services.podcast import upload_sermon_to_podcast
+from app.services.podcast import publish_episode
 
 
 app = typer.Typer(help = 'Exportera registret som html eller enskild predikan som podcast', no_args_is_help=True)
@@ -18,7 +18,7 @@ def html():
 def podcast(sermon_code: str):
     """Exportera en predikan som podcast."""
     print(f"Exportera predikan {sermon_code} som podcast.")
-    upload_sermon_to_podcast(sermon_code)
+    publish_episode(sermon_code)
 
     # sermon export podcast P382
 
