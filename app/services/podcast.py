@@ -2,13 +2,13 @@
 
 from dataclasses import dataclass
 from pathlib import Path
-#from typing import List
+import re
 from jinja2 import Environment, FileSystemLoader
 from app.errors import NotFoundError, FileError
-from app.utils import parse_sermon_code, PATTERN
+from app.utils import parse_sermon_code, PATTERN, rss_date
 from app.config import USER, PATH_RECORDINGS, PODCAST_FEED, PODCAST_AUDIO, PODCAST_COVER, PODCAST_TITLE, PODCAST_DESCRIPTION, PODCAST_AUTHOR, PODCAST_MAX_DAYS
 from app.services.sermon_draft import load_sermon_as_draft
-from app.presentation.common import console, user_input
+from app.presentation.common import console, user_input, clear_screen
 
 
 # Special data class for a podcast episode
@@ -25,6 +25,7 @@ class Episode:
 
 def publish_episode(data: str):
     """Publish an episode to the podcast."""
+    clear_screen()
 
     # 1. Prepare episode object to publish
     # 2. update local feed.xml
@@ -42,7 +43,9 @@ def publish_episode(data: str):
     # 1. Determine if data is a sermon code or external file and build an episode object to publish
     file = Path(data).expanduser().resolve()  # Get absolute path if data is a filename, relative or absolute path
     console.print(file)
-    if PATTERN['code'].match(data) or PATTERN['code'].match('P' + data):  # Clearly a sermon code
+
+    code = re.compile(r'^[Pp]?\d{3}$')  # Sermon code on this format: P372 etc
+    if code.match(data):
         episode = episode_from_sermon(data)
     elif '.' in data:  # Probably a file name
         if not file.is_file():
@@ -53,6 +56,7 @@ def publish_episode(data: str):
 
 
     # 2. Update feed.xml by adding the new episode
+    console.print(episode)
 
     # episode ...
 
@@ -124,27 +128,26 @@ def episode_from_sermon(sermon_code: str) -> Episode:
 def episode_from_file(file_name: str) -> Episode:
     """Make episode object from external file and user input."""
 
-    title = ''
-    description = ''
-    date = ''  # in the correct format!
-
     path = Path(file_name).expanduser().resolve()  # Get absolute path if data is a filename, relative or absolute path
     size = Path(path).stat().st_size
+
+    # User input
+    title = user_input('Avsnittets titel', allow_empty=False)
+    description = user_input('Beskrivning av avsnittet', allow_empty=True)
+    date = user_input('Datum för publicering', ' [ÅÅÅÅ-MM-DD]', pattern=PATTERN['date'], allow_empty=False)
+    time = user_input('Klockslag för publicering', ' [HH:MM]', default='10:00', pattern=PATTERN['time'], allow_empty=False)
+    pub_date = rss_date(date, time)
 
 
     # Make an episode object
     episode = Episode(
         title=title,
         description=description,
-        pub_date=date,
+        pub_date=pub_date,
         url=f"{PODCAST_AUDIO}/{file_name}",
         size=size,
         path=path)
 
     return episode
-
-
-
-
 
 
