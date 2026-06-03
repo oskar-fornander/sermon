@@ -5,17 +5,22 @@ from pypdf import PdfReader
 #import shutil
 import sqlite3
 from app.config import DB_FILE, PATH_BACKUP
+from email.utils import format_datetime
+from zoneinfo import ZoneInfo
 from datetime import datetime, date, timedelta
 import re
 from app.presentation.common import ICON, console
 from app.errors import ValidationError
 from app.db import get_last_sermon_code
 
+    #Convert date to correct format
+
 
 PATTERN = {}  # Patterns to check validity of user inputs when creating and editing a sermon
 PATTERN['code'] = re.compile(r'^P\d{3}$')  # Sermon code on this format: P372 etc
 PATTERN['related_sermons'] = re.compile(r'^P\d{3}((\s*\,\s*)(P\d{3}))*$') # P001, P002 etc
 PATTERN['date'] = re.compile(r'^20\d{2}-(0[1-9]|1[0-2])-(0[1-9]|[12][0-9]|3[0-1])$') # Date: YYYY-MM-DD, does not validate dates
+PATTERN['time'] = re.compile(r'^[0-2]\d\:[0-5]\d$') # Time: HH:MM, does not validate time
 PATTERN['iso_format'] = re.compile(r'^\d{4}-\d{2}-\d{2}$') # Date: YYYY-MM-DD, does not validate dates
 PATTERN['manuscript'] = re.compile(r'^P\d{3}[abcde]?\.(pdf|PDF)$')  # Manuscript P371.pdf, P371b.PDF
 PATTERN['recording'] = re.compile(r'^20\d{2}-(0[1-9]|1[0-2])-(0[1-9]|[12][0-9]|3[0-1])_Predikan.*\..{3}$')  # Recording 2026-01-25_Predikan.mp3 but also 2026-01-25_Predikan_2.mp4 and others variants
@@ -81,6 +86,15 @@ def validate_date(s):
         datetime.strptime(s, '%Y-%m-%d')
     except Exception:
         raise ValidationError(f"Datum är ogiltigt ({s})")
+
+
+def rss_date(date_str: str, time_str: str = '10:00') -> str:
+    """Return date and time in format needed for podcast feed."""
+    dt = datetime.strptime(f"{date_str} {time_str}", "%Y-%m-%d %H:%M")
+    dt = dt.replace(tzinfo=ZoneInfo("Europe/Stockholm"))
+    return format_datetime(dt)
+
+
 
 
 def get_file_link(path, file_name, title = None, show_missing_file = True, show_title_if_missing = True, show_meta = False):
