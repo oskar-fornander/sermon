@@ -3,12 +3,16 @@
 from dataclasses import dataclass
 from pathlib import Path
 import re
+from xml.etree import ElementTree as ET
 from jinja2 import Environment, FileSystemLoader
 from app.errors import NotFoundError, FileError
 from app.utils import parse_sermon_code, PATTERN, rss_date
-from app.config import USER, PATH_RECORDINGS, PODCAST_FEED, PODCAST_AUDIO, PODCAST_COVER, PODCAST_TITLE, PODCAST_DESCRIPTION, PODCAST_AUTHOR, PODCAST_MAX_DAYS
+from app.config import USER, PATH_RECORDINGS, PATH_PODCAST, PODCAST_FEED, PODCAST_AUDIO, PODCAST_COVER, PODCAST_TITLE, PODCAST_DESCRIPTION, PODCAST_AUTHOR, PODCAST_MAX_DAYS
 from app.services.sermon_draft import load_sermon_as_draft
 from app.presentation.common import console, user_input, clear_screen
+
+
+LOCAL_FEED = PATH_PODCAST / PODCAST_FEED[PODCAST_FEED.rfind('/') + 1:]  # Local path to feed.xml
 
 
 # Special data class for a podcast episode
@@ -19,7 +23,29 @@ class Episode:
     pub_date: str
     url: str
     size: int
-    path: Path
+    path: Path | None = None
+
+    @classmethod
+    def from_xml(cls, item):
+        enclosure = item.find('enclosure')
+        return cls(
+            title=item.findtext('title', ''),
+            description=item.findtext('description', ''),
+            pub_date=item.findtext('pubDate', ''),
+            url=enclosure.get('url', ''),
+            size=int(enclosure.get('length', 0))
+        )
+
+def load_episodes_from_xml(feed_file: Path = LOCAL_FEED) -> list[Episode]:
+    tree = ET.parse(feed_file)
+    root = tree.getroot()
+
+    episodes = [
+        Episode.from_xml(item)
+        for item in root.findall("./channel/item")
+    ]
+
+    return episodes
 
 
 
@@ -54,10 +80,12 @@ def publish_episode(data: str):
         episode = episode_from_file(data)
     else:
         raise NotFoundError(f"'{data}' är varken en existerande fil eller en giltig predikokod.")
+    console.print(episode)
 
 
     # 2. Update feed.xml by adding the new episode
-    console.print(episode)
+    episodes = load_episodes_from_xml()  # Load all episodes from local feed.xml
+    console.print(episodes)
 
     # episode ...
 
