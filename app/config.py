@@ -65,6 +65,7 @@ DEFAULT_CONFIG = {
         "title": "",
         "description": "",
         "author": "",
+        "min_episodes": "3",
         "max_days": "60"
     }
 }
