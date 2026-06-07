@@ -40,6 +40,7 @@ def publish_episode(data: str):
     # 4. upload feed.xml
 
 
+
     # 1. Determine if data is a sermon code or external file and build an episode object to publish
     file = Path(data).expanduser().resolve()  # Get absolute path if data is a filename, relative or absolute path
     console.print(file)
@@ -98,6 +99,9 @@ def episode_from_sermon(sermon_code: str) -> Episode:
     console.print(recording)
 
     date = recording.date  # Date for recording is also used to find service
+    time = '10:00'  # Default time
+    pub_date = rss_date(date, time)
+
     file_name = recording.file_name
     if file_name[-4:] != '.mp3':
         raise FileError(f"Fel format på inspelning: {file_name} (ska vara .mp3)")
@@ -116,7 +120,7 @@ def episode_from_sermon(sermon_code: str) -> Episode:
     episode = Episode(
         title=f"Predikan: {sermon_draft.title} | {USER}, {date}",
         description=f"{sermon_draft.introduction} | {place}, {date}",
-        pub_date=date,
+        pub_date=pub_date,
         url=f"{PODCAST_AUDIO}/{file_name}",
         size=size,
         path=mp3_path)
