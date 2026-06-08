@@ -7,13 +7,6 @@ app = typer.Typer(help = 'Hantera podcast för predikningar och externt material
 
 
 @app.command()
-def list():
-    """Få en överblick över tillgängliga avsnitt."""
-    print("Få en överblick över tillgängliga avsnitt.")
-    pass
-
-
-@app.command()
 def publish(sermon_code: str):
     """Publicera ett podcastavsnitt med en exporterad predikan eller extern fil."""
     print(f"Exportera predikan {sermon_code} som podcast.")
@@ -26,6 +19,19 @@ def publish(sermon_code: str):
 
 
 @app.command()
+def prune():
+    """Rensar gamla avsnitt från podcasten."""
+    prune_podcast()
+
+
+@app.command()
+def list():
+    """Få en överblick över tillgängliga avsnitt."""
+    print("Få en överblick över tillgängliga avsnitt.")
+    pass
+
+
+@app.command()
 def remove():
     """Radera ett avsnitt i podcasten."""
     pass
@@ -35,13 +41,6 @@ def remove():
 def update():
     """Uppdatera ett avsnitt i podcasten."""
     pass
-
-
-
-@app.command()
-def prune():
-    """Rensar gamla avsnitt från podcasten."""
-    prune_podcast()
 
 
 
