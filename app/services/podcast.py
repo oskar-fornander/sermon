@@ -2,17 +2,19 @@
 
 from dataclasses import dataclass
 from pathlib import Path
+from datetime import datetime
 import re
 from xml.etree import ElementTree as ET
 from jinja2 import Environment, FileSystemLoader
 from app.errors import NotFoundError, FileError
-from app.utils import parse_sermon_code, PATTERN, rss_date
-from app.config import USER, PATH_RECORDINGS, PATH_PODCAST, PODCAST_FEED, PODCAST_AUDIO, PODCAST_COVER, PODCAST_TITLE, PODCAST_DESCRIPTION, PODCAST_AUTHOR, PODCAST_MAX_DAYS
+from app.utils import parse_sermon_code, PATTERN, rss_date, iso_date_from_rss_date, rss_date_days_old
+from app.config import USER, WEB_URL, PATH_RECORDINGS, PATH_PODCAST, PODCAST_REMOTE_DIR, PODCAST_FEED, PODCAST_AUDIO, PODCAST_COVER, PODCAST_TITLE, PODCAST_DESCRIPTION, PODCAST_AUTHOR, PODCAST_MIN_EPISODES, PODCAST_MAX_DAYS
 from app.services.sermon_draft import load_sermon_as_draft
-from app.presentation.common import console, user_input, clear_screen
+from app.services.upload import upload_file, delete_file
+from app.presentation.common import console, user_input, clear_screen, user_confirmation
 
 
-LOCAL_FEED = PATH_PODCAST / PODCAST_FEED[PODCAST_FEED.rfind('/') + 1:]  # Local path to feed.xml
+LOCAL_FEED = PATH_PODCAST / PODCAST_FEED  # Local path to feed.xml
 
 
 # Special data class for a podcast episode
@@ -48,28 +50,29 @@ def load_episodes_from_xml(feed_file: Path = LOCAL_FEED) -> list[Episode]:
     return episodes
 
 
+def list_episodes():
+    """List all episodes in podcast feed."""
+    pass
+
 
 def publish_episode(data: str):
     """Publish an episode to the podcast."""
-    clear_screen()
 
     # 1. Prepare episode object to publish
     # 2. update local feed.xml
-    #       - Read from local feed.xml
-    #       - Extract all items
-    #       - Remove items that shall not remain
-    #       - Add new item
-    #       - Sort
+    #       - Read from local feed.xml and extract all items
+    #       - Add new item and sort
     #       - Render a new feed.xml
     #       - Save locally
     # 3. upload mp3
     # 4. upload feed.xml
+    # 5. prune podcast
 
 
 
     # 1. Determine if data is a sermon code or external file and build an episode object to publish
+    console.print('Hämtar data för podcast ...')
     file = Path(data).expanduser().resolve()  # Get absolute path if data is a filename, relative or absolute path
-    console.print(file)
 
     code = re.compile(r'^[Pp]?\d{3}$')  # Sermon code on this format: P372 etc
     if code.match(data):
@@ -80,15 +83,99 @@ def publish_episode(data: str):
         episode = episode_from_file(data)
     else:
         raise NotFoundError(f"'{data}' är varken en existerande fil eller en giltig predikokod.")
-    console.print(episode)
+    #console.print(episode)
+    if not episode:
+        console.print("Inget avsnitt publicerat.")
+        return
 
+    if rss_date_days_old(episode.pub_date) > PODCAST_MAX_DAYS:  # Give a warning if uploading too old episode
+        console.print(f"Detta avsnitt har ett publiceringsdatum som är äldre än {PODCAST_MAX_DAYS} dagar, som är maxgränsen för avsnitt angiven i konfigurationsfilen.")
+        if not user_confirmation("Vill du ändå publicera avsnittet (under dagens datum)?", blank_line=False):
+            console.print("Inget avsnitt publicerat.")
+            return
+        episode.pub_date = rss_date(datetime.today().date().isoformat()[:10])  # Set today as publication date for the uploaded episode
 
     # 2. Update feed.xml by adding the new episode
     episodes = load_episodes_from_xml()  # Load all episodes from local feed.xml
-    console.print(episodes)
+    dates = [e.pub_date for e in episodes]
+    if episode.pub_date in dates:  # Is this episode already uploaded?
+        title = episodes[dates.index(episode.pub_date)].title
+        console.print(f"Det finns redan ett avsnitt med samma publiceringsdatum:\n[title]{title}[/title]")
+        if not user_confirmation(f"Ska detta avsnitt ändå publiceras?", blank_line=False):
+            console.print("Inget avsnitt publicerat.")
+            return
 
-    # episode ...
+    console.print(f"Uppdaterar {PODCAST_FEED} ...")
+    episodes.append(episode)  # Add new episode
+    episodes.sort(key=lambda x: iso_date_from_rss_date(x.pub_date), reverse=True)  # Sort all episodes by date in descending order
+    list_episodes()
+    render_podcast_feed(episodes)  # Render feed.xml and save locally
 
+    # 3. Upload mp3
+    console.print(f"Laddar upp fil: {episode.path.name} ...")
+    upload_file(episode.path, episode.url)
+
+    # 4. Upload feed.xml
+    console.print(f"Laddar upp {PODCAST_FEED} ...")
+    upload_file(LOCAL_FEED, PODCAST_REMOTE_DIR, PODCAST_FEED)
+
+    # 5. Prune podcast
+    prune_podcast() # Remove episodes older than PODCAST_MAX_DAYS if more than PODCAST_MIN_EPISODES episodes
+    console.print('Klart.')
+
+
+def prune_podcast():
+    """Remove episodes older than PODCAST_MAX_DAYS if more than PODCAST_MIN_EPISODES episodes"""
+    console.print('Raderar gamla avsnitt i podcast ...')
+    to_remove = []
+    episodes = load_episodes_from_xml()  # Load all episodes from local feed.xml
+    episodes.sort(key=lambda x: iso_date_from_rss_date(x.pub_date), reverse=True)  # Sort all episodes by date
+    while len(episodes) > PODCAST_MIN_EPISODES and rss_date_days_old(episodes[-1].pub_date) > PODCAST_MAX_DAYS:  # prune old episodes if more than minimum number of episodes currently in podcast and episode is older than maximum number of days
+        to_remove.append(episodes.pop())
+
+    if len(to_remove) == 0:
+        console.print('Inga avsnitt att radera.')
+        return
+    for episode in to_remove:
+        console.print(f"Raderar avsnitt: {iso_date_from_rss_date(episode.pub_date)[:10]}: {episode.title}")
+
+    render_podcast_feed(episodes)  # Render feed.xml and save locally
+
+    #upload feed.xml
+    upload_file(LOCAL_FEED, PODCAST_REMOTE_DIR, PODCAST_FEED)
+    console.print(f"Podcastens flöde är uppdaterat: [link={WEB_URL}/{PODCAST_REMOTE_DIR}/{PODCAST_FEED}]{WEB_URL}/{PODCAST_REMOTE_DIR}/{PODCAST_FEED}[/link]")
+
+    #remove mp3 from server
+    for episode in to_remove:
+        delete_file(episode.url)
+
+
+
+def render_podcast_feed(episodes):
+    """Render feed.xml and save locally"""
+    #console.print(episodes)
+
+    # Build podcast feed.xml with Jinja2 template
+    TEMPLATE_DIR = (Path(__file__).resolve().parent.parent / "templates")    
+    env = Environment(loader=FileSystemLoader(TEMPLATE_DIR))
+    template = env.get_template('podcast.xml.j2')
+
+
+    # One for local use:
+    podcast_feed = template.render(
+        title=PODCAST_TITLE,
+        link=f"{WEB_URL}/{PODCAST_REMOTE_DIR}/{PODCAST_FEED}",
+        description=PODCAST_DESCRIPTION,
+        author=PODCAST_AUTHOR,
+        cover=f"{WEB_URL}/{PODCAST_COVER}",
+        episodes=episodes
+    )
+
+    file = PATH_PODCAST / PODCAST_FEED  # local feed.xml file
+    with open(file, 'w', encoding='utf-8') as f:
+        f.write(podcast_feed)
+
+    #console.print(f"Export till [link=file://{file}]{PODCAST_FEED}[/link] är klart.")
 
 
 
@@ -124,7 +211,7 @@ def episode_from_sermon(sermon_code: str) -> Episode:
             return
         recording = recordings[int(choice) - 1]
 
-    console.print(recording)
+    #console.print(recording)
 
     date = recording.date  # Date for recording is also used to find service
     time = '10:00'  # Default time
@@ -153,7 +240,9 @@ def episode_from_sermon(sermon_code: str) -> Episode:
         size=size,
         path=mp3_path)
 
-    return episode
+    if user_confirmation(f"[sermon_code]{sermon_draft.code}[/sermon_code] [title]{sermon_draft.title}[/title], {date} {place}\nÄr detta predikan som ska publiceras i podcasten?", blank_line=False):
+        return episode
+    return None
 
 
 
@@ -180,6 +269,10 @@ def episode_from_file(file_name: str) -> Episode:
         size=size,
         path=path)
 
-    return episode
+
+    if user_confirmation(f"{episode.title}, {date} ({path.name})\nÄr detta det avsnitt som ska publiceras i podcasten?"):
+        return episode
+    return None
+
 
 
