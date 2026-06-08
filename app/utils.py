@@ -87,21 +87,36 @@ def validate_date(s):
     except Exception:
         raise ValidationError(f"Datum är ogiltigt ({s})")
 
+def parse_iso_date(date_str: str) -> date:
+    """Return date object from iso formatted string (only date)"""
+    try:
+        dt = datetime.strptime(date_str[:10], '%Y-%m-%d')
+    except Excdption:
+        raise ValidationError(f"Datum ogiltigt: {date_str}")
+    return dt.date
+
 
 def rss_date(date_str: str, time_str: str = '10:00') -> str:
     """Return date and time in format needed for podcast feed."""
-    dt = datetime.strptime(f"{date_str} {time_str}", "%Y-%m-%d %H:%M")
+    dt = datetime.strptime(f"{date_str} {time_str}", '%Y-%m-%d %H:%M')
     dt = dt.replace(tzinfo=ZoneInfo("Europe/Stockholm"))
     return format_datetime(dt)
 
 def iso_date_from_rss_date(date_str: str) -> str:
     """Return date in ISO format from rss date format."""
-    date_str = date_str.strip()
     try:
-        dt = datetime.strptime(date_str, "%a, %d %b %Y %H:%M:%S %z")
+        dt = datetime.strptime(date_str.strip(), '%a, %d %b %Y %H:%M:%S %z')
     except Exception:
         raise ValidationError(f"Ogiltigt RSS-datum: {date_str!r}")
     return dt.isoformat()[:19]  # Return date and time but remove time zone information (2026-05-24T10:00:00), this is sortable
+
+def rss_date_days_old(date_str) -> int:
+    """Return number of days between date_str (in rss format) and today."""
+    try:
+        dt = datetime.strptime(date_str.strip(), '%a, %d %b %Y %H:%M:%S %z')
+    except Exception:
+        raise ValidationError(f"Ogiltigt RSS-datum: {date_str!r}")
+    return (datetime.today().date() - dt.date()).days
 
 
 
