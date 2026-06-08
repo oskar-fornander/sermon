@@ -90,7 +90,7 @@ def publish_episode(data: str):
 
     if rss_date_days_old(episode.pub_date) > PODCAST_MAX_DAYS:  # Give a warning if uploading too old episode
         console.print(f"Detta avsnitt har ett publiceringsdatum som är äldre än {PODCAST_MAX_DAYS} dagar, som är maxgränsen för avsnitt angiven i konfigurationsfilen.")
-        if not user_confirmation("Vill du ändå publicera avsnittet (under dagens datum)?", blank_line=False):
+        if not user_confirmation("Vill du ändå publicera avsnittet (under dagens datum)?", default=False, blank_line=False):
             console.print("Inget avsnitt publicerat.")
             return
         episode.pub_date = rss_date(datetime.today().date().isoformat()[:10])  # Set today as publication date for the uploaded episode
@@ -113,7 +113,7 @@ def publish_episode(data: str):
 
     # 3. Upload mp3
     console.print(f"Laddar upp fil: {episode.path.name} ...")
-    upload_file(episode.path, episode.url)
+    upload_file(episode.path, episode.url[len(WEB_URL):])  # note: remove url from path for upload
 
     # 4. Upload feed.xml
     console.print(f"Laddar upp {PODCAST_FEED} ...")
@@ -236,7 +236,7 @@ def episode_from_sermon(sermon_code: str) -> Episode:
         title=f"Predikan: {sermon_draft.title} | {USER}, {date}",
         description=f"{sermon_draft.introduction} | {place}, {date}",
         pub_date=pub_date,
-        url=f"{PODCAST_AUDIO}/{file_name}",
+        url=f"{WEB_URL}/{PODCAST_AUDIO}/{file_name}",
         size=size,
         path=mp3_path)
 
@@ -265,7 +265,7 @@ def episode_from_file(file_name: str) -> Episode:
         title=title,
         description=description,
         pub_date=pub_date,
-        url=f"{PODCAST_AUDIO}/{file_name}",
+        url=f"{WEB_URL}/{PODCAST_AUDIO}/{file_name}",
         size=size,
         path=path)
 
