@@ -97,7 +97,10 @@ def rss_date(date_str: str, time_str: str = '10:00') -> str:
 def iso_date_from_rss_date(date_str: str) -> str:
     """Return date in ISO format from rss date format."""
     date_str = date_str.strip()
-    dt = datetime.strptime(date_str, "%a, %d %b %Y %H:%M:%S %z")
+    try:
+        dt = datetime.strptime(date_str, "%a, %d %b %Y %H:%M:%S %z")
+    except Exception:
+        raise ValidationError(f"Ogiltigt RSS-datum: {date_str!r}")
     return dt.isoformat()[:19]  # Return date and time but remove time zone information (2026-05-24T10:00:00), this is sortable
 
 
