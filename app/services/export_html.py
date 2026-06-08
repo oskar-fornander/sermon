@@ -1,9 +1,10 @@
 #app/services/export_html.py
+from pathlib import Path
 from dataclasses import dataclass, asdict
 from typing import List
 from jinja2 import Environment, FileSystemLoader
 from app.db import query_sermons
-from app.config import PATH_HTML, USER, CLOUD_PROVIDER, CLOUD_MANUSCRIPTS, CLOUD_RECORDINGS, CLOUD_RESOURCES 
+from app.config import PATH_HTML, USER, CLOUD_PROVIDER, CLOUD_MANUSCRIPTS, CLOUD_RECORDINGS, CLOUD_RESOURCES, HTML_REMOTE_DIR
 from app.services.sermon_draft import load_sermon_as_draft, SermonDraft
 from app.presentation.common import console
 from app.services.upload import upload_file
@@ -59,7 +60,8 @@ def export_html():
 
 
     # Build html page:
-    env = Environment(loader=FileSystemLoader('app/templates'))
+    TEMPLATE_DIR = (Path(__file__).resolve().parent.parent / "templates")    
+    env = Environment(loader=FileSystemLoader(TEMPLATE_DIR))
     template = env.get_template('sermon.html.j2')
 
     # One for local use:
@@ -91,7 +93,7 @@ def export_html():
 
     # Upload file with sftp
     try:
-        remote_path = upload_file(file_web)
+        remote_path = upload_file(file_web, HTML_REMOTE_DIR, 'index.html')
         console.print(f"Uppladdad till: [link={remote_path}]{remote_path}[/link]")
     except Exception as e:
         raise RuntimeError(f"Uppladdning med sftp misslyckades: {e}")

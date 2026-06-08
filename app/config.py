@@ -16,8 +16,9 @@ USER = ''
 ARCHIVE_ROOT, PATH_DATABASE, DB_FILE  = None, None, None
 PATH_BACKUP, PATH_MANUSCRIPTS, PATH_RECORDINGS, PATH_RESOURCES, PATH_HTML, PATH_PODCAST = None, None, None, None, None, None
 CLOUD_PROVIDER, CLOUD_MANUSCRIPTS, CLOUD_RECORDINGS, CLOUD_RESOURCES = None, None, None, None 
-SFTP_HOST, SFTP_PORT, SFTP_USER, SFTP_KEY, SFTP_REMOTE_PATH, SFTP_URL = None, None, None, None, None, None
-PODCAST_FEED, PODCAST_AUDIO, PODCAST_COVER, PODCAST_TITLE, PODCAST_DESCRIPTION, PODCAST_AUTHOR, PODCAST_MIN_EPISODES, PODCAST_MAX_DAYS = None, None, None, None, None, None, None, None
+SFTP_HOST, SFTP_PORT, SFTP_USER, SFTP_KEY  = None, None, None, None
+WEB_URL, WEB_ROOT, HTML_REMOTE_DIR = None, None, None
+PODCAST_REMOTE_DIR, PODCAST_FEED, PODCAST_AUDIO, PODCAST_COVER, PODCAST_TITLE, PODCAST_DESCRIPTION, PODCAST_AUTHOR, PODCAST_MIN_EPISODES, PODCAST_MAX_DAYS = None, None, None, None, None, None, None, None, None
 
 APP_PDF, APP_AUDIO, APP_VIDEO, APP_URL = None, None, None, None
 
@@ -53,12 +54,17 @@ DEFAULT_CONFIG = {
         "host": "",
         "port": "",
         "username": "",
-        "key_file": "",
-        "remote_path": "",
-        "public_url": ""
+        "key_file": ""
+    },
+    "web": {
+        "site_url": "",
+        "site_root": ""
+    },
+    "html": {
+        "remote_dir": ""
     },
     "podcast": {
-        "base_url": "",
+        "remote_dir": "",
         "feed_path": "",
         "audio_path": "",
         "cover_image": "",
@@ -69,11 +75,12 @@ DEFAULT_CONFIG = {
         "max_days": "60"
     }
 }
+root = str(Path.home() / "predikan" / "archive")
 
 DEFAULT_CONFIG_TEXT = f"""
 # Sermon configuration
 user: Oskar Fornander                         # The user of this application
-root: {str(Path.home() / predikan / archive)}
+root: {root}
 database: sermon.db
 paths: 
   database: data
@@ -99,13 +106,16 @@ sftp:
   port: 
   username: 
   key_file: 
-  remote_path: 
-  public_url: 
+web:
+  site_url: 
+  site_root: 
+html:
+  remote_dir: 
 podcast:
-  base_url: 
-  feed_path: 
+  remote_dir: 
+  feed_path: "
   audio_path: 
-  cover_image: 
+  cover_image:
   title: 
   description: 
   author: 
@@ -216,7 +226,7 @@ def define_apps():
 
 def define_sftp():
     """Define settings for sftp connection"""
-    global SFTP_HOST, SFTP_PORT, SFTP_USER, SFTP_KEY, SFTP_REMOTE_PATH, SFTP_URL
+    global SFTP_HOST, SFTP_PORT, SFTP_USER, SFTP_KEY, WEB_URL, WEB_ROOT, HTML_REMOTE_DIR
     if not CONFIG:
         load_config()
     sftp_config = CONFIG.get('sftp', {})
@@ -224,27 +234,31 @@ def define_sftp():
     SFTP_PORT = str(sftp_config.get('port', 22))
     SFTP_USER = sftp_config.get('username')
     SFTP_KEY = sftp_config.get('key_file')
-    SFTP_REMOTE_PATH = sftp_config.get('remote_path')
-    SFTP_URL = sftp_config.get('public_url')
+
+    web_config = CONFIG.get('web', {})
+    WEB_URL = web_config.get('site_url').rstrip('/')
+    WEB_ROOT = web_config.get('site_root').rstrip('/')
+    HTML_REMOTE_DIR = CONFIG.get('html', {}).get('remote_dir').rstrip('/')
+
 
 def define_podcast():
     """Define paths and settings for podcast"""
-    global PODCAST_FEED, PODCAST_AUDIO, PODCAST_COVER, PODCAST_TITLE, PODCAST_DESCRIPTION, PODCAST_AUTHOR, PODCAST_MIN_EPISODES, PODCAST_MAX_DAYS
+    global PODCAST_REMOTE_DIR, PODCAST_FEED, PODCAST_AUDIO, PODCAST_COVER, PODCAST_TITLE, PODCAST_DESCRIPTION, PODCAST_AUTHOR, PODCAST_MIN_EPISODES, PODCAST_MAX_DAYS
     if not CONFIG:
         load_config()
     podcast_config = CONFIG.get('podcast', {})
-    podcast_url = podcast_config.get('base_url').rstrip('/')
 
-    PODCAST_FEED = f"{podcast_url}/{podcast_config.get('feed_path').rstrip('/')}"
-    PODCAST_AUDIO = f"{podcast_url}/{podcast_config.get('audio_path').rstrip('/')}"
-    PODCAST_COVER = f"{podcast_url}/{podcast_config.get('cover_image')}"
+    PODCAST_REMOTE_DIR = podcast_config.get('remote_dir').rstrip('/')
+    PODCAST_FEED = f"{PODCAST_REMOTE_DIR}/{podcast_config.get('feed_path').rstrip('/')}"
+    PODCAST_AUDIO = f"{PODCAST_REMOTE_DIR}/{podcast_config.get('audio_path').rstrip('/')}"
+    PODCAST_COVER = f"{PODCAST_REMOTE_DIR}/{podcast_config.get('cover_image')}"
 
     PODCAST_TITLE = podcast_config.get('title')
     PODCAST_DESCRIPTION = podcast_config.get('description')
     PODCAST_AUTHOR = podcast_config.get('author')
 
-    PODCAST_MIN_EPISODES = podcast_config.get('min_episodes')
-    PODCAST_MAX_DAYS = podcast_config.get('max_days')
+    PODCAST_MIN_EPISODES = int(podcast_config.get('min_episodes'))
+    PODCAST_MAX_DAYS = int(podcast_config.get('max_days'))
 
 
 def ensure_database():
