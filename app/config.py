@@ -249,7 +249,7 @@ def define_podcast():
     podcast_config = CONFIG.get('podcast', {})
 
     PODCAST_REMOTE_DIR = podcast_config.get('remote_dir').rstrip('/')
-    PODCAST_FEED = f"{PODCAST_REMOTE_DIR}/{podcast_config.get('feed_path').rstrip('/')}"
+    PODCAST_FEED = podcast_config.get('feed_file').rstrip('/')
     PODCAST_AUDIO = f"{PODCAST_REMOTE_DIR}/{podcast_config.get('audio_path').rstrip('/')}"
     PODCAST_COVER = f"{PODCAST_REMOTE_DIR}/{podcast_config.get('cover_image')}"
 
