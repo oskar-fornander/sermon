@@ -17,7 +17,7 @@ ARCHIVE_ROOT, PATH_DATABASE, DB_FILE  = None, None, None
 PATH_BACKUP, PATH_MANUSCRIPTS, PATH_RECORDINGS, PATH_RESOURCES, PATH_HTML, PATH_PODCAST = None, None, None, None, None, None
 CLOUD_PROVIDER, CLOUD_MANUSCRIPTS, CLOUD_RECORDINGS, CLOUD_RESOURCES = None, None, None, None 
 SFTP_HOST, SFTP_PORT, SFTP_USER, SFTP_KEY, SFTP_REMOTE_PATH, SFTP_URL = None, None, None, None, None, None
-PODCAST_FEED, PODCAST_AUDIO, PODCAST_COVER, PODCAST_TITLE, PODCAST_DESCRIPTION, PODCAST_AUTHOR, PODCAST_MAX_DAYS = None, None, None, None, None, None, None 
+PODCAST_FEED, PODCAST_AUDIO, PODCAST_COVER, PODCAST_TITLE, PODCAST_DESCRIPTION, PODCAST_AUTHOR, PODCAST_MIN_EPISODES, PODCAST_MAX_DAYS = None, None, None, None, None, None, None, None
 
 APP_PDF, APP_AUDIO, APP_VIDEO, APP_URL = None, None, None, None
 
@@ -70,6 +70,48 @@ DEFAULT_CONFIG = {
     }
 }
 
+DEFAULT_CONFIG_TEXT = f"""
+# Sermon configuration
+user: Oskar Fornander                         # The user of this application
+root: {str(Path.home() / predikan / archive)}
+database: sermon.db
+paths: 
+  database: data
+  backup: data/backup
+  manuscripts: files/manuscripts
+  recordings: files/recordings
+  resources: files/resources
+  html: html
+  podcast: podcast
+cloud:
+  provider:                                  # Name of cloud storage service
+  urls:
+    manuscripts: 
+    recordings: 
+    resources: 
+apps:                                       # Default apps used to open different files
+  pdf: Preview
+  audio: QuickTime Player
+  video: QuickTime Player
+  browser: Safari
+sftp:
+  host: 
+  port: 
+  username: 
+  key_file: 
+  remote_path: 
+  public_url: 
+podcast:
+  base_url: 
+  feed_path: 
+  audio_path: 
+  cover_image: 
+  title: 
+  description: 
+  author: 
+  min_episodes: 3       # The podcast will never have less than this number of episodes
+  max_days: 60          # The podcast episodes will be removed if older than this
+"""
 
 logging.getLogger('pypdf').setLevel(logging.ERROR)  # Hide non critical error messages
 
@@ -103,6 +145,7 @@ def ensure_config_exists():
 
         with open(CONFIG_FILE, "w", encoding="utf-8") as f:
             yaml.safe_dump(DEFAULT_CONFIG, f, sort_keys=False)
+        #CONFIG_FILE.write_text(DEFAULT_CONFIG_TEXT, encoding="utf-8")
 
         console.print(f"Ny konfigurationsfil skapad: {CONFIG_FILE} \nRedigera den för att ange korrekt sökväg till predikoarkivet. \nProgrammet avslutas.")
         sys.exit(1)  # Quit
@@ -186,7 +229,7 @@ def define_sftp():
 
 def define_podcast():
     """Define paths and settings for podcast"""
-    global PODCAST_FEED, PODCAST_AUDIO, PODCAST_COVER, PODCAST_TITLE, PODCAST_DESCRIPTION, PODCAST_AUTHOR, PODCAST_MAX_DAYS
+    global PODCAST_FEED, PODCAST_AUDIO, PODCAST_COVER, PODCAST_TITLE, PODCAST_DESCRIPTION, PODCAST_AUTHOR, PODCAST_MIN_EPISODES, PODCAST_MAX_DAYS
     if not CONFIG:
         load_config()
     podcast_config = CONFIG.get('podcast', {})
@@ -200,6 +243,7 @@ def define_podcast():
     PODCAST_DESCRIPTION = podcast_config.get('description')
     PODCAST_AUTHOR = podcast_config.get('author')
 
+    PODCAST_MIN_EPISODES = podcast_config.get('min_episodes')
     PODCAST_MAX_DAYS = podcast_config.get('max_days')
 
 
