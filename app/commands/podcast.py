@@ -1,6 +1,6 @@
 import typer
 from app.presentation.common import clear_screen
-from app.services.podcast import publish_episode
+from app.services.podcast import publish_episode, prune_podcast
 
 
 app = typer.Typer(help = 'Hantera podcast för predikningar och externt material', no_args_is_help=True)
@@ -41,7 +41,7 @@ def update():
 @app.command()
 def prune():
     """Rensar gamla avsnitt från podcasten."""
-    pass
+    prune_podcast()
 
 
 
