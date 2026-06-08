@@ -3,15 +3,14 @@
 <rss version="2.0" xmlns:itunes="http://www.itunes.com/dtds/podcast-1.0.dtd">
     <channel>
 
-        <title>{{ podcast.title }}</title>
-        <link>{{ podcast.link }}</link>
-        <description>{{ podcast.description }}</description>
+        <title>{{ title }}</title>
+        <link>{{ link }}</link>
+        <description>{{ description }}</description>
         <language>sv-SE</language>
-        <itunes:author>{{ podcast.author }}</itunes:author>
-        <itunes:summary>{{ podcast.description }}</itunes:summary>
+        <itunes:author>{{ author }}</itunes:author>
+        <itunes:summary>{{ description }}</itunes:summary>
         <itunes:explicit>false</itunes:explicit>
-        <itunes:image href="{{ podcast.cover }}"/>
-
+        <itunes:image href="{{ cover }}"/>
 
         {% for episode in episodes %}
         <item>
