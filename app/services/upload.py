@@ -40,6 +40,7 @@ def delete_file(remote_path):
 
     key_file = str(Path(SFTP_KEY).expanduser())
 
+    remote_path = remote_path.replace(f"{WEB_URL}/", '')
     remote_file = f"{WEB_ROOT}/{remote_path}"
 
     result = subprocess.run(
