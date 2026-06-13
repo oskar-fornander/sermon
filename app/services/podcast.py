@@ -2,6 +2,7 @@
 
 from dataclasses import dataclass
 from pathlib import Path
+import shutil
 from datetime import datetime
 import re
 from xml.etree import ElementTree as ET
@@ -13,7 +14,7 @@ from app.utils import parse_sermon_code, PATTERN, rss_date, iso_date_from_rss_da
 from app.config import USER, WEB_URL, PATH_RECORDINGS, PATH_PODCAST, PODCAST_REMOTE_DIR, PODCAST_FEED, PODCAST_AUDIO, PODCAST_COVER, PODCAST_TITLE, PODCAST_DESCRIPTION, PODCAST_AUTHOR, PODCAST_MIN_EPISODES, PODCAST_MAX_DAYS
 from app.services.sermon_draft import load_sermon_as_draft
 from app.services.upload import upload_file, delete_file
-from app.presentation.common import console, user_input, clear_screen, user_confirmation
+from app.presentation.common import console, user_input, clear_screen, user_confirmation, user_choice
 
 
 LOCAL_FEED = PATH_PODCAST / PODCAST_FEED  # Local path to feed.xml
@@ -52,14 +53,25 @@ def load_episodes_from_xml(feed_file: Path = LOCAL_FEED) -> list[Episode]:
     return episodes
 
 
+def backup_feed():
+    """Make a backup of feed.xml"""
+    feed = Path(LOCAL_FEED)
+    backup = feed.with_name(f"feed-backup.xml")
+    shutil.copy2(feed, backup)
+
+
 def list_episodes():
     """List all episodes in podcast feed."""
 
     episodes = load_episodes_from_xml()  # Load all episodes from local feed.xml
     episodes.sort(key=lambda x: iso_date_from_rss_date(x.pub_date), reverse=True)  # Sort all episodes by date
 
+    if len(episodes) == 0:
+        console.print(f"Inga avsnitt i podcasten [title]{PODCAST_TITLE}[/title]")
+        return
+
     table = Table(  # Show episodes in a table
-        title='Avsnitt i podcast',
+        title=f"Avsnitt i podcast: [title]{PODCAST_TITLE}[/title]",
         box=box.SIMPLE_HEAD
     )
     table.add_column()
@@ -86,7 +98,6 @@ def publish_episode(data: str):
     # 3. upload mp3
     # 4. upload feed.xml
     # 5. prune podcast
-
 
 
     # 1. Determine if data is a sermon code or external file and build an episode object to publish
@@ -127,7 +138,6 @@ def publish_episode(data: str):
     console.print(f"Uppdaterar {PODCAST_FEED} ...")
     episodes.append(episode)  # Add new episode
     episodes.sort(key=lambda x: iso_date_from_rss_date(x.pub_date), reverse=True)  # Sort all episodes by date in descending order
-    list_episodes()
     render_podcast_feed(episodes)  # Render feed.xml and save locally
 
     # 3. Upload mp3
@@ -141,6 +151,8 @@ def publish_episode(data: str):
     # 5. Prune podcast
     prune_podcast() # Remove episodes older than PODCAST_MAX_DAYS if more than PODCAST_MIN_EPISODES episodes
     console.print('Klart.')
+    
+    list_episodes()
 
 
 def prune_podcast():
@@ -166,7 +178,48 @@ def prune_podcast():
 
     #remove mp3 from server
     for episode in to_remove:
+        console.print(f"Raderar {episode.url} ...")
         delete_file(episode.url)
+
+
+def remove_episode():
+    """Remove an episode"""
+
+    episodes = list_episodes()
+
+    choice = user_choice(title='Avsnitt att radera', options = [str(x + 1) for x in range(len(episodes))] + ['q'], default = None)
+    if choice == 'q':
+        console.print('Inget avsnitt raderas.')
+        return
+    if not user_confirmation(f"Radera avsnitt {choice} ur podcasten?", default=False, blank_line=False):
+        console.print('Inget avsnitt raderas.')
+        return
+
+    removed_episode = episodes.pop(int(choice) - 1)  # remove episode from list
+
+    render_podcast_feed(episodes)  # Render feed.xml and save locally
+
+    # Remove mp3 from server
+    console.print(f"Raderar fil: {removed_episode.url} ...")
+    delete_file(removed_episode.url)
+
+    # Upload feed.xml
+    console.print(f"Laddar upp {PODCAST_FEED} ...")
+    upload_file(LOCAL_FEED, PODCAST_REMOTE_DIR, PODCAST_FEED)
+
+    # Prune podcast
+    prune_podcast() # Remove episodes older than PODCAST_MAX_DAYS if more than PODCAST_MIN_EPISODES episodes
+    console.print('Klart.')
+
+
+
+def edit_episode():
+    """Edit data for an episode"""
+    pass
+
+
+
+
 
 
 
@@ -174,13 +227,13 @@ def render_podcast_feed(episodes):
     """Render feed.xml and save locally"""
     #console.print(episodes)
 
+    backup_feed()  # We can restore podcast feed if something goes wrong
+
     # Build podcast feed.xml with Jinja2 template
     TEMPLATE_DIR = (Path(__file__).resolve().parent.parent / "templates")    
     env = Environment(loader=FileSystemLoader(TEMPLATE_DIR))
     template = env.get_template('podcast.xml.j2')
 
-
-    # One for local use:
     podcast_feed = template.render(
         title=PODCAST_TITLE,
         link=f"{WEB_URL}/{PODCAST_REMOTE_DIR}/{PODCAST_FEED}",
