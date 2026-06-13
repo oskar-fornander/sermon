@@ -313,6 +313,11 @@ def episode_from_sermon(sermon_code: str) -> Episode:
         path=mp3_path)
 
     if user_confirmation(f"[sermon_code]{sermon_draft.code}[/sermon_code] [title]{sermon_draft.title}[/title], {date} {place}\nÄr detta predikan som ska publiceras i podcasten?", blank_line=False):
+        if not user_confirmation(f"Bekräfta publiceringsdatum: [title]{date} {time}[/title] ('n' för att ange eget publiceringsdatum)"):
+            date = user_input('Datum för publicering', ' [ÅÅÅÅ-MM-DD]', pattern=PATTERN['date'], allow_empty=False)
+            time = user_input('Klockslag för publicering', ' [HH:MM]', default='10:00', pattern=PATTERN['time'], allow_empty=False)
+            pub_date = rss_date(date, time)
+            episode.pub_date = pub_date
         return episode
     return None
 
