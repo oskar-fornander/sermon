@@ -1,6 +1,6 @@
 import typer
 from app.presentation.common import clear_screen
-from app.services.podcast import publish_episode, prune_podcast, list_episodes
+from app.services.podcast import publish_episode, prune_podcast, list_episodes, remove_episode, edit_episode
 
 
 app = typer.Typer(help = 'Hantera podcast för predikningar och externt material', no_args_is_help=True)
@@ -33,14 +33,13 @@ def list():
 @app.command()
 def remove():
     """Radera ett avsnitt i podcasten."""
-    pass
+    remove_episode()
 
 
 @app.command()
-def update():
-    """Uppdatera ett avsnitt i podcasten."""
-    pass
-
+def edit():
+    """Redigera data för ett avsnitt i podcasten."""
+    edit_episode()
 
 
 
