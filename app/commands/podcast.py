@@ -1,6 +1,6 @@
 import typer
 from app.presentation.common import clear_screen
-from app.services.podcast import publish_episode, prune_podcast
+from app.services.podcast import publish_episode, prune_podcast, list_episodes
 
 
 app = typer.Typer(help = 'Hantera podcast för predikningar och externt material', no_args_is_help=True)
@@ -27,8 +27,7 @@ def prune():
 @app.command()
 def list():
     """Få en överblick över tillgängliga avsnitt."""
-    print("Få en överblick över tillgängliga avsnitt.")
-    pass
+    list_episodes()
 
 
 @app.command()

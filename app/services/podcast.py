@@ -6,6 +6,8 @@ from datetime import datetime
 import re
 from xml.etree import ElementTree as ET
 from jinja2 import Environment, FileSystemLoader
+from rich.table import Table
+from rich import box
 from app.errors import NotFoundError, FileError
 from app.utils import parse_sermon_code, PATTERN, rss_date, iso_date_from_rss_date, rss_date_days_old
 from app.config import USER, WEB_URL, PATH_RECORDINGS, PATH_PODCAST, PODCAST_REMOTE_DIR, PODCAST_FEED, PODCAST_AUDIO, PODCAST_COVER, PODCAST_TITLE, PODCAST_DESCRIPTION, PODCAST_AUTHOR, PODCAST_MIN_EPISODES, PODCAST_MAX_DAYS
@@ -52,7 +54,24 @@ def load_episodes_from_xml(feed_file: Path = LOCAL_FEED) -> list[Episode]:
 
 def list_episodes():
     """List all episodes in podcast feed."""
-    pass
+
+    episodes = load_episodes_from_xml()  # Load all episodes from local feed.xml
+    episodes.sort(key=lambda x: iso_date_from_rss_date(x.pub_date), reverse=True)  # Sort all episodes by date
+
+    table = Table(  # Show episodes in a table
+        title='Avsnitt i podcast',
+        box=box.SIMPLE_HEAD
+    )
+    table.add_column()
+    table.add_column('Datum')
+    table.add_column('Avsnitt')
+    table.add_column('Ljudfil')
+
+    for i, episode in enumerate(episodes):
+        table.add_row(f"{i + 1}.", f"{iso_date_from_rss_date(episode.pub_date)[:10]}", f"[title]{episode.title}[/title]\n{episode.description}\n", f"[dim]{episode.url[episode.url.rfind('/') + 1:]}[/dim]")
+
+    console.print(table)
+    return episodes
 
 
 def publish_episode(data: str):
