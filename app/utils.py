@@ -2,6 +2,7 @@ import os, shlex, shutil
 import time
 import subprocess
 import tempfile
+import yaml
 from pathlib import Path
 from urllib import parse
 from mutagen.mp3 import MP3
@@ -65,6 +66,19 @@ def open_editor(data):
         os.unlink(path)
 
     return
+
+
+
+# Make PyYaml write block text automatically
+class LiteralString(str):
+    pass
+def literal_presenter(dumper, data):
+    return dumper.represent_scalar(
+        "tag:yaml.org,2002:str",
+        data,
+        style="|",
+    )
+yaml.SafeDumper.add_representer(LiteralString, literal_presenter)
 
 
 def parse_sermon_code(code: str, raiseError = True) -> str:
