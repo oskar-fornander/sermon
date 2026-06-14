@@ -5,12 +5,13 @@ from pathlib import Path
 import shutil
 from datetime import datetime
 import re
+import yaml
 from xml.etree import ElementTree as ET
 from jinja2 import Environment, FileSystemLoader
 from rich.table import Table
 from rich import box
 from app.errors import NotFoundError, FileError
-from app.utils import parse_sermon_code, PATTERN, rss_date, iso_date_from_rss_date, rss_date_days_old
+from app.utils import open_editor, parse_sermon_code, PATTERN, rss_date, iso_date_from_rss_date, rss_date_days_old
 from app.config import USER, WEB_URL, PATH_RECORDINGS, PATH_PODCAST, PODCAST_REMOTE_DIR, PODCAST_FEED, PODCAST_AUDIO, PODCAST_COVER, PODCAST_TITLE, PODCAST_DESCRIPTION, PODCAST_AUTHOR, PODCAST_MIN_EPISODES, PODCAST_MAX_DAYS
 from app.services.sermon_draft import load_sermon_as_draft
 from app.services.upload import upload_file, delete_file
@@ -40,6 +41,19 @@ class Episode:
             url=enclosure.get('url', ''),
             size=int(enclosure.get('length', 0))
         )
+
+    def to_edit_yaml(self) -> str:
+        data = {
+            "title": self.title,
+            "pub_date": iso_date_from_rss_date(self.pub_date)[:16].replace('T', ' '),
+            "description": self.description
+        }
+        return yaml.safe_dump(
+            data,
+            sort_keys=False,
+            allow_unicode=True
+        )
+
 
 def load_episodes_from_xml(feed_file: Path = LOCAL_FEED) -> list[Episode]:
     tree = ET.parse(feed_file)
@@ -184,7 +198,6 @@ def prune_podcast():
 
 def remove_episode():
     """Remove an episode"""
-
     episodes = list_episodes()
 
     choice = user_choice(title='Avsnitt att radera', options = [str(x + 1) for x in range(len(episodes))] + ['q'], default = None)
@@ -215,12 +228,65 @@ def remove_episode():
 
 def edit_episode():
     """Edit data for an episode"""
-    pass
+    episodes = list_episodes()
+    choice = user_choice(title='Avsnitt att redigera', options = [str(x + 1) for x in range(len(episodes))] + ['q'], default = None)
+    if choice == 'q':
+        console.print('Avbryter.')
+        return
+    edited_episode = episodes.pop(int(choice) - 1)  # remove episode from list
+    data = edited_episode.to_edit_yaml()  # Only edit title, description and pub_date
+    data = '# Ändra data nedan för detta avsnitt i podcasten.\n# Datumformat: YYYY-MM-DD HH:MM\n# OBS: Ändra inte nycklarna.\n\n' + '\n\n'.join(data.split('\n'))
+    console.log(data)
+
+    # Open in editor to edit
+    response = open_editor(data);
+    edited_data = response or data
+    console.log(edited_data)
+    edited_data = yaml.safe_load(edited_data)
+    console.log(edited_data)
 
 
+    return
 
+#            from datetime import datetime
+#
+#            def update_from_yaml(self, text: str):
+#                data = yaml.safe_load(text)
+#
+#                required = {"title", "pub_date", "description"}
+#
+#                missing = required - data.keys()
+#                if missing:
+#                    raise ValueError(
+#                        f"Saknade fält: {', '.join(missing)}"
+#                    )
+#
+#                # Validera datum
+#                try:
+#                    datetime.strptime(
+#                        data["pub_date"],
+#                        "%Y-%m-%d %H:%M"
+#                    )
+#                except ValueError:
+#                    raise ValueError(
+#                        "pub_date måste ha formatet ÅÅÅÅ-MM-DD HH:MM"
+#                    )
+#
+#                self.title = data["title"]
+#                self.description = data["description"]
+#                self.pub_date = data["pub_date"]
 
+    episodes.append(edited_episode)  # Add edited episode back to list
+    episodes.sort(key=lambda x: iso_date_from_rss_date(x.pub_date), reverse=True)  # Sort all episodes by date
+    render_podcast_feed(episodes)  # Render feed.xml and save locally
 
+    # Upload feed.xml
+    console.print(f"Laddar upp {PODCAST_FEED} ...")
+    upload_file(LOCAL_FEED, PODCAST_REMOTE_DIR, PODCAST_FEED)
+
+    # Prune podcast
+    prune_podcast() # Remove episodes older than PODCAST_MAX_DAYS if more than PODCAST_MIN_EPISODES episodes
+    console.print('Klart.')
 
 
 def render_podcast_feed(episodes):
