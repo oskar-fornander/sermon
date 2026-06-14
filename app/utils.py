@@ -59,7 +59,7 @@ def open_editor(data):
         subprocess.run(editor_cmd + [str(path)], check=True)
         with open(path, 'r') as f:
             new_data = f.read().strip()
-            if new_data == data:  # No changes
+            if new_data == data.strip():  # No changes
                 return None
             return new_data
     finally:
@@ -148,10 +148,13 @@ def parse_iso_date(date_str: str) -> date:
     return dt.date
 
 
-def rss_date(date_str: str, time_str: str = '10:00') -> str:
-    """Return date and time in format needed for podcast feed."""
-    dt = datetime.strptime(f"{date_str} {time_str}", '%Y-%m-%d %H:%M')
-    dt = dt.replace(tzinfo=ZoneInfo("Europe/Stockholm"))
+def rss_date(date_time_str: str) -> str:
+    """Return date and time in format needed for podcast feed, from 'YYYY-MM-DD HH:MM'."""
+    try:
+        dt = datetime.strptime(date_time_str, '%Y-%m-%d %H:%M')
+        dt = dt.replace(tzinfo=ZoneInfo("Europe/Stockholm"))
+    except Exception:
+        raise ValidationError(f"Ogiltigt datum: {date_time_str!r}")
     return format_datetime(dt)
 
 def iso_date_from_rss_date(date_str: str) -> str:
