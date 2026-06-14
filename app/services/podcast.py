@@ -11,7 +11,7 @@ from jinja2 import Environment, FileSystemLoader
 from rich.table import Table
 from rich import box
 from app.errors import NotFoundError, FileError
-from app.utils import open_editor, parse_sermon_code, PATTERN, rss_date, iso_date_from_rss_date, rss_date_days_old
+from app.utils import open_editor, LiteralString, parse_sermon_code, PATTERN, rss_date, iso_date_from_rss_date, rss_date_days_old
 from app.config import USER, WEB_URL, PATH_RECORDINGS, PATH_PODCAST, PODCAST_REMOTE_DIR, PODCAST_FEED, PODCAST_AUDIO, PODCAST_COVER, PODCAST_TITLE, PODCAST_DESCRIPTION, PODCAST_AUTHOR, PODCAST_MIN_EPISODES, PODCAST_MAX_DAYS
 from app.services.sermon_draft import load_sermon_as_draft
 from app.services.upload import upload_file, delete_file
@@ -46,13 +46,22 @@ class Episode:
         data = {
             "title": self.title,
             "pub_date": iso_date_from_rss_date(self.pub_date)[:16].replace('T', ' '),
-            "description": self.description
+            "description": LiteralString(self.description)
         }
         return yaml.safe_dump(
             data,
             sort_keys=False,
             allow_unicode=True
         )
+    def update_from_yaml(self, text: str):
+        data = yaml.safe_load(text)
+        required = {"title", "pub_date", "description"}
+        missing = required - data.keys()
+        if missing:
+            raise ValueError(f"Saknade fält: {', '.join(missing)}")
+        self.title = data["title"]
+        self.description = data["description"]
+        self.pub_date = rss_date(data['pub_date'])
 
 
 def load_episodes_from_xml(feed_file: Path = LOCAL_FEED) -> list[Episode]:
@@ -137,7 +146,7 @@ def publish_episode(data: str):
         if not user_confirmation("Vill du ändå publicera avsnittet (under dagens datum)?", default=False, blank_line=False):
             console.print("Inget avsnitt publicerat.")
             return
-        episode.pub_date = rss_date(datetime.today().date().isoformat()[:10])  # Set today as publication date for the uploaded episode
+        episode.pub_date = rss_date(f"{datetime.today().date().isoformat()[:10]} 10:00")  # Set today as publication date for the uploaded episode
 
     # 2. Update feed.xml by adding the new episode
     episodes = load_episodes_from_xml()  # Load all episodes from local feed.xml
@@ -235,53 +244,21 @@ def edit_episode():
         return
     edited_episode = episodes.pop(int(choice) - 1)  # remove episode from list
     data = edited_episode.to_edit_yaml()  # Only edit title, description and pub_date
-    data = '# Ändra data nedan för detta avsnitt i podcasten.\n# Datumformat: YYYY-MM-DD HH:MM\n# OBS: Ändra inte nycklarna.\n\n' + '\n\n'.join(data.split('\n'))
-    console.log(data)
+    data = '# Ändra data nedan för detta avsnitt i podcasten.\n# Datumformat: YYYY-MM-DD HH:MM\n# OBS: Ändra inte nycklarna.\n\n' + data
 
     # Open in editor to edit
-    response = open_editor(data);
-    edited_data = response or data
-    console.log(edited_data)
-    edited_data = yaml.safe_load(edited_data)
-    console.log(edited_data)
-
-
-    return
-
-#            from datetime import datetime
-#
-#            def update_from_yaml(self, text: str):
-#                data = yaml.safe_load(text)
-#
-#                required = {"title", "pub_date", "description"}
-#
-#                missing = required - data.keys()
-#                if missing:
-#                    raise ValueError(
-#                        f"Saknade fält: {', '.join(missing)}"
-#                    )
-#
-#                # Validera datum
-#                try:
-#                    datetime.strptime(
-#                        data["pub_date"],
-#                        "%Y-%m-%d %H:%M"
-#                    )
-#                except ValueError:
-#                    raise ValueError(
-#                        "pub_date måste ha formatet ÅÅÅÅ-MM-DD HH:MM"
-#                    )
-#
-#                self.title = data["title"]
-#                self.description = data["description"]
-#                self.pub_date = data["pub_date"]
+    edited_data = open_editor(data);
+    if not edited_data:
+        console.print('Ingen ändring i avsnittet.')
+        return
+    edited_episode.update_from_yaml(edited_data)  # Save changes to object
 
     episodes.append(edited_episode)  # Add edited episode back to list
     episodes.sort(key=lambda x: iso_date_from_rss_date(x.pub_date), reverse=True)  # Sort all episodes by date
     render_podcast_feed(episodes)  # Render feed.xml and save locally
 
     # Upload feed.xml
-    console.print(f"Laddar upp {PODCAST_FEED} ...")
+    console.print(f"Avsnittet är uppdaterat. Laddar upp {PODCAST_FEED} ...")
     upload_file(LOCAL_FEED, PODCAST_REMOTE_DIR, PODCAST_FEED)
 
     # Prune podcast
@@ -353,7 +330,7 @@ def episode_from_sermon(sermon_code: str) -> Episode:
 
     date = recording.date  # Date for recording is also used to find service
     time = '10:00'  # Default time
-    pub_date = rss_date(date, time)
+    pub_date = rss_date(f"{date} {time}")
 
     file_name = recording.file_name
     if file_name[-4:] != '.mp3':
@@ -382,7 +359,7 @@ def episode_from_sermon(sermon_code: str) -> Episode:
         if not user_confirmation(f"Bekräfta publiceringsdatum: [title]{date} {time}[/title] ('n' för att ange eget publiceringsdatum)"):
             date = user_input('Datum för publicering', ' [ÅÅÅÅ-MM-DD]', pattern=PATTERN['date'], allow_empty=False)
             time = user_input('Klockslag för publicering', ' [HH:MM]', default='10:00', pattern=PATTERN['time'], allow_empty=False)
-            pub_date = rss_date(date, time)
+            pub_date = rss_date(f"{date} {time}")
             episode.pub_date = pub_date
         return episode
     return None
@@ -400,7 +377,7 @@ def episode_from_file(file_name: str) -> Episode:
     description = user_input('Beskrivning av avsnittet', allow_empty=True)
     date = user_input('Datum för publicering', ' [ÅÅÅÅ-MM-DD]', pattern=PATTERN['date'], allow_empty=False)
     time = user_input('Klockslag för publicering', ' [HH:MM]', default='10:00', pattern=PATTERN['time'], allow_empty=False)
-    pub_date = rss_date(date, time)
+    pub_date = rss_date(f"{date} {time}")
 
 
     # Make an episode object
