@@ -1,8 +1,11 @@
+import os, shlex, shutil
+import time
+import subprocess
+import tempfile
 from pathlib import Path
 from urllib import parse
 from mutagen.mp3 import MP3
 from pypdf import PdfReader
-#import shutil
 import sqlite3
 from app.config import DB_FILE, PATH_BACKUP
 from email.utils import format_datetime
@@ -27,6 +30,41 @@ PATTERN['recording'] = re.compile(r'^20\d{2}-(0[1-9]|1[0-2])-(0[1-9]|[12][0-9]|3
 PATTERN['file_name'] = re.compile(r'^.+\..{3}$')  # Generic file name
 PATTERN['url'] = re.compile(r'^https?\:\/\/')  # URL http(s)://...
 
+
+
+
+def find_editor() -> list[str]:
+    editor = os.environ.get("VISUAL") or os.environ.get("EDITOR")
+    if editor:
+        return shlex.split(editor)
+    for editor in ("nvim", "vim", "nano"):
+        if shutil.which(editor):
+            return [editor]
+    raise RuntimeError("Ingen texteditor hittades. Sätt $VISUAL eller $EDITOR.")
+
+
+def open_editor(data):
+    """Open editor with data for editing"""
+    editor_cmd = find_editor()
+    console.print(f"[dim]Öppnar editor: {' '.join(editor_cmd)}[/dim]")
+    time.sleep(1)
+
+    with tempfile.NamedTemporaryFile(suffix=".txt", mode="w+", delete=False) as tf:
+        tf.write(data or '')
+        tf.flush()
+        path = tf.name
+
+    try:
+        subprocess.run(editor_cmd + [str(path)], check=True)
+        with open(path, 'r') as f:
+            new_data = f.read().strip()
+            if new_data == data:  # No changes
+                return None
+            return new_data
+    finally:
+        os.unlink(path)
+
+    return
 
 
 def parse_sermon_code(code: str, raiseError = True) -> str:
