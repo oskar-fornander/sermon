@@ -66,7 +66,7 @@ def get_sermon_by_id(id: int, conn = None):
         )
         row = cur.fetchone()
         if row is None:
-            raise NotFoundError(f"Predikan [key]{code}[/key] finns inte.")
+            raise NotFoundError(f"Predikan finns inte.")
         if new_conn:
             conn.close()
         return row
@@ -99,7 +99,6 @@ def sermon_exists(code: str, conn = None) -> True|False:
     if conn is None:
         new_conn = True
         conn = get_connection()
-    conn = get_connection()
     cur = conn.cursor()
     try:
         cur.execute(
@@ -688,7 +687,7 @@ def update_sermon_from_draft(draft: "SermonDraft"):
             update_resources(conn, sermon_id, draft.resources, delete_missing=True)
             update_bible_references(conn, sermon_id, draft.bible_references)
             update_related_sermons(conn, sermon_id, draft.related_sermons)
-    except Exception: 
+    except Exception as e: 
         raise DatabaseError(f"Databasfel: {e}")
     finally:
         conn.close()
@@ -1006,7 +1005,7 @@ def delete_sermon_from_database(sermon_id: int):
                 """,
                 (sermon_id,)
             )
-    except Exception: 
+    except Exception as e: 
         raise DatabaseError(f"Databasfel: {e}")
     finally:
         conn.close()
