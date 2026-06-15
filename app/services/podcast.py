@@ -143,7 +143,7 @@ def publish_episode(data: str):
 
     if rss_date_days_old(episode.pub_date) > PODCAST_MAX_DAYS:  # Give a warning if uploading too old episode
         console.print(f"Detta avsnitt har ett publiceringsdatum som är äldre än {PODCAST_MAX_DAYS} dagar, som är maxgränsen för avsnitt angiven i konfigurationsfilen.")
-        if not user_confirmation("Vill du ändå publicera avsnittet (under dagens datum)?", default=False, blank_line=False):
+        if not user_confirmation("Ska avsnittet ändå publiceras (under dagens datum)?", default=False, blank_line=False):
             console.print("Inget avsnitt publicerat.")
             return
         episode.pub_date = rss_date(f"{datetime.today().date().isoformat()[:10]} 10:00")  # Set today as publication date for the uploaded episode

@@ -15,7 +15,7 @@ def render_edit_menu(title, options, show_menu_options=False):
         for i in range(len(options)):
             menu += f"[key]{i + 1}.[/key]{NBSP}{options[i]}  "
     else:
-        menu = f"Ange vilket fält du vill redigera. Enter (tomt) behåller värdet, '-' rensar (om tillåtet). I översikten markeras vilka fält som är ändrade. Spara med [key]s[/key] och avbryt med [key]q[/key]."
+        menu = f"Ange fält att redigera. Enter (tomt) behåller värdet, '-' rensar (om tillåtet). I översikten markeras vilka fält som är ändrade. Spara med [key]s[/key] och avbryt med [key]q[/key]."
 
     subtitle = f"[bold][key]s[/key]: spara, [key]q[/key]: avbryt[/bold]"
     print()
@@ -139,7 +139,7 @@ def user_edit_generic_complex(sermon_code, title, data, fields, path = None, new
         subtitle = f"[bold][key]s[/key]: spara, [key]q[/key]: avbryt[/bold]"
         print()
         console.print(
-            Panel(f"Välj vad du vill redigera. Enter (tomt) behåller värdet, '-' rensar (om tillåtet). Lägg till {title.lower()} med [key]+[/key] och radera vald rad med [key]x[/key].",
+            Panel(f"Ange fält att redigera. Enter (tomt) behåller värdet, '-' rensar (om tillåtet). Lägg till {title.lower()} med [key]+[/key] och radera vald rad med [key]x[/key].",
                 title=f"[title]Redigera {title.lower()}[/title]",
                 title_align='left', 
                 subtitle=subtitle,
@@ -157,7 +157,7 @@ def user_edit_generic_complex(sermon_code, title, data, fields, path = None, new
             edited.append((len(data) - 1, fields[i][0]))  # Used to indicate in preview what was just changed
 
     def delete_row():
-        if Confirm.ask(f"Är du säker på att du vill radera {title.lower()} {row_index(row)}?", default = False):
+        if Confirm.ask(f"Ska {title.lower()} {row_index(row)} raderas?", default = False):
             if hasattr(data[row], 'file_name'):  # If there is a file to remove
                 file_name = data[row].file_name
                 if file_name:

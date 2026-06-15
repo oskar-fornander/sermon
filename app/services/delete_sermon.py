@@ -22,7 +22,7 @@ def delete_sermon(sermon_code: str):
     sermon_id = draft.id  # internal database id for this sermon
 
     # Double user confirmations before deleting
-    if user_confirmation(f"Predikan [key]{sermon_code}[/key] och alla tillhörande filer kommer att raderas. Är du säker på att du vill fortsätta?", default = False):
+    if user_confirmation(f"Predikan [key]{sermon_code}[/key] och alla tillhörande filer kommer att raderas. Bekräfta och fortsätt?", default = False):
         if user_confirmation(f"Denna åtgärd går inte att ångra; all data för [key]{sermon_code}[/key] kommer att försvinna. Radera?", default = False):
 
             # 1. Save sermon draft temporarily in a file and erase it (this way it can be manually restored from trash can)
