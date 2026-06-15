@@ -12,9 +12,14 @@ from rich.columns import Columns
 from rich.padding import Padding
 from rich import box
 from rich.color import Color
-from rich.prompt import Prompt, Confirm
-
 from app.presentation.theme import custom_theme, ICON, LIST_MARKER, TAB
+
+from rich.prompt import Prompt, Confirm
+# Svenska översättningar för Rich-promptar
+Prompt.validate_error_message = "[prompt.invalid]Ange ett giltigt värde[/prompt.invalid]"
+Prompt.illegal_choice_message = "[prompt.invalid.choice]Välj ett av de tillgängliga alternativen[/prompt.invalid.choice]"
+Confirm.validate_error_message = "[prompt.invalid]Ange [key]y[/key] eller [key]n[/key][/prompt.invalid]"
+
 
 console = Console(theme=custom_theme) #apply custom theme (defined in theme.py) to the console
 
