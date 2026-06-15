@@ -22,14 +22,14 @@ custom_theme = Theme ({
     'key': 'bold yellow',
     'code': 'honeydew2 bold italic',
     'notes': 'dim',
-    'highlight': 'bold yellow',
+    'highlight': 'black on yellow',
     'tip': 'bold dim',
     'alert': 'red bold',
     'edited': 'dark_orange',
     'deleted': 'dim',
     'selected': 'reverse',
     'not_selected': 'dim',
-    'link_style': 'dim',    # Add this theme to links like this: [link=http...][link_style]link_text[/link_style][/link]
+    'link_style': 'dim underline',    # Add this theme to links like this: [link=http...][link_style]link_text[/link_style][/link]
     'disabled': 'dim',
     'error': 'orange3'
 })
