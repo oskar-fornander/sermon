@@ -95,7 +95,7 @@ def interactive_edit_sermon(sermon_draft, pending_file_deletions = None):
                 if new_value == original_code:  # Ok to change back
                     break
                 if new_value in used_codes:
-                    console.print(f"[bold red]Det finns redan en predikan med denna kod i databasen.[/bold red]")
+                    console.print(f"[alert]Det finns redan en predikan med denna kod i databasen.[/alert]")
                 else:
                     break
         elif option == 'Bibelreferenser':
@@ -116,7 +116,7 @@ def interactive_edit_sermon(sermon_draft, pending_file_deletions = None):
                 for related_code in new_value:
                     if related_code not in used_codes or related_code == original_code:  # No need to check pattern when checking against used codes
                         all_codes_valid = False
-                        console.print(f"[bold red]Det finns ingen predikan med kod {related_code}.[/bold red]")
+                        console.print(f"[alert]Det finns ingen predikan med kod {related_code}.[/alert]")
                 if all_codes_valid:
                     new_value = list(set(new_value))  # remove duplicates if any
                     new_value.sort()
