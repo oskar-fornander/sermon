@@ -114,7 +114,7 @@ def render_sermon_card(sermon_draft, preview=False, menu=[], edited_fields=[], q
             elements.append(f"{TAB_}[notes]{recording.date}[/notes]  {link}")
         elif recording.external_url: # Either a local file OR an external link for each recording
             link_title = 'extern url'
-            elements.append(f"{TAB_}[notes]{recording.date}[/notes]  [link={recording.external_url}]{link_title}[/link]  [notes]{recording.type}[/notes]")
+            elements.append(f"{TAB_}[notes]{recording.date}[/notes]  [link={recording.external_url}][link_style]{link_title}[/link_style][/link]  [notes]{recording.type}[/notes]")
         if recording.notes:
             recording_notes = recording.notes
             if query:  # Highlight search result

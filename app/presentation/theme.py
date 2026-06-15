@@ -29,7 +29,7 @@ custom_theme = Theme ({
     'deleted': 'dim',
     'selected': 'reverse',
     'not_selected': 'dim',
-    'link_style': 'dim underline',    # Add this theme to links like this: [link=http...][link_style]link_text[/link_style][/link]
+    'link_style': 'underline',    # Add this theme to links like this: [link=http...][link_style]link_text[/link_style][/link]
     'disabled': 'dim',
     'error': 'orange3'
 })

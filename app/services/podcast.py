@@ -197,7 +197,7 @@ def prune_podcast():
 
     #upload feed.xml
     upload_file(LOCAL_FEED, PODCAST_REMOTE_DIR, PODCAST_FEED)
-    console.print(f"Podcastens flöde är uppdaterat: [link={WEB_URL}/{PODCAST_REMOTE_DIR}/{PODCAST_FEED}]{WEB_URL}/{PODCAST_REMOTE_DIR}/{PODCAST_FEED}[/link]")
+    console.print(f"Podcastens flöde är uppdaterat: [link={WEB_URL}/{PODCAST_REMOTE_DIR}/{PODCAST_FEED}][link_style]{WEB_URL}/{PODCAST_REMOTE_DIR}/{PODCAST_FEED}[/link_style][/link]")
 
     #remove mp3 from server
     for episode in to_remove:

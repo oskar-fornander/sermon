@@ -76,7 +76,7 @@ def export_html():
     with open(file_local, 'w', encoding='utf-8') as f:
         f.write(html_local)
 
-    console.print(f"Export till html är klart: [link=file://{file_local}]{file_local}[/link]")
+    console.print(f"Export till html är klart: [link=file://{file_local}][link_style]{file_local}[/link_style][/link]")
 
     # And one for online use:
     console.print('Laddar upp ...')
@@ -94,7 +94,7 @@ def export_html():
     # Upload file with sftp
     try:
         remote_path = upload_file(file_web, HTML_REMOTE_DIR, 'index.html')
-        console.print(f"Uppladdad till: [link={remote_path}]{remote_path}[/link]")
+        console.print(f"Uppladdad till: [link={remote_path}][link_style]{remote_path}[/link_style][/link]")
     except Exception as e:
         raise RuntimeError(f"Uppladdning med sftp misslyckades: {e}")
 

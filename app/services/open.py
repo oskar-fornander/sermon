@@ -41,10 +41,10 @@ def open_manuscript(sermon_code: str):
 
     try:
         if APP_PDF:
-            console.print(f"Öppnar [link=file://{path}]{file_name}[/link] med {APP_PDF} ...")
+            console.print(f"Öppnar [link=file://{path}][link_style]{file_name}[/link_style][/link] med {APP_PDF} ...")
             subprocess.run(['open', '-a', APP_PDF, path])
         else:
-            console.print(f"Öppnar [link=file://{path}]{file_name}[/link] ...")
+            console.print(f"Öppnar [link=file://{path}][link_style]{file_name}[/link_style][/link] ...")
             subprocess.run(['open', path])
     except Exception:
         raise FileError(f"Det gick inte att öppna filen {path}")
@@ -92,23 +92,23 @@ def open_recording(sermon_code: str):
 
         try:
             if APP:
-                console.print(f"Öppnar [link=file://{path}]{file_name}[/link] med {APP} ...")
+                console.print(f"Öppnar [link=file://{path}][link_style]{file_name}[/link_style][/link] med {APP} ...")
                 subprocess.run(['open', '-a', APP, path])
             else:
-                console.print(f"Öppnar [link=file://{path}]{file_name}[/link] ...")
+                console.print(f"Öppnar [link=file://{path}][link_style]{file_name}[/link_style][/link] ...")
                 subprocess.run(['open', path])
         except Exception:
             raise FileError(f"Det gick inte att öppna filen {path}")
 
     elif external_url:  # Open external url
         if not url_is_ok(external_url):
-            raise ValidationError(f"Länken verkar vara trasig: [link={external_url}]{external_url}[/link]")
+            raise ValidationError(f"Länken verkar vara trasig: [link={external_url}][link_style]{external_url}[/link_style][/link]")
         try:
             if APP_URL:
-                console.print(f"Öppnar [link={external_url}]{external_url}[/link] med {APP_URL} ...")
+                console.print(f"Öppnar [link={external_url}][link_style]{external_url}[/link_style][/link] med {APP_URL} ...")
                 subprocess.run(['open', '-a', APP_URL, external_url])
             else:
-                console.print(f"Öppnar [link={external_url}]{file_name}[/link] ...")
+                console.print(f"Öppnar [link={external_url}][link_style]{file_name}[/link_style][/link] ...")
                 subprocess.run(['open', external_url])
         except Exception:
             raise FileError(f"Det gick inte att öppna länken {external_url}")
@@ -149,16 +149,16 @@ def open_resource(sermon_code: str):
     try:
 # This could be improoved ...
         if APP_PDF and ('.pdf' in file_name or '.jpg' in file_name or '.png' in file_name):
-            console.print(f"Öppnar [link=file://{path}]{file_name}[/link] med {APP_PDF} ...")
+            console.print(f"Öppnar [link=file://{path}][link_style]{file_name}[/link_style][/link] med {APP_PDF} ...")
             subprocess.run(['open', '-a', APP_PDF, path])
         elif APP_AUDIO and ('.wav' in file_name or '.mp3' in file_name):
-            console.print(f"Öppnar [link=file://{path}]{file_name}[/link] med {APP_AUDIO} ...")
+            console.print(f"Öppnar [link=file://{path}][link_style]{file_name}[/link_style][/link] med {APP_AUDIO} ...")
             subprocess.run(['open', '-a', APP_AUDIO, path])
         elif APP_VIDEO and ('.mp4' in file_name or '.mov' in file_name):
-            console.print(f"Öppnar [link=file://{path}]{file_name}[/link] med {APP_VIDEO} ...")
+            console.print(f"Öppnar [link=file://{path}][link_style]{file_name}[/link_style][/link] med {APP_VIDEO} ...")
             subprocess.run(['open', '-a', APP_VIDEO, path])
         else:
-            console.print(f"Öppnar [link=file://{path}]{file_name}[/link] ...")
+            console.print(f"Öppnar [link=file://{path}][link_style]{file_name}[/link_style][/link] ...")
             subprocess.run(['open', path])
     except Exception:
         raise FileError(f"Det gick inte att öppna filen {path}")

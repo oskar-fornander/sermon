@@ -181,7 +181,7 @@ def get_file_link(path, file_name, title = None, show_missing_file = True, show_
     if not title:
         title = file_name
     if 'http' in file_name:  # Probably not a file but an URL
-        return f"[link={file_name}]{title}[/link]"
+        return f"[link={file_name}][link_style]{title}[/link_style][/link]"
     if not file_name:
         return ''
     file_path = path / Path(file_name.strip())
@@ -191,17 +191,17 @@ def get_file_link(path, file_name, title = None, show_missing_file = True, show_
         if not file_path.is_file():  # File does not exist
             marker = f"[alert]{ICON['missing_file']}[/alert]"  # Mark missing file with an icon and style
             if show_title_if_missing:  # Show marker next to title or only marker?
-                return f"{marker} [link=file://{url_encoded_path}]{title}[/link]"  # ✘ P371.pdf
+                return f"{marker} [link=file://{url_encoded_path}][link_style]{title}[/link_style][/link]"  # ✘ P371.pdf
             else:
-                return f"[link=file://{url_encoded_path}]{marker}[/link]"  # ✘
+                return f"[link=file://{url_encoded_path}][link_style]{marker}[/link_style][/link]"  # ✘
     if show_meta:  # Show length of mp3-file and number of pages in pdf
         meta = ''
         if '.mp3' in file_name:
             meta = f" [notes]({get_audio_length(url_encoded_path)})[/notes]"
         elif '.pdf' in file_name:
             meta = f" [notes]({get_pdf_pages(url_encoded_path)})[/notes]"
-        return f"[link=file://{url_encoded_path}]{title}[/link]{meta}"
-    return f"[link=file://{url_encoded_path}]{title}[/link]"
+        return f"[link=file://{url_encoded_path}][link_style]{title}[/link_style][/link]{meta}"
+    return f"[link=file://{url_encoded_path}][link_style]{title}[/link_style][/link]"
 
 
 def get_audio_length(path: str) -> str:
