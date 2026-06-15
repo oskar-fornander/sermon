@@ -143,7 +143,7 @@ def parse_iso_date(date_str: str) -> date:
     """Return date object from iso formatted string (only date)"""
     try:
         dt = datetime.strptime(date_str[:10], '%Y-%m-%d')
-    except Excdption:
+    except Exception:
         raise ValidationError(f"Datum ogiltigt: {date_str}")
     return dt.date
 
