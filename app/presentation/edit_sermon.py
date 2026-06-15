@@ -4,6 +4,7 @@ import time
 from app.config import PATH_MANUSCRIPTS, PATH_RECORDINGS, PATH_RESOURCES
 from app.utils import get_file_link, PATTERN, open_editor
 from app.services.sermon_draft import deep_copy, new_service_draft, new_manuscript_draft, new_recording_draft, new_resource_draft
+from app.presentation.common import user_input
 
 
 def render_edit_menu(title, options, show_menu_options=False):
@@ -46,7 +47,7 @@ def user_edit_short_text_list(sermon_code, title, value, separator=';'):
     return None
 
 
-def user_edit_short_text(sermon_code, title, value, choices = None, pattern = None):
+def user_edit_short_text(sermon_code, title, value, choices = None, pattern = None, pattern_example = None):
     """Let user edit a value"""
     subtitle = f"[dim]Enter (tomt) behåller värdet, '-' rensar (om tillåtet).[/dim]"
     if not value:
@@ -62,7 +63,7 @@ def user_edit_short_text(sermon_code, title, value, choices = None, pattern = No
         )
     )
     
-    new_value = user_input(title, default=None, choices=choices, pattern=pattern, allow_empty=True, blank_line=True)
+    new_value = user_input(title, default=None, choices=choices, pattern=pattern, pattern_example=pattern_example, allow_empty=True, blank_line=True)
 
     return new_value
 

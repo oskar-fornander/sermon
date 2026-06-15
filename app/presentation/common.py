@@ -41,7 +41,7 @@ def render_info_panel(title: str, content: str='', subtitle: str='', blank_line 
         print()
 
 
-def user_input(title, description='', default=None, choices=None, pattern=None, allow_empty=True, invalid_choices=[], blank_line=True):
+def user_input(title, description='', default=None, choices=None, pattern=None, pattern_example=None, allow_empty=True, invalid_choices=[], blank_line=True):
     """Custom function to get user input from terminal via rich.prompt() with some safety functions"""
     if blank_line:
         console.print()
@@ -52,12 +52,12 @@ def user_input(title, description='', default=None, choices=None, pattern=None, 
                 answer = None  # or ''
                 break
             else:
-                console.print(f"[alert]Värdet av [white dim]{title}[/white dim] får inte vara tomt.[/alert]")
+                console.print(f"[alert]Värdet av [title]{title}[/title] får inte vara tomt.[/alert]")
                 continue
 
         if invalid_choices:  # Check if invalid answer
             if answer in invalid_choices:
-                console.print(f"[alert]Följande värden av [white dim]{title}[/white dim] är inte tillåtna: {', '.join(invalid_choices)}.[/alert]")
+                console.print(f"[alert]Följande värden av [title]{title}[/title] är inte tillåtna: {', '.join(invalid_choices)}.[/alert]")
                 continue
 
         if pattern:  # Check against pattern
@@ -66,7 +66,8 @@ def user_input(title, description='', default=None, choices=None, pattern=None, 
             elif answer == '-':
                 break
             else:
-                console.print(f"[alert]Värdet av [white dim]{title}[/white dim] matchar inte formatet.[/alert]")
+                example = f"[dim]({pattern_example})[/dim]" if pattern_example else ''
+                console.print(f"[alert]Värdet av [title]{title}[/title] matchar inte formatet.[/alert] {example}")
                 continue
 
         break
@@ -90,7 +91,7 @@ def user_choice(title='Ditt val', options = None, default = None):
             #return False  # empty choice
         if options:
             if choice.strip() not in options:
-                console.print(f"[alert]Välj ett av alternativen ([white dim]{', '.join(options)}[/white dim]).[/alert]")
+                console.print(f"[alert]Välj ett av alternativen ([title]{', '.join(options)}[/title]).[/alert]")
                 continue
         return choice
 

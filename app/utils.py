@@ -46,6 +46,7 @@ def find_editor() -> list[str]:
 
 def open_editor(data):
     """Open editor with data for editing"""
+    data = data or ''
     editor_cmd = find_editor()
     console.print(f"[dim]Öppnar editor: {' '.join(editor_cmd)}[/dim]")
     time.sleep(1)

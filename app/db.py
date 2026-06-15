@@ -41,7 +41,7 @@ def get_sermon_by_code(code: str, conn = None):
         )
         row = cur.fetchone()
         if row is None:
-            raise NotFoundError(f"Predikan [key]{code}[/key] finns inte. (Ange predikokoden i formatet P001.)")
+            raise NotFoundError(f"Predikan [key]{code}[/key] finns inte.")
         if new_conn:
             conn.close()
         return row

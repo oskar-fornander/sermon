@@ -89,7 +89,7 @@ def interactive_edit_sermon(sermon_draft, pending_file_deletions = None):
         if option == 'Predikokod':  # Special case: sermon code. Make sure the sermon code is unique and valid
             used_codes = get_all_sermon_codes()  # A new sermon code must be unique
             while True:
-                new_value = user_edit_short_text(sermon_draft.code, 'Predikokod', current_value, pattern=PATTERN['code'])
+                new_value = user_edit_short_text(sermon_draft.code, 'Predikokod', current_value, pattern=PATTERN['code'], pattern_example='t.ex. P001')
                 if not new_value:  # no value no change
                     break
                 if new_value == original_code:  # Ok to change back

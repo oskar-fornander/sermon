@@ -20,7 +20,7 @@ def new_sermon():
     used_codes = get_all_sermon_codes()  # A new sermon code must be unique
     default_code = 'P' + f"{int(get_last_sermon_code()[1:]) + 1:03d}"  # Default code for new sermon: last code + 1, as three digits with leading zeros
     while True:
-        code = user_input('Predikokod', default=default_code, pattern=PATTERN['code'], allow_empty=False)
+        code = user_input('Predikokod', default=default_code, pattern=PATTERN['code'], pattern_example=f"t.ex. {default_code}", allow_empty=False)
         if code in used_codes:
             console.print(f"[alert]Det finns redan en predikan med denna kod i databasen.[/alert]")
         else:

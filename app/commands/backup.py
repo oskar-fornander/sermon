@@ -11,7 +11,7 @@ def backup():
 
     clear_screen()
     backup_file = backup_database()
-    console.print(f"Databasen är säkerhetskopierad: {backup_file}")
+    console.print(f"Databasen är säkerhetskopierad: [link=file://{backup_file.parent}]{backup_file.name}[/link]")
 
 
 
