@@ -39,6 +39,7 @@ def export_html():
             except Exception:
                 date = ''
             sermon = SermonDraftWithDate(**asdict(s), date=date, all_dates=[])  # Add date to object by extending it to a new dataclass
+            sermons.append(sermon)
         else:
             all_dates = []
             for service in s.services:  # Add date for each service. There may be duplicates if a sermon has more than one service
@@ -47,8 +48,7 @@ def export_html():
             all_dates = all_dates[::-1]  # Sort dates in reversed order
             for date in all_dates:
                 sermon = SermonDraftWithDate(**asdict(s), date=date, all_dates=all_dates)  # Add date to object by extending it to a new dataclass
-
-        sermons.append(sermon)
+                sermons.append(sermon)
 
         # Replace non-existing values with '–' and joins lists
         sermon.context = sermon.context or '–'
