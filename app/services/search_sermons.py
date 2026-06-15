@@ -5,7 +5,7 @@ from app.db import query_sermons
 from app.services.sermon_draft import load_sermon_as_draft
 from app.presentation.sermon_list import render_sermon_list
 from app.presentation.sermon_card import render_sermon_card
-from app.presentation.common import console, user_confirmation, user_input, render_info_panel, clear_screen
+from app.presentation.common import console, pause, user_confirmation, user_input, render_info_panel, clear_screen
 from app.utils import parse_month, validate_date, parse_sermon_code
 
 
@@ -89,8 +89,7 @@ def search_sermons(query = [], list_by='code', n=0, reverse = False, bible_only 
 
         clear_screen()
         render_sermon_card(sermons[codes.index(code)], query=query) 
-        while not user_confirmation('Fortsätta?', default=True, blank_line=False):
-            pass
+        pause()
         clear_screen()
 
 

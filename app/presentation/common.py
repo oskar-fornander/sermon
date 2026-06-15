@@ -101,6 +101,10 @@ def user_choice(title='Ditt val', options = None, default = None):
         return choice
 
 
+def pause(message="Tryck Enter för att fortsätta ..."):
+    """Pause code until user presses enter."""
+    console.print(f"[tip]{message}[/tip]", end='')
+    input()
 
 
 
