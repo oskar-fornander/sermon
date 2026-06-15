@@ -8,6 +8,7 @@ from app.db import delete_sermon_from_database
 from app.services.sermon_draft import load_sermon_as_draft
 from app.presentation.common import console, clear_screen, render_info_panel, user_input, user_confirmation, user_choice
 from app.utils import parse_sermon_code
+from app.errors import FileError
 
 
 # Delete sermon from database
