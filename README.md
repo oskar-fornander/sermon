@@ -1,166 +1,167 @@
-# Sermons
+# Sermon - Predikoarkiv
+*© Oskar Fornander 2026*
 
-*Oskar Fornander*
+Sermon är ett terminalbaserat verktyg (CLI) skrivet i Python för att organisera, söka i och underhålla ett personligt predikoregister. Det hanterar metadata om predikningar (rubrik, sammanhang, bibelreferenser, budskap, kommentarer, datum och platser) samt länkar till tillhörande manus (PDF), ljud-/ och filminspelningar (MP3/MP4), resurser och relaterade predikningar.
 
-Privat predikoregister för mina predikningar.
+---
 
-## TODO
+## Funktioner i korthet
 
+*   **Översikt & Sök:** Sök på fritext eller bibelreferenser, samt lista predikningar sorterat efter datum eller predikokod.
+*   **Interaktiv inmatning & redigering:** Skapa nya eller uppdatera befintliga predikningar med en kraftfull terminalbaserad redigerare för både metadata och kopplade filer.
+*   **Filhantering:** Öppna tillhörande manus, inspelningar eller resurser direkt från terminalen med dina förvalda program.
+*   **Hälsokontroll av filer:** Hitta saknade filer som refereras i databasen, samt oanvända filer som ligger i dina arkivmappar.
+*   **HTML-export:** Generera en sökbar, mobilvänlig HTML-sida över hela registret och ladda upp den automatiskt via SFTP.
+*   **Podcast-publicering:** Exportera predikningar till en podcast-feed (RSS) och ladda upp ljudfiler och XML direkt till din server.
 
-## uv
+---
 
+## Installation & Setup
 
-``` Installera CLI globalt (editable)
-uv tool uninstall sermon        # valfritt men bra vid ändringar
-uv sync                         # uppdatera dependencies (creates uv.lock) 
-uv tool install --editable .    # installera
+Sermon kräver Python 3.12 eller senare.
+
+### Alternativ 1: Installation med `uv` (rekommenderas)
+Om du använder pakethanteraren `uv` kan du synka och installera verktyget i redigerbart läge (editable) globalt:
+
+```bash
+# Synka dependencies (skapar/uppdaterar uv.lock)
+uv sync
+
+# Installera verktyget globalt i redigerbart läge
+uv tool install --editable .
+```
+Du kan sedan köra appen direkt med kommandot `sermon`. Om du vill köra koden utan att installera den globalt använder du:
+```bash
+uv run sermon [kommando]
 ```
 
-`uv run sermon ...`  - Köra appen utan global installation
+### Alternativ 2: Installation med standard `venv` och `pip`
+```bash
+# Skapa virtuell miljö
+python -m venv .venv
 
-## venv + pip
+# Aktivera virtuell miljö (macOS/Linux)
+source .venv/bin/activate
 
-``` Installera med venv + pip
-python -m venv .venv            # skapa ett virtual environment
-source .venv/bin/activate       # aktivera venv
-pip install -e .                # installera projekt gobalt (editable)
-```
-`pip install -e .` eller `p install -r requirements.txt`  # När dependencies ändrats
-
-
-## Mappstruktur
-Överblick: 
-```
-predikan            # överordnad mapp
-├── sermon/         # koden - synkas mot GitHub
-└── archive/        # filerna - synkas med molntjänst
-```
-Fullständig mappstruktur:
-```
-predikan/                   # överordnad mapp
-├── sermon/                 # CLI-projekt (GitHub)
-│   ├── app/                # Alla python-filer
-│   │   ├── cli.py          
-│   │   ├── config.py
-│   │   ├── db.py
-│   │   ├── errors.py
-│   │   ├── utils.py
-│   │   ├── commands/       # Varje CLI-kommando har en egen fil
-│   │   │   ├── backup.py
-│   │   │   ├── delete.py
-│   │   │   ├── edit.py
-│   │   │   ├── export.py
-│   │   │   ├── files.py
-│   │   │   ├── list.py
-│   │   │   ├── new.py
-│   │   │   ├── open.py
-│   │   │   ├── search.py
-│   │   │   └── show.py
-│   │   ├── presentation/
-│   │   │   ├── common.py
-│   │   │   ├── edit_sermon.py
-│   │   │   ├── new_sermon.py
-│   │   │   ├── sermon_card.py
-│   │   │   ├── sermon_list.py
-│   │   │   └── theme.py
-│   │   ├── services/
-│   │   │   ├── delete_sermon.py
-│   │   │   ├── edit_sermon.py
-│   │   │   ├── list_sermons.py
-│   │   │   ├── new_sermon.py
-│   │   │   ├── search_sermons.py
-│   │   │   ├── sermon_draft.py
-│   │   │   └── show_sermon.py
-│   │   └──tools/
-│   │       ├── files.py
-│   │       └── import_xml.py     # Engångsskript för import från gammalt system, kör så här: python -m app.tools.import_xml.py sermons.xml Skapar ny databasfil.
-│   │
-│   ├── config.yaml           # Konfigurationsfil (Den riktiga konfigurationsfilen finns i ~/.config/sermon/config.yaml)
-│   ├── schema.sql            # Schema för databasen
-│   ├── README.md             
-│   ├── pyproject.toml        
-│   └── uv.lock
-│
-└── archive/                  # filer (synkade med molntjänst)
-    ├── data/
-    │   ├── sermons.db        # SQLite
-    │   └── backup
-    │       ├── sermon_2026-03-21.db
-    │       └── sermon ...
-    │
-    ├── files/
-    │   ├── manuscripts/      # PDF
-    │   ├── recordings/       # MP3
-    │   ├── resources/        # PDF etc.
-    │   └── originals/        # Diverse originalfiler etc. som inte kopplas till databasen
-    │
-    └── html/
-        └── index.html        # Mobil översikt
+# Installera projektet i redigerbart läge
+pip install -e .
 ```
 
-All kod ligger i mappen `sermon/` och synkas mot GitHub.
-Alla filer ligger i mappen `archive/` som synkas med molntjänst (Mega).
+---
 
-## Molntjänst
+## Konfiguration
 
-Synkning av mappen `archive/`sker med valfri molntjänst. Denna är inte beroende av koden i `sermon/`och kan därför bytas ut när som helst.
+Första gången du kör appen skapas en standardkonfiguration i:
+`~/.config/sermon/config.yaml`
 
-Använd förslagsvis *Google Drive*, *pCloud* eller *Mega*. Synkningen behöver ske automatiskt och gärna så att data sparas i molnet och syns på datorn utan att ta upp plats, men kan öppnas från datorn (laddas ned när en fil öppnas). Utrymmet behöver vara tillräckligt stort (uppskattningsvis >10GB till att börja med). Synkning till flera datorer. Notera att molntjänsten måste funka på de operativsystem och versioner som används.
+Öppna den filen för att konfigurera sökvägar till ditt predikoarkiv samt SFTP-uppgifter.
 
-Start: **Mega**
-
-## Databas
-
+### Exempel på `config.yaml`
+```yaml
+user: Oskar Fornander
+root: ~/predikan/archive                # Mappen där databasen och filerna ligger
+database: sermon.db
+paths:
+  database: data
+  backup: data/backup
+  manuscripts: files/manuscripts
+  recordings: files/recordings
+  resources: files/resources
+  html: html
+  podcast: podcast
+cloud:
+  provider: Mega                        # Namn på din molntjänst (Google Drive, Mega, etc.)
+  urls:
+    manuscripts: "https://mega.nz/..."
+    recordings: "https://mega.nz/..."
+    resources: "https://mega.nz/..."
+apps:                                   # Program som öppnar dina filer på macOS
+  pdf: Preview
+  audio: QuickTime Player
+  video: QuickTime Player
+  browser: Safari
+sftp:                                   # Inställningar för uppladdning av HTML/podcast
+  host: din.server.se
+  port: 22
+  username: sftp_användare
+  key_file: ~/.ssh/id_rsa
+web:
+  site_url: "https://dinhemsida.se"
+  site_root: "/var/www/sermon"
+html:
+  remote_dir: "html"
+podcast:
+  remote_dir: "podcast"
+  feed_file: "feed.xml"
+  audio_path: "audio"
+  cover_image: "cover.jpg"
+  title: "Predikokanalen"
+  description: "Predikningar av Oskar Fornander"
+  author: "Oskar Fornander"
+  min_episodes: 3
+  max_days: 60
 ```
-sermon
- ├── service
- ├── manuscript
- ├── recording
- ├── resource
- └── bible_reference
+
+---
+
+## Användning
+
+Kör `sermon --help` för en fullständig överblick över alla tillgängliga kommandon.
+
+### Söka och lista
+```bash
+# Lista de 10 senaste predikningarna (standardsortering efter kod)
+sermon list
+
+# Visa alla predikningar sorterade efter datum (nyast först)
+sermon list --all --sort date
+
+# Sök efter predikningar som innehåller ordet "nåd" och "tro"
+sermon search nåd tro
+
+# Sök endast i bibelreferenser
+sermon search "Joh 3" --bible
 ```
 
-Alla relationer är: enkelriktade, icke-cirkulära och lätta att fråga i SQLite.
+### Visa, skapa och redigera
+```bash
+# Visa en specifik predikan snyggt uppställd
+sermon show P371
 
-### Tabeller
+# Skapa en ny predikan interaktivt (frågar efter kod och titel, öppnar sedan redigeringsmenyn)
+sermon new
 
-```
-Sermon: id, title, context, introduction, message, notes
-Service: id, sermon_id, date, place, notes
-Manuscript: id, sermon_id, file_name, version, date, notes
-Recording: id, sermon_id, type, file_name, external_url, date, notes
-Resource: id, sermon_id, file_name, title, notes
-Bible_reference: id, sermon_id, reference_text
-```
-
-*Bible_reference* är möjligt att utveckla senare, men i nuläget sparas varje inmatad bibelreferens som en egen rad, så som den skrevs. t.ex. `sermon attach bible "Joh 1:1-5; Joh 8:12; 1Mos 1:1-3"` –> 3 referenser
-
-
-## CLI Commands
-```
-* sermon show P371              #Show particular sermon by ID
-* sermon list                   #Show (all) sermons in a list
-* sermon search joh             #Search and list sermons by ...
-* sermon new                    #Add new sermon [id, title, context, reference(s), introduction, message, (related), comment, report]
-* sermon delete P371            #Delete a post
-* sermon edit                   #Edit an existing sermon, its meta data and links and connected resources
-* sermon export html            #Create a html overview of all sermons, to browse in mobile
-* sermon export podcast         #Export sermon for podcast
+# Redigera en befintlig predikan interaktivt
+sermon edit P371
 ```
 
-## Old XML-element
+### Hantera filer
+Sermon kan öppna de fysiska filerna associerade med en predikan:
+```bash
+# Öppna manus (PDF)
+sermon open manuscript P371
+
+# Öppna ljud- eller videoinspelning
+sermon open recording P371
+
+# Kontrollera diskfiler mot databasen (hitta oanvända eller saknade PDF/MP3-filer)
+sermon files check
 ```
-  <sermon index="P370" title="Messias" context="F&#xF6;rsta s&#xF6;ndagen i advent">
-    <reference>Sak 9:9-10</reference>
-    <introduction>&#x201D;Se, din konung kommer till dig&#x201D;; den som kommer &#xE4;r Messias man v&#xE4;ntat p&#xE5;.</introduction>
-    <message>Jesus f&#xE5;r b&#xE4;ra alla f&#xF6;rv&#xE4;ntningar p&#xE5; den v&#xE4;ntade messias/kungen. Mycket i evangelierna pekar p&#xE5; att han ses som den messias man v&#xE4;ntat p&#xE5;.</message>
-    <keyword/>
-    <related/>
-    <service date="2025-11-30" place="Missionskyrkan, Lagan" notice=""/>
-    <manuscript>P370.pdf</manuscript>
-    <resource title=""/>
-    <recording type="audio" date="2025-11-30">2025-11-30_Predikan.mp3</recording>
-    <comment/>
-    <report>B</report>
-  </sermon>
-````
+
+### Export & Underhåll
+```bash
+# Skapa lokalt och ladda upp index.html-sidan via SFTP
+sermon export html
+
+# Publicera en specifik predikan (eller godtycklig MP3-fil) till podcast-flödet
+sermon export podcast P371
+
+# Visa och hantera avsnitt i podcast
+sermon podcast list
+
+# Säkerhetskopiera SQLite-databasen till data/backup/
+sermon backup
+
+# Radera en predikan och flytta dess tillhörande PDF- och MP3-filer till papperskorgen
+sermon delete P371
+```
