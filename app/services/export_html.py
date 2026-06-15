@@ -33,6 +33,14 @@ def export_html():
     for d in data:
         s = load_sermon_as_draft(d['code'])  # Make a SermonDraft object from each sermon. 
 
+        # Replace non-existing values with '–' and joins lists
+        sermon.context = sermon.context or '–'
+        sermon.introduction = sermon.introduction or '–'
+        sermon.message = sermon.message or '–'
+        sermon.report = sermon.report or '–'
+        sermon.notes = sermon.notes or '–'
+        sermon.related_sermons = ', '.join(sermon.related_sermons) or '–'
+
         if len(s.services) == 0:  # Special case: no service, use date from  manuscript instead
             try:
                 date = f"({s.manuscripts[0].date})"
@@ -49,14 +57,6 @@ def export_html():
             for date in all_dates:
                 sermon = SermonDraftWithDate(**asdict(s), date=date, all_dates=all_dates)  # Add date to object by extending it to a new dataclass
                 sermons.append(sermon)
-
-        # Replace non-existing values with '–' and joins lists
-        sermon.context = sermon.context or '–'
-        sermon.introduction = sermon.introduction or '–'
-        sermon.message = sermon.message or '–'
-        sermon.report = sermon.report or '–'
-        sermon.notes = sermon.notes or '–'
-        sermon.related_sermons = ', '.join(sermon.related_sermons) or '–'
 
 
     # Build html page:
