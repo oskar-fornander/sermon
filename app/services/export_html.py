@@ -34,12 +34,12 @@ def export_html():
         s = load_sermon_as_draft(d['code'])  # Make a SermonDraft object from each sermon. 
 
         # Replace non-existing values with '–' and joins lists
-        s.context = sermon.context or '–'
-        s.introduction = sermon.introduction or '–'
-        s.message = sermon.message or '–'
-        s.report = sermon.report or '–'
-        s.notes = sermon.notes or '–'
-        s.related_sermons = ', '.join(sermon.related_sermons) or '–'
+        s.context = s.context or '–'
+        s.introduction = s.introduction or '–'
+        s.message = s.message or '–'
+        s.report = s.report or '–'
+        s.notes = s.notes or '–'
+        s.related_sermons = ', '.join(s.related_sermons) or '–'
 
         if len(s.services) == 0:  # Special case: no service, use date from  manuscript instead
             try:
