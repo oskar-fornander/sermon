@@ -114,6 +114,9 @@ def sermon_exists(code: str, conn = None) -> True|False:
         return True
     except sqlite3.Error as e:
         raise DatabaseError(f"Databasfel: {e}")
+    finally:
+        if new_conn:
+            conn.close()
 
 
 def query_sermons(sort: str = 'code', limit: int = 0, query: [str] = [], bible_only: bool = False, date: str = None, date_from: str = None, date_to: str = None, year: int = None, month: int = None, place: str = None, report: str = None, must_have_recording: bool = False):
