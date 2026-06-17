@@ -26,16 +26,6 @@ APP_PDF, APP_AUDIO, APP_VIDEO, APP_URL = None, None, None, None
 DEFAULT_CONFIG = {
     "user": "",
     "root": str(Path.home() / "predikan" / "archive"),
-    "database": "sermon.db",
-    "paths": {
-        "database": "data",
-        "backup": "data/backup",
-        "manuscripts": "files/manuscripts",
-        "recordings": "files/recordings",
-        "resources": "files/resources",
-        "html": "html",
-        "podcast": "podcast"
-    },
     "cloud": {
         "provider": "",
         "urls": {
@@ -81,15 +71,6 @@ DEFAULT_CONFIG_TEXT = f"""
 # Sermon configuration
 user: Oskar Fornander                         # Namnet på användaren av denna applikation
 root: {root}                                  # Sökväg till predikoarkivet
-database: sermon.db
-paths: 
-  database: data                                
-  backup: data/backup
-  manuscripts: files/manuscripts
-  recordings: files/recordings
-  resources: files/resources
-  html: html
-  podcast: podcast
 cloud:
   provider:                                  # Name of cloud storage service
   urls:
@@ -182,21 +163,24 @@ def define_paths():
             f"Redigera {CONFIG_FILE} och ange korrekt sökväg och/eller skapa mappen."
         )
 
-    PATH_DATABASE = ARCHIVE_ROOT / CONFIG['paths']['database']
-    DB_FILE = PATH_DATABASE / CONFIG['database']
-    PATH_BACKUP = ARCHIVE_ROOT / CONFIG['paths']['backup']
-    PATH_MANUSCRIPTS = ARCHIVE_ROOT / CONFIG['paths']['manuscripts']
-    PATH_RECORDINGS = ARCHIVE_ROOT / CONFIG['paths']['recordings']
-    PATH_RESOURCES = ARCHIVE_ROOT / CONFIG['paths']['resources']
-    PATH_HTML = ARCHIVE_ROOT / CONFIG['paths']['html']
-    PATH_PODCAST = ARCHIVE_ROOT / CONFIG['paths']['podcast']
+    PATH_DATABASE = ARCHIVE_ROOT / 'data'
+    DB_FILE = PATH_DATABASE / 'sermon.db'
+    PATH_BACKUP = PATH_DATABASE / 'backup'
+    PATH_MANUSCRIPTS = ARCHIVE_ROOT / 'files' / 'manuscripts'
+    PATH_RECORDINGS = ARCHIVE_ROOT / 'files' / 'recordings'
+    PATH_RESOURCES = ARCHIVE_ROOT / 'files' / 'resources'
+    PATH_HTML = ARCHIVE_ROOT / 'html'
+    PATH_PODCAST = ARCHIVE_ROOT / 'podcast'
 
-    PATH_DATABASE.mkdir(parents=True, exist_ok=True)  # Make sure these directories exist
+    # Make sure these directories exist
+    PATH_DATABASE.mkdir(parents=True, exist_ok=True)  
     PATH_BACKUP.mkdir(parents=True, exist_ok=True)
     PATH_MANUSCRIPTS.mkdir(parents=True, exist_ok=True)
     PATH_RECORDINGS.mkdir(parents=True, exist_ok=True)
     PATH_RESOURCES.mkdir(parents=True, exist_ok=True)
     PATH_HTML.mkdir(parents=True, exist_ok=True)
+    PATH_PODCAST.mkdir(parents=True, exist_ok=True)
+
 
 def define_cloud():
     """Define paths to cloud where files are saved"""
