@@ -5,7 +5,7 @@ from pathlib import Path
 import yaml
 import sqlite3
 import logging
-from app.presentation.common import console
+from app.presentation.common import console, user_confirmation
 
 
 CONFIG_DIR = Path.home() / ".config" / "sermon"  # This is the absolute path to config.yaml
@@ -158,10 +158,12 @@ def define_paths():
 
     ARCHIVE_ROOT = Path(CONFIG['root']).expanduser().resolve()
     if not ARCHIVE_ROOT.exists():  # If the root directory does not exist: quit and make sure to change in config or create it
-        raise RuntimeError(
-            f"Konfigurerad rotmapp finns inte: {ARCHIVE_ROOT}\n"
-            f"Redigera {CONFIG_FILE} och ange korrekt sökväg och/eller skapa mappen."
-        )
+        if user_confirmation(f"Konfigurerad rotmapp för predikoarkivet finns inte: {ARCHIVE_ROOT}. Ska den skapas?", default=False):
+            ARCHIVE_ROOT.mkdir(parents=True, exist_ok=True)
+            console.print(f"Mappen har skapats.")
+        else:
+            console.print(f"Ange korrekt sökväg till rotmapp för predikoarkivet i konfigurationsfilen: {CONFIG_FILE}")
+            sys.exit(1)
 
     PATH_DATABASE = ARCHIVE_ROOT / 'data'
     DB_FILE = PATH_DATABASE / 'sermon.db'
