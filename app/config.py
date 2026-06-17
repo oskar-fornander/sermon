@@ -71,19 +71,19 @@ DEFAULT_CONFIG = {
         "title": "",
         "description": "",
         "author": "",
-        "min_episodes": "3",
-        "max_days": "60"
+        "min_episodes": 3,
+        "max_days": 60
     }
 }
 root = str(Path.home() / "predikan" / "archive")
 
 DEFAULT_CONFIG_TEXT = f"""
 # Sermon configuration
-user: Oskar Fornander                         # The user of this application
-root: {root}
+user: Oskar Fornander                         # Namnet på användaren av denna applikation
+root: {root}                                  # Sökväg till predikoarkivet
 database: sermon.db
 paths: 
-  database: data
+  database: data                                
   backup: data/backup
   manuscripts: files/manuscripts
   recordings: files/recordings
@@ -157,7 +157,7 @@ def ensure_config_exists():
             yaml.safe_dump(DEFAULT_CONFIG, f, sort_keys=False)
         #CONFIG_FILE.write_text(DEFAULT_CONFIG_TEXT, encoding="utf-8")
 
-        console.print(f"Ny konfigurationsfil skapad: {CONFIG_FILE} \nRedigera den för att ange korrekt sökväg till predikoarkivet. \nProgrammet avslutas.")
+        console.print(f"Ny konfigurationsfil skapad: {CONFIG_FILE} \nRedigera den för att ange korrekt sökväg till predikoarkivet och övriga inställningar. \nProgrammet avslutas.")
         sys.exit(1)  # Quit
 
 
@@ -248,8 +248,8 @@ def define_podcast():
         load_config()
     podcast_config = CONFIG.get('podcast', {})
 
-    PODCAST_REMOTE_DIR = podcast_config.get('remote_dir').rstrip('/')
-    PODCAST_FEED = podcast_config.get('feed_file').rstrip('/')
+    PODCAST_REMOTE_DIR = podcast_config.get('remote_dir', '').rstrip('/')
+    PODCAST_FEED = podcast_config.get('feed_file', '').rstrip('/')
     PODCAST_AUDIO = f"{PODCAST_REMOTE_DIR}/{podcast_config.get('audio_path').rstrip('/')}"
     PODCAST_COVER = f"{PODCAST_REMOTE_DIR}/{podcast_config.get('cover_image')}"
 
