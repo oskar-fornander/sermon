@@ -2,12 +2,12 @@
 
 import sys
 import traceback
-from app.errors import SermonError
-from app.config import CONFIG, DB_FILE, USER, get_user
-from app.config import init_environment
-from app.presentation.common import render_info_panel, clear_screen
 import typer
 from typer.core import TyperGroup
+from app.config import init_environment, CONFIG, DB_FILE, get_user
+from app.errors import SermonError
+from app.presentation.common import render_info_panel, clear_screen
+
 
 COMMAND_ORDER = [
     'list', 'search', 'show',               # Group 0
@@ -23,7 +23,6 @@ class OrderedGroup(TyperGroup):
         return sorted(all_commands, key=lambda x: COMMAND_ORDER.index(x) if x in COMMAND_ORDER else 999)
 
 
-init_environment()
 
 from app.commands import list as list_commands
 from app.commands import export as export_commands
@@ -40,7 +39,7 @@ from app.commands.backup import backup
 
 app = typer.Typer(
         cls=OrderedGroup, 
-        help = f"Predikoarkiv: {get_user()}    [© Oskar Fornander 2026]",
+        help=f"Predikoarkiv: {get_user()}    [© Oskar Fornander 2026]",
         no_args_is_help=True,
         add_completion=False
 )
@@ -68,6 +67,7 @@ app.add_typer(files_commands.app, name='files', rich_help_panel=command_groups[2
 def run():
     try:
         clear_screen()
+        init_environment()
         app()
     except SermonError as e:
         render_info_panel(title='[error]Fel[/error]', content=f"{e}")
@@ -75,7 +75,7 @@ def run():
     except Exception as e:
         msg = f"Ett oväntat fel inträffade: {e}\n"
         render_info_panel(title='[error]Fel[/error]', content=msg)
-        traceback.print_exc()  # file and row number
+        #traceback.print_exc()  # file and row number
         sys.exit(1)
 
 

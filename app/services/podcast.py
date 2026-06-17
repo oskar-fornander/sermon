@@ -12,13 +12,12 @@ from rich.table import Table
 from rich import box
 from app.errors import NotFoundError, FileError
 from app.utils import open_editor, LiteralString, parse_sermon_code, PATTERN, rss_date, iso_date_from_rss_date, rss_date_days_old
-from app.config import USER, WEB_URL, PATH_RECORDINGS, PATH_PODCAST, PODCAST_REMOTE_DIR, PODCAST_FEED, PODCAST_AUDIO, PODCAST_COVER, PODCAST_TITLE, PODCAST_DESCRIPTION, PODCAST_AUTHOR, PODCAST_MIN_EPISODES, PODCAST_MAX_DAYS
+from app.config import USER, WEB_URL, PATH_RECORDINGS, PATH_PODCAST, PODCAST_REMOTE_DIR, PODCAST_FEED, LOCAL_PODCAST_FEED, PODCAST_AUDIO, PODCAST_COVER, PODCAST_TITLE, PODCAST_DESCRIPTION, PODCAST_AUTHOR, PODCAST_MIN_EPISODES, PODCAST_MAX_DAYS
 from app.services.sermon_draft import load_sermon_as_draft
 from app.services.upload import upload_file, delete_file
 from app.presentation.common import console, user_input, clear_screen, user_confirmation, user_choice
 
 
-LOCAL_FEED = PATH_PODCAST / PODCAST_FEED  # Local path to feed.xml
 
 
 # Special data class for a podcast episode
@@ -64,7 +63,7 @@ class Episode:
         self.pub_date = rss_date(data['pub_date'])
 
 
-def load_episodes_from_xml(feed_file: Path = LOCAL_FEED) -> list[Episode]:
+def load_episodes_from_xml(feed_file: Path = LOCAL_PODCAST_FEED) -> list[Episode]:
     tree = ET.parse(feed_file)
     root = tree.getroot()
 
@@ -78,7 +77,7 @@ def load_episodes_from_xml(feed_file: Path = LOCAL_FEED) -> list[Episode]:
 
 def backup_feed():
     """Make a backup of feed.xml"""
-    feed = Path(LOCAL_FEED)
+    feed = Path(LOCAL_PODCAST_FEED)
     backup = feed.with_name(f"feed-backup.xml")
     shutil.copy2(feed, backup)
 
@@ -169,7 +168,7 @@ def publish_episode(data: str):
 
     # 4. Upload feed.xml
     console.print(f"Laddar upp {PODCAST_FEED} ...")
-    upload_file(LOCAL_FEED, PODCAST_REMOTE_DIR, PODCAST_FEED)
+    upload_file(LOCAL_PODCAST_FEED, PODCAST_REMOTE_DIR, PODCAST_FEED)
 
     # 5. Prune podcast
     prune_podcast() # Remove episodes older than PODCAST_MAX_DAYS if more than PODCAST_MIN_EPISODES episodes
@@ -196,7 +195,7 @@ def prune_podcast():
     render_podcast_feed(episodes)  # Render feed.xml and save locally
 
     #upload feed.xml
-    upload_file(LOCAL_FEED, PODCAST_REMOTE_DIR, PODCAST_FEED)
+    upload_file(LOCAL_PODCAST_FEED, PODCAST_REMOTE_DIR, PODCAST_FEED)
     console.print(f"Podcastens flöde är uppdaterat: [link={WEB_URL}/{PODCAST_REMOTE_DIR}/{PODCAST_FEED}][link_style]{WEB_URL}/{PODCAST_REMOTE_DIR}/{PODCAST_FEED}[/link_style][/link]")
 
     #remove mp3 from server
@@ -227,7 +226,7 @@ def remove_episode():
 
     # Upload feed.xml
     console.print(f"Laddar upp {PODCAST_FEED} ...")
-    upload_file(LOCAL_FEED, PODCAST_REMOTE_DIR, PODCAST_FEED)
+    upload_file(LOCAL_PODCAST_FEED, PODCAST_REMOTE_DIR, PODCAST_FEED)
 
     # Prune podcast
     prune_podcast() # Remove episodes older than PODCAST_MAX_DAYS if more than PODCAST_MIN_EPISODES episodes
@@ -259,7 +258,7 @@ def edit_episode():
 
     # Upload feed.xml
     console.print(f"Avsnittet är uppdaterat. Laddar upp {PODCAST_FEED} ...")
-    upload_file(LOCAL_FEED, PODCAST_REMOTE_DIR, PODCAST_FEED)
+    upload_file(LOCAL_PODCAST_FEED, PODCAST_REMOTE_DIR, PODCAST_FEED)
 
     # Prune podcast
     prune_podcast() # Remove episodes older than PODCAST_MAX_DAYS if more than PODCAST_MIN_EPISODES episodes

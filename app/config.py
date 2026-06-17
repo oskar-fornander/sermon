@@ -18,7 +18,7 @@ PATH_BACKUP, PATH_MANUSCRIPTS, PATH_RECORDINGS, PATH_RESOURCES, PATH_HTML, PATH_
 CLOUD_PROVIDER, CLOUD_MANUSCRIPTS, CLOUD_RECORDINGS, CLOUD_RESOURCES = None, None, None, None 
 SFTP_HOST, SFTP_PORT, SFTP_USER, SFTP_KEY  = None, None, None, None
 WEB_URL, WEB_ROOT, HTML_REMOTE_DIR = None, None, None
-PODCAST_REMOTE_DIR, PODCAST_FEED, PODCAST_AUDIO, PODCAST_COVER, PODCAST_TITLE, PODCAST_DESCRIPTION, PODCAST_AUTHOR, PODCAST_MIN_EPISODES, PODCAST_MAX_DAYS = None, None, None, None, None, None, None, None, None
+PODCAST_REMOTE_DIR, PODCAST_FEED, LOCAL_PODCAST_FEED, PODCAST_AUDIO, PODCAST_COVER, PODCAST_TITLE, PODCAST_DESCRIPTION, PODCAST_AUTHOR, PODCAST_MIN_EPISODES, PODCAST_MAX_DAYS = None, None, None, None, None, None, None, None, None, None
 
 APP_PDF, APP_AUDIO, APP_VIDEO, APP_URL = None, None, None, None
 
@@ -103,8 +103,9 @@ podcast:
 logging.getLogger('pypdf').setLevel(logging.ERROR)  # Hide non critical error messages
 
 def get_user():
-    init_environment()
-    return USER
+    load_config()
+    user = CONFIG.get('user') or ''
+    return user
 
 def init_environment():
     """Initialize the environment"""
@@ -190,9 +191,9 @@ def define_cloud():
     app_cloud = CONFIG.get('cloud', {})
     CLOUD_PROVIDER = app_cloud.get('provider', {})
     urls = app_cloud.get('urls', {})
-    CLOUD_MANUSCRIPTS = urls.get('manuscripts', '')
-    CLOUD_RECORDINGS = urls.get('recordings', '')
-    CLOUD_RESOURCES = urls.get('resources', '')
+    CLOUD_MANUSCRIPTS = urls.get('manuscripts') or ''
+    CLOUD_RECORDINGS = urls.get('recordings') or ''
+    CLOUD_RESOURCES = urls.get('resources') or ''
 
 
 def define_apps():
@@ -217,26 +218,31 @@ def define_sftp():
     SFTP_USER = sftp_config.get('username') or None
     SFTP_KEY = sftp_config.get('key_file') or None
 
-    WEB_URL = CONFIG.get('web', {}).get('url', '').rstrip('/')
-    WEB_ROOT = sftp_config.get('root', '').rstrip('/')
-    HTML_REMOTE_DIR = CONFIG.get('html', {}).get('remote_dir', '').rstrip('/')
+    WEB_URL = CONFIG.get('web', {}).get('url') or ''
+    WEB_URL = WEB_URL.rstrip('/')
+    WEB_ROOT = sftp_config.get('root') or ''
+    WEB_ROOT = WEB_ROOT.rstrip('/')
+    HTML_REMOTE_DIR = CONFIG.get('html', {}).get('remote_dir') or ''
+    HTML_REMOTE_DIR = HTML_REMOTE_DIR.rstrip('/')
 
 
 def define_podcast():
     """Define paths and settings for podcast"""
-    global PODCAST_REMOTE_DIR, PODCAST_FEED, PODCAST_AUDIO, PODCAST_COVER, PODCAST_TITLE, PODCAST_DESCRIPTION, PODCAST_AUTHOR, PODCAST_MIN_EPISODES, PODCAST_MAX_DAYS
+    global PODCAST_REMOTE_DIR, PODCAST_FEED, PODCAST_AUDIO, PODCAST_COVER, PODCAST_TITLE, PODCAST_DESCRIPTION, PODCAST_AUTHOR, PODCAST_MIN_EPISODES, PODCAST_MAX_DAYS, LOCAL_PODCAST_FEED
     if not CONFIG:
         load_config()
     podcast_config = CONFIG.get('podcast', {})
 
-    PODCAST_REMOTE_DIR = podcast_config.get('remote_dir', '').rstrip('/')
+    PODCAST_REMOTE_DIR = podcast_config.get('remote_dir') or ''
+    PODCAST_REMOTE_DIR = PODCAST_REMOTE_DIR.rstrip('/')
     PODCAST_FEED = 'feed.xml'
+    LOCAL_PODCAST_FEED = PATH_PODCAST / PODCAST_FEED  # Local path to feed.xml
     PODCAST_AUDIO = f"{PODCAST_REMOTE_DIR}/audio"
-    PODCAST_COVER = f"{PODCAST_REMOTE_DIR}/{podcast_config.get('cover_image', '')}"
+    PODCAST_COVER = f"{PODCAST_REMOTE_DIR}/{podcast_config.get('cover_image') or ''}"
 
-    PODCAST_TITLE = podcast_config.get('title', '')
-    PODCAST_DESCRIPTION = podcast_config.get('description', '')
-    PODCAST_AUTHOR = podcast_config.get('author', '')
+    PODCAST_TITLE = podcast_config.get('title') or ''
+    PODCAST_DESCRIPTION = podcast_config.get('description') or ''
+    PODCAST_AUTHOR = podcast_config.get('author') or ''
 
     PODCAST_MIN_EPISODES = int(podcast_config.get('min_episodes', '0'))
     PODCAST_MAX_DAYS = int(podcast_config.get('max_days', '365'))
