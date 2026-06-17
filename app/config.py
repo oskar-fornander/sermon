@@ -19,8 +19,9 @@ CLOUD_PROVIDER, CLOUD_MANUSCRIPTS, CLOUD_RECORDINGS, CLOUD_RESOURCES = None, Non
 SFTP_HOST, SFTP_PORT, SFTP_USER, SFTP_KEY  = None, None, None, None
 WEB_URL, WEB_ROOT, HTML_REMOTE_DIR = None, None, None
 PODCAST_REMOTE_DIR, PODCAST_FEED, LOCAL_PODCAST_FEED, PODCAST_AUDIO, PODCAST_COVER, PODCAST_TITLE, PODCAST_DESCRIPTION, PODCAST_AUTHOR, PODCAST_MIN_EPISODES, PODCAST_MAX_DAYS = None, None, None, None, None, None, None, None, None, None
-
 APP_PDF, APP_AUDIO, APP_VIDEO, APP_URL = None, None, None, None
+
+HAS_CLOUD, HAS_SFTP, HAS_HTML, HAS_PODCAST = None, None, None, None  # Feature flags
 
 
 DEFAULT_CONFIG = {
@@ -109,16 +110,23 @@ def get_user():
 
 def init_environment():
     """Initialize the environment"""
-    global USER
+    global USER, HAS_CLOUD, HAS_SFTP, HAS_HTML, HAS_PODCAST
     load_config()  # Load config.yaml
+    if not CONFIG:
+        raise RuntimeError(f"Fel vid inläsning av konfigurationsfilen {CONFIG_FILE}")
+        sys.exit(1)
 
     try:
         USER = CONFIG.get('user') or ''
         define_paths()  # Define paths for all files and folders
         define_cloud()  # Define paths for cloud service (used in exported html file)
+        HAS_CLOUD = CLOUD_PROVIDER and CLOUD_MANUSCRIPTS and CLOUD_RECORDINGS and CLOUD_RESOURCES  # Set feature flag for cloud service
         define_apps()  # Define default apps
         define_sftp()  # Define settings for sftp connection
+        HAS_SFTP = SFTP_HOST and SFTP_PORT and SFTP_USER and SFTP_KEY and WEB_URL
+        HAS_HTML = HTML_REMOTE_DIR != ''
         define_podcast()  # Define settings and paths for podcast
+        HAS_PODCAST = PODCAST_REMOTE_DIR and PODCAST_TITLE
     except Exception as error:
         raise RuntimeError(f"Ett fel uppstod i uppstarten: {error}")
         sys.exit(1)
