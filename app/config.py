@@ -40,23 +40,21 @@ DEFAULT_CONFIG = {
         "video": "QuickTime Player",
         "browser": "Safari"
     },
+    "web": {
+        "url": ""
+    },
     "sftp": {
+        "root": "",
         "host": "",
         "port": "",
         "username": "",
         "key_file": ""
-    },
-    "web": {
-        "site_url": "",
-        "site_root": ""
     },
     "html": {
         "remote_dir": ""
     },
     "podcast": {
         "remote_dir": "",
-        "feed_path": "",
-        "audio_path": "",
         "cover_image": "",
         "title": "",
         "description": "",
@@ -82,20 +80,18 @@ apps:                                       # Default apps used to open differen
   audio: QuickTime Player
   video: QuickTime Player
   browser: Safari
+web:
+  url: 
 sftp:
+  root: 
   host: 
   port: 
   username: 
   key_file: 
-web:
-  site_url: 
-  site_root: 
 html:
   remote_dir: 
 podcast:
   remote_dir: 
-  feed_path: "
-  audio_path: 
   cover_image:
   title: 
   description: 
@@ -192,11 +188,11 @@ def define_cloud():
         load_config()
 
     app_cloud = CONFIG.get('cloud', {})
-    CLOUD_PROVIDER = app_cloud.get('provider')
+    CLOUD_PROVIDER = app_cloud.get('provider', {})
     urls = app_cloud.get('urls', {})
-    CLOUD_MANUSCRIPTS = urls.get('manuscripts')
-    CLOUD_RECORDINGS = urls.get('recordings')
-    CLOUD_RESOURCES = urls.get('resources')
+    CLOUD_MANUSCRIPTS = urls.get('manuscripts', '')
+    CLOUD_RECORDINGS = urls.get('recordings', '')
+    CLOUD_RESOURCES = urls.get('resources', '')
 
 
 def define_apps():
@@ -216,15 +212,14 @@ def define_sftp():
     if not CONFIG:
         load_config()
     sftp_config = CONFIG.get('sftp', {})
-    SFTP_HOST = sftp_config.get('host')
+    SFTP_HOST = sftp_config.get('host') or None
     SFTP_PORT = str(sftp_config.get('port', 22))
-    SFTP_USER = sftp_config.get('username')
-    SFTP_KEY = sftp_config.get('key_file')
+    SFTP_USER = sftp_config.get('username') or None
+    SFTP_KEY = sftp_config.get('key_file') or None
 
-    web_config = CONFIG.get('web', {})
-    WEB_URL = web_config.get('site_url').rstrip('/')
-    WEB_ROOT = web_config.get('site_root').rstrip('/')
-    HTML_REMOTE_DIR = CONFIG.get('html', {}).get('remote_dir').rstrip('/')
+    WEB_URL = CONFIG.get('web', {}).get('url', '').rstrip('/')
+    WEB_ROOT = sftp_config.get('root', '').rstrip('/')
+    HTML_REMOTE_DIR = CONFIG.get('html', {}).get('remote_dir', '').rstrip('/')
 
 
 def define_podcast():
@@ -235,16 +230,16 @@ def define_podcast():
     podcast_config = CONFIG.get('podcast', {})
 
     PODCAST_REMOTE_DIR = podcast_config.get('remote_dir', '').rstrip('/')
-    PODCAST_FEED = podcast_config.get('feed_file', '').rstrip('/')
-    PODCAST_AUDIO = f"{PODCAST_REMOTE_DIR}/{podcast_config.get('audio_path').rstrip('/')}"
-    PODCAST_COVER = f"{PODCAST_REMOTE_DIR}/{podcast_config.get('cover_image')}"
+    PODCAST_FEED = 'feed.xml'
+    PODCAST_AUDIO = f"{PODCAST_REMOTE_DIR}/audio"
+    PODCAST_COVER = f"{PODCAST_REMOTE_DIR}/{podcast_config.get('cover_image', '')}"
 
-    PODCAST_TITLE = podcast_config.get('title')
-    PODCAST_DESCRIPTION = podcast_config.get('description')
-    PODCAST_AUTHOR = podcast_config.get('author')
+    PODCAST_TITLE = podcast_config.get('title', '')
+    PODCAST_DESCRIPTION = podcast_config.get('description', '')
+    PODCAST_AUTHOR = podcast_config.get('author', '')
 
-    PODCAST_MIN_EPISODES = int(podcast_config.get('min_episodes'))
-    PODCAST_MAX_DAYS = int(podcast_config.get('max_days'))
+    PODCAST_MIN_EPISODES = int(podcast_config.get('min_episodes', '0'))
+    PODCAST_MAX_DAYS = int(podcast_config.get('max_days', '365'))
 
 
 def ensure_database():
@@ -264,7 +259,5 @@ def create_schema(conn):
         schema_sql = f.read()
     conn.executescript(schema_sql)
     conn.commit()
-
-
 
 
