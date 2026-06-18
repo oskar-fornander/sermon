@@ -23,7 +23,6 @@ class OrderedGroup(TyperGroup):
         return sorted(all_commands, key=lambda x: COMMAND_ORDER.index(x) if x in COMMAND_ORDER else 999)
 
 
-
 from app.commands import list as list_commands
 from app.commands import export as export_commands
 from app.commands import podcast as podcast_commands
@@ -66,8 +65,6 @@ app.add_typer(files_commands.app, name='files', rich_help_panel=command_groups[2
 
 def run():
     try:
-        clear_screen()
-        init_environment()
         app()
     except SermonError as e:
         render_info_panel(title='[error]Fel[/error]', content=f"{e}")

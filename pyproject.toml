@@ -19,4 +19,4 @@ dependencies = [
 ]
 
 [project.scripts]
-sermon = "app.cli:run"
+sermon = "app.main:main"
