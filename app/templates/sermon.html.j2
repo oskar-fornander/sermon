@@ -60,7 +60,9 @@
                                 <br/>&nbsp;&nbsp;&nbsp;&nbsp;<span class="date">{{ x.date }}</span> <span class="file-name"><a href="../files/manuscripts/{{x.file_name}}" target="_blank">{{ x.file_name }}</a></span> <span class="notes">{{ x.notes or '' }}</span>
                                 {% else %}
                                 <br/>&nbsp;&nbsp;&nbsp;&nbsp;<span class="date">{{ x.date }}</span> <span class="file-name">{{ x.file_name }}</span> <span class="notes">{{ x.notes or '' }}</span>
+                                {% if has_cloud %}
                                 &#x2197;<a href="{{ cloud.manuscripts }}" target="_blank">Öppna i {{ cloud.provider }}</a>
+                                {% endif %}
                                 {% endif %}
                                 {% endfor %}
                             </div>
@@ -71,7 +73,9 @@
                                 <br/>&nbsp;&nbsp;&nbsp;&nbsp;<span class="title"><a href="../files/resources/{{ x.file_name }}" target="_blank">{{ x.title }}</a></span>  <span class="notes">{{ x.notes or '' }}</span>
                                 {% else %}
                                 <br/>&nbsp;&nbsp;&nbsp;&nbsp;<span class="title">{{ x.title }}</span>  <span class="notes">{{ x.notes or '' }}</span>
+                                {% if has_cloud %}
                                 &#x2197;<a href="{{ cloud.resources }}" target="_blank">Öppna i {{ cloud.provider }}</a>
+                                {% endif %}
                                 {% endif %}
                                 {% endfor %}
                             </div>
@@ -89,7 +93,9 @@
                                     <br/>&nbsp;&nbsp;&nbsp;&nbsp;<span class="date">{{ x.date }}</span> <span class="file-name"><a href="../files/recordings/{{ x.file_name }}" target="_blank">{{ x.file_name }}</a></span>  <span class="type">({{ x.type }})</span> <span class="notes">{{ x.notes or '' }}</span>
                                     {% else %}
                                     <br/>&nbsp;&nbsp;&nbsp;&nbsp;<span class="date">{{ x.date }}</span> <span class="file-name">{{ x.file_name }}</span>  <span class="type">({{ x.type }})</span> <span class="notes">{{ x.notes or '' }}</span>
+                                    {% if has_cloud %}
                                     &#x2197;<a href="{{ cloud.recordings }}" target="_blank">Öppna i {{ cloud.provider }}</a>
+                                    {% endif %}
                                     {% endif %}
                                 {% elif x.external_url %}
                                     <br/>&nbsp;&nbsp;&nbsp;&nbsp;<span class="date">{{ x.date }}</span> <span class="file-name"><a href="{{ x.external_url }}" target="_blank">{{ x.external_url }}</a></span>  <span class="type">({{ x.type }})</span> <span class="notes">{{ x.notes or '' }}</span>

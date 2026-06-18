@@ -1,12 +1,16 @@
 import subprocess
 import socket
 from pathlib import Path
-from app.config import SFTP_HOST, SFTP_PORT, SFTP_USER, SFTP_KEY, WEB_ROOT, WEB_URL
+from app.config import SFTP_HOST, SFTP_PORT, SFTP_USER, SFTP_KEY, WEB_ROOT, WEB_URL, HAS_SFTP, CONFIG_FILE
 from app.errors import ValidationError
 
 
 def upload_file(local_path, remote_path, remote_name=''):
     """Upload file with sftp"""
+    if not HAS_SFTP:
+        console.print(f"SFTP är inte konfigurerat.\nÄndra konfiguration i {CONFIG_FILE}.")
+        return None
+
     if remote_name:
         remote_path += '/' + remote_name
 
@@ -35,6 +39,10 @@ def upload_file(local_path, remote_path, remote_name=''):
 
 def delete_file(remote_path):
     """Delete file on remote server via ssh"""
+    if not HAS_SFTP:
+        console.print(f"SFTP är inte konfigurerat.\nÄndra konfiguration i {CONFIG_FILE}.")
+        return None
+
     if not SFTP_HOST:
         raise ValidationError("SFTP ej konfigurerat")
 

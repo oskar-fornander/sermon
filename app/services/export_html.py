@@ -4,7 +4,7 @@ from dataclasses import dataclass, asdict
 from typing import List
 from jinja2 import Environment, FileSystemLoader
 from app.db import query_sermons
-from app.config import PATH_HTML, USER, CLOUD_PROVIDER, CLOUD_MANUSCRIPTS, CLOUD_RECORDINGS, CLOUD_RESOURCES, HTML_REMOTE_DIR
+from app.config import PATH_HTML, USER, CLOUD_PROVIDER, CLOUD_MANUSCRIPTS, CLOUD_RECORDINGS, CLOUD_RESOURCES, HTML_REMOTE_DIR, HAS_SFTP, HAS_HTML, HAS_CLOUD, CONFIG_FILE
 from app.services.sermon_draft import load_sermon_as_draft, SermonDraft
 from app.presentation.common import console
 from app.services.upload import upload_file
@@ -69,7 +69,8 @@ def export_html():
         sermons=sermons,
         user=USER,
         mode='local',
-        cloud=cloud
+        cloud=cloud,
+        has_cloud=HAS_CLOUD
     )
 
     file_local = PATH_HTML / 'sermon.local.html'
@@ -84,7 +85,8 @@ def export_html():
         sermons=sermons,
         user=USER,
         mode='webb',
-        cloud=cloud
+        cloud=cloud,
+        has_cloud=HAS_CLOUD
     )
 
     file_web = PATH_HTML / 'sermon.web.html'
@@ -93,6 +95,12 @@ def export_html():
 
     # Upload file with sftp
     try:
+        if not HAS_SFTP:
+            console.print(f"SFTP är inte konfigurerat. HTML har endast sparats lokalt.\nÄndra konfiguration i {CONFIG_FILE}.")
+            return
+        if not HAS_HTML:
+            console.print(f"Fjärrmapp (HTML - REMOTE_DIR) är inte konfigurerat. HTML har endast sparats lokalt.\nÄndra konfiguration i {CONFIG_FILE}.")
+            return
         remote_path = upload_file(file_web, HTML_REMOTE_DIR, 'index.html')
         console.print(f"Uppladdad till: [link={remote_path}][link_style]{remote_path}[/link_style][/link]")
     except Exception as e:

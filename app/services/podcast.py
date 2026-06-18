@@ -10,14 +10,20 @@ from xml.etree import ElementTree as ET
 from jinja2 import Environment, FileSystemLoader
 from rich.table import Table
 from rich import box
-from app.errors import NotFoundError, FileError
+from app.errors import NotFoundError, FileError, ValidationError
 from app.utils import open_editor, LiteralString, parse_sermon_code, PATTERN, rss_date, iso_date_from_rss_date, rss_date_days_old
-from app.config import USER, WEB_URL, PATH_RECORDINGS, PATH_PODCAST, PODCAST_REMOTE_DIR, PODCAST_FEED, LOCAL_PODCAST_FEED, PODCAST_AUDIO, PODCAST_COVER, PODCAST_TITLE, PODCAST_DESCRIPTION, PODCAST_AUTHOR, PODCAST_MIN_EPISODES, PODCAST_MAX_DAYS
+from app.config import USER, WEB_URL, PATH_RECORDINGS, PATH_PODCAST, PODCAST_REMOTE_DIR, PODCAST_FEED, LOCAL_PODCAST_FEED, PODCAST_AUDIO, PODCAST_COVER, PODCAST_TITLE, PODCAST_DESCRIPTION, PODCAST_AUTHOR, PODCAST_MIN_EPISODES, PODCAST_MAX_DAYS, HAS_SFTP, HAS_PODCAST, CONFIG_FILE
 from app.services.sermon_draft import load_sermon_as_draft
 from app.services.upload import upload_file, delete_file
 from app.presentation.common import console, user_input, clear_screen, user_confirmation, user_choice
 
 
+def has_podcast():
+    """Make sure PODCAST and SFTP are configured before continuing."""
+    if not HAS_SFTP:
+        raise ValidationError(f"SFTP är inte konfigurerat.\nÄndra konfiguration i {CONFIG_FILE}.")
+    if not HAS_PODCAST:
+        raise ValidationError(f"Uppgifter för podcast är inte konfigurerat.\nÄndra konfiguration i {CONFIG_FILE}.")
 
 
 # Special data class for a podcast episode
@@ -110,6 +116,7 @@ def list_episodes():
 
 def publish_episode(data: str):
     """Publish an episode to the podcast."""
+    has_podcast()
 
     # 1. Prepare episode object to publish
     # 2. update local feed.xml
@@ -179,6 +186,7 @@ def publish_episode(data: str):
 
 def prune_podcast():
     """Remove episodes older than PODCAST_MAX_DAYS if more than PODCAST_MIN_EPISODES episodes"""
+    has_podcast()
     console.print('Raderar gamla avsnitt i podcast ...')
     to_remove = []
     episodes = load_episodes_from_xml()  # Load all episodes from local feed.xml
@@ -206,6 +214,7 @@ def prune_podcast():
 
 def remove_episode():
     """Remove an episode"""
+    has_podcast()
     episodes = list_episodes()
 
     choice = user_choice(title='Avsnitt att radera', options = [str(x + 1) for x in range(len(episodes))] + ['q'], default = None)
@@ -236,6 +245,7 @@ def remove_episode():
 
 def edit_episode():
     """Edit data for an episode"""
+    has_podcast()
     episodes = list_episodes()
     choice = user_choice(title='Avsnitt att redigera', options = [str(x + 1) for x in range(len(episodes))] + ['q'], default = None)
     if choice == 'q':
