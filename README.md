@@ -16,11 +16,62 @@ Sermon är ett terminalbaserat verktyg (CLI) skrivet i Python för att organiser
 
 ---
 
-## Installation & Setup
+## Installation
 
-Sermon kräver Python 3.12 eller senare.
+Sermon kräver **Python 3.12 eller senare** installerat på datorn.
 
-### Alternativ 1: Installation med `uv` (rekommenderas)
+### Alternativ 1: `pipx`
+
+Det enklaste och säkraste sättet att installera Sermon är med **pipx**. Det installerar programmet i en isolerad miljö på
+din dator och gör kommandot `sermon` tillgängligt globalt i din terminal.
+
+#### Steg 1: Installera pipx
+Om du inte redan har `pipx` installerat på din dator, gör så här:
+* **macOS (via Homebrew):**
+```bash
+brew install pipx
+pipx ensurepath
+```
+
+* Linux (Ubuntu/Debian):
+```bash
+sudo apt update
+sudo apt install pipx
+pipx ensurepath
+```
+
+* Windows (via PowerShell):
+```bash
+python -m pip install --user pipx
+python -m pipx ensurepath
+```
+
+(Starta om din terminal efter att du kört  ensurepath  för att ändringarna ska träda i kraft).
+
+#### Steg 2: Installera Sermon direkt från GitHub
+
+Du behöver inte ladda ner källkodsfilerna manuellt. Kör bara följande kommando i terminalen:
+
+`pipx install git+https://github.com/oskar-fornander/sermon.git`
+
+Nu är Sermon installerat! Du kan köra programmet från valfri mapp i terminalen genom att skriva:
+
+`sermon --help`
+
+#### Hur fungerar det under huven? (Bra att veta)
+
+* Var sparas programfilerna? Källkoden laddas ner av  pipx  och sparas i en dold, skyddad katalog i din hemkatalog ( ~/.local/share/pipx/  på macOS/Linux eller  %USERPROFILE%\.local\pipx\  på Windows). Du behöver aldrig röra dessa filer manuellt.
+
+* Var sparas mina inställningar? Första gången du kör programmet skapas inställningsfilen  config.yaml  automatiskt i mappen  ~/.config/sermon/  (macOS/Linux) eller  %USERPROFILE%\.config\sermon\  (Windows).
+
+* Var sparas mitt predikoarkiv? Dina predikofiler (PDF, MP3, databas etc.) sparas i den mapp du ställer in i  config.yaml  under nyckeln  archive_path (standard är  ~/predikan/archive ).
+
+* För att **uppdatera** programmet till en ny version, kör `pipx upgrade sermon`
+
+* För att **avinstallera** programmet, kör `pipx uninstall sermon`
+
+
+### Alternativ 2: Installation med `uv`
 Om du använder pakethanteraren `uv` kan du synka och installera verktyget i redigerbart läge (editable) globalt:
 
 ```bash
@@ -35,7 +86,7 @@ Du kan sedan köra appen direkt med kommandot `sermon`. Om du vill köra koden u
 uv run sermon [kommando]
 ```
 
-### Alternativ 2: Installation med standard `venv` och `pip`
+### Alternativ 3: Installation med standard `venv` och `pip`
 ```bash
 # Skapa virtuell miljö
 python -m venv .venv
@@ -46,25 +97,6 @@ source .venv/bin/activate
 # Installera projektet i redigerbart läge
 pip install -e .
 ```
-
-### Alternativ 3: Installera som ett fristående program (rekommenderas för användare)
-Om du bara vill använda verktyget utan att utveckla det, rekommenderas `pipx`. Det installerar Sermon i en isolerad miljö
-men gör kommandot tillgängligt globalt i ditt system:
-
-1. **Installera pipx** (om du inte redan har det):
-   * **macOS:** `brew install pipx`
-   * **Linux (Ubuntu/Debian):** `sudo apt install pipx`
-   * **Windows:** `scoop install pipx` eller `pip install pipx`
-   * Kör sedan `pipx ensurepath` för att uppdatera din terminal-sökväg.
-
-2. **Installera Sermon:**
-   Ställ dig i projektmappen och kör:
-   ```bash
-   pipx install .
-
-Nu kan du köra applikationen var som helst ifrån genom att bara skriva  sermon  i din terminal!
-
----
 
 ## Konfiguration
 
