@@ -37,10 +37,10 @@ DEFAULT_CONFIG = {
         }
     },
     "apps": {
-        "pdf": "Preview",
-        "audio": "QuickTime Player",
-        "video": "QuickTime Player",
-        "browser": "Safari"
+        "pdf": "",
+        "audio": "",
+        "video": "",
+        "browser": ""
     },
     "web": {
         "url": ""

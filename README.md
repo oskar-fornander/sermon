@@ -47,6 +47,23 @@ source .venv/bin/activate
 pip install -e .
 ```
 
+### Alternativ 3: Installera som ett fristående program (rekommenderas för användare)
+Om du bara vill använda verktyget utan att utveckla det, rekommenderas `pipx`. Det installerar Sermon i en isolerad miljö
+men gör kommandot tillgängligt globalt i ditt system:
+
+1. **Installera pipx** (om du inte redan har det):
+   * **macOS:** `brew install pipx`
+   * **Linux (Ubuntu/Debian):** `sudo apt install pipx`
+   * **Windows:** `scoop install pipx` eller `pip install pipx`
+   * Kör sedan `pipx ensurepath` för att uppdatera din terminal-sökväg.
+
+2. **Installera Sermon:**
+   Ställ dig i projektmappen och kör:
+   ```bash
+   pipx install .
+
+Nu kan du köra applikationen var som helst ifrån genom att bara skriva  sermon  i din terminal!
+
 ---
 
 ## Konfiguration
@@ -56,40 +73,41 @@ Första gången du kör appen skapas en standardkonfiguration i:
 
 Öppna den filen för att konfigurera sökvägar till ditt predikoarkiv samt SFTP-uppgifter.
 
-### Exempel på `config.yaml`
-```yaml
-user: Oskar Fornander             # Namnet på användaren av denna applikation
-archive_path: ~/predikan/archive  # Sökväg till predikoarkivet
-cloud:
-  provider:                       # Namn på molntjänst
-  urls:
-    manuscripts:                  # url till mapp för manuskript på molntjänsten
-    recordings: 
-    resources: 
-apps:                             # Standardapplikationer för att öppna olika filer
-  pdf: Preview
-  audio: QuickTime Player
-  video: QuickTime Player
-  browser: Safari
-web:
-  url:                            # Webbsida
-sftp:                             # Inställningar för uppladdning med SFTP
-  root: 
-  host: 
-  port: 
-  username: 
-  key_file: 
-html:
-  remote_dir:                     # Fjärrmapp för webböversikt av arkivet (`sermon export html` laddar upp hit)
-podcast:                          # Inställningar för podcast
-  remote_dir:                               
-  cover_image:
-  title: 
-  description: 
-  author: 
-  min_episodes: 3                 # Podcasten kommer inte ha färre än så här många avsnitt
-  max_days: 60                    # Podcastavsnitt raderas om de är äldre än så här många dagar
-```
+### Inställningar i `config.yaml`
+
+| Inställning | Beskrivning | Exempel / Standardvärde |
+| :--- | :--- | :--- |
+| `user` | Ditt namn. Används för att personifiera hjälprutor samt som skapare i webbexporten och podcast-flödet. | `"Oskar Fornander"` |
+| `archive_path` | Den lokala sökvägen till mappen där alla predikofiler, backuper och databasen lagras. | `"~/predikan/archive"` |
+| **`cloud:`** | *Inställningar för att integrera med din lokala molnsynk (t.ex. MEGA, Dropbox).* | |
+| `  provider` | Namnet på molntjänsten som synkar din lokala arkivmapp. | `"MEGA"` |
+| `  urls.manuscripts` | Delningslänk till din manuskript-mapp i molnet (används för klickbara länkar i webbexporten). | `"https://mega.nz/..."` |
+| `  urls.recordings` | Delningslänk till din inspelnings-mapp i molnet. | `"https://mega.nz/..."` |
+| `  urls.resources` | Delningslänk till din resurs-mapp i molnet. | `"https://mega.nz/..."` |
+| **`apps:`** | *Programnamn som ska användas för att öppna filer. Lämna tomma `""` för systemets standardprogram.* | |
+| `  pdf` | Program för att öppna PDF-manuskript. | `"Preview"` (macOS) |
+| `  audio` | Program för att spela upp ljudinspelningar (MP3). | `"QuickTime Player"` (macOS) |
+| `  video` | Program för att spela upp videoinspelningar (MP4). | `"QuickTime Player"` (macOS) |
+| `  browser` | Webbläsare för att öppna länkar. | `"Safari"` (macOS) |
+| **`web:`** | *Hemsidesinställningar* | |
+| `  url` | Den publika webbadressen där din predikolista och podcast kommer att ligga. | `"https://exempel.se/predikan"` |
+| **`sftp:`** | *Anslutningsuppgifter för automatisk uppladdning av hemsida och podcast via SFTP.* | |
+| `  root` | Sökvägen till din användares hemkatalog eller webb-root på fjärrservern. | `"/var/www/html"` |
+| `  host` | Fjärrserverns värdnamn eller IP-adress. | `"sftp.exempel.se"` |
+| `  port` | SSH/SFTP-port. | `22` |
+| `  username` | Ditt SSH-användarnamn på servern. | `"mitt_anvandarnamn"` |
+| `  key_file` | Sökväg till din privata SSH-nyckel för lösenordslös inloggning. | `"~/.ssh/id_ed25519"` |
+| **`html:`** | *Inställningar för den sökbara webböversikten.* | |
+| `  remote_dir` | Mapp på fjärrservern (relativt till sftp-root) dit webbsidan laddas upp. | `"public_html"` |
+| **`podcast:`** | *Inställningar för RSS-feed och ljudfiler för podden.* | |
+| `  remote_dir` | Mapp på fjärrservern (relativt till sftp-root) dit ljudfiler och RSS-feed laddas upp. | `"public_html/podcast"` |
+| `  cover_image` | Filnamn för omslagsbilden till din podcast (måste finnas i din podcast-arkivmapp). | `"cover.jpg"` |
+| `  title` | Podcastens namn i podcast-spelare. | `"Predikningar"` |
+| `  description` | En kort beskrivning av podcasten. | `"En samling predikningar av..."` |
+| `  author` | Podcastens skapare/talare. | `"Oskar Fornander"` |
+| `  min_episodes` | Minsta antal avsnitt som alltid sparas i RSS-flödet (även om de blivit för gamla). | `3` |
+| `  max_days` | Maxålder i dagar för att behålla ett avsnitt i RSS-flödet (äldre gallras automatiskt bort). | `60` |
+
 
 ---
 
