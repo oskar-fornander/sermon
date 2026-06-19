@@ -1,4 +1,4 @@
-import os, shlex, shutil
+import os, sys, shlex, shutil
 import time
 import subprocess
 import tempfile
@@ -67,6 +67,31 @@ def open_editor(data):
         os.unlink(path)
 
     return
+
+
+def open_file_cross_platform(path, app_name=None):
+    """Opens a file or URL not dependent on OS."""
+    path_str = str(path)
+
+    if app_name:
+        if sys.platform == 'darwin':
+            # macOS: Use open with -a flag for specific program
+            subprocess.run(['open', '-a', app_name, path_str], check=True)
+        elif sys.platform == 'win32':
+            # Windows: Run program with file as argument
+            subprocess.run([app_name, path_str], check=True, shell=True)
+        else:
+            # Linux: Run program with file as argument
+            subprocess.run([app_name, path_str], check=True)
+    else:
+        # Open with standard program of the system
+        if sys.platform == 'darwin':
+            subprocess.run(['open', path_str], check=True)
+        elif sys.platform == 'win32':
+            os.startfile(path_str)
+        else:
+            # Linux (and other Unix-like systems)
+            subprocess.run(['xdg-open', path_str], check=True)
 
 
 

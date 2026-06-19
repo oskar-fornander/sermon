@@ -2,7 +2,7 @@
 import subprocess
 from pathlib import Path
 import requests
-from app.utils import parse_sermon_code
+from app.utils import parse_sermon_code, open_file_cross_platform
 from app.presentation.common import clear_screen, console, user_choice
 from app.config import APP_PDF, APP_AUDIO, APP_VIDEO, APP_URL, PATH_MANUSCRIPTS, PATH_RECORDINGS, PATH_RESOURCES
 from app.db import get_manuscripts_for_sermon, get_recordings_for_sermon, get_resources_for_sermon
@@ -40,12 +40,9 @@ def open_manuscript(sermon_code: str):
 
 
     try:
-        if APP_PDF:
-            console.print(f"Öppnar [link=file://{path}][link_style]{file_name}[/link_style][/link] med {APP_PDF} ...")
-            subprocess.run(['open', '-a', APP_PDF, path])
-        else:
-            console.print(f"Öppnar [link=file://{path}][link_style]{file_name}[/link_style][/link] ...")
-            subprocess.run(['open', path])
+        app = f"med {APP_PDF}" if APP_PDF else ''
+        console.print(f"Öppnar [link=file://{path}][link_style]{file_name}[/link_style][/link] {app} ...")
+        open_file_cross_platform(path, APP_PDF)
     except Exception:
         raise FileError(f"Det gick inte att öppna filen {path}")
 
@@ -91,12 +88,9 @@ def open_recording(sermon_code: str):
             raise FileError('Inte angiven filtyp: audio eller video')
 
         try:
-            if APP:
-                console.print(f"Öppnar [link=file://{path}][link_style]{file_name}[/link_style][/link] med {APP} ...")
-                subprocess.run(['open', '-a', APP, path])
-            else:
-                console.print(f"Öppnar [link=file://{path}][link_style]{file_name}[/link_style][/link] ...")
-                subprocess.run(['open', path])
+            app = f"med {APP}" if APP else ''
+            console.print(f"Öppnar [link=file://{path}][link_style]{file_name}[/link_style][/link] {app} ...")
+            open_file_cross_platform(path, APP)
         except Exception:
             raise FileError(f"Det gick inte att öppna filen {path}")
 
@@ -104,12 +98,9 @@ def open_recording(sermon_code: str):
         if not url_is_ok(external_url):
             raise ValidationError(f"Länken verkar vara trasig: [link={external_url}][link_style]{external_url}[/link_style][/link]")
         try:
-            if APP_URL:
-                console.print(f"Öppnar [link={external_url}][link_style]{external_url}[/link_style][/link] med {APP_URL} ...")
-                subprocess.run(['open', '-a', APP_URL, external_url])
-            else:
-                console.print(f"Öppnar [link={external_url}][link_style]{file_name}[/link_style][/link] ...")
-                subprocess.run(['open', external_url])
+            app = f"med {APP_URL}" if APP_URL else ''
+            console.print(f"Öppnar [link={external_url}][link_style]{external_url}[/link_style][/link] {app} ...")
+            open_file_cross_platform(external_url, APP_URL)
         except Exception:
             raise FileError(f"Det gick inte att öppna länken {external_url}")
 
@@ -146,20 +137,17 @@ def open_resource(sermon_code: str):
     if not Path.is_file(path):
         raise FileError(f"Filen [link_style][link=file://{PATH_RESOURCES}]{PATH_RESOURCES}[/link]/{file_name}[/link_style] saknas.")
 
-    try:
-# This could be improoved ...
+    try:  # This could be improoved ...
+        APP = None
         if APP_PDF and ('.pdf' in file_name or '.jpg' in file_name or '.png' in file_name):
-            console.print(f"Öppnar [link=file://{path}][link_style]{file_name}[/link_style][/link] med {APP_PDF} ...")
-            subprocess.run(['open', '-a', APP_PDF, path])
+            APP = APP_PDF
         elif APP_AUDIO and ('.wav' in file_name or '.mp3' in file_name):
-            console.print(f"Öppnar [link=file://{path}][link_style]{file_name}[/link_style][/link] med {APP_AUDIO} ...")
-            subprocess.run(['open', '-a', APP_AUDIO, path])
+            APP = APP_AUDIO
         elif APP_VIDEO and ('.mp4' in file_name or '.mov' in file_name):
-            console.print(f"Öppnar [link=file://{path}][link_style]{file_name}[/link_style][/link] med {APP_VIDEO} ...")
-            subprocess.run(['open', '-a', APP_VIDEO, path])
-        else:
-            console.print(f"Öppnar [link=file://{path}][link_style]{file_name}[/link_style][/link] ...")
-            subprocess.run(['open', path])
+            APP = APP_VIDEO
+        app = f"med {APP}" if APP else ''
+        console.print(f"Öppnar [link=file://{path}][link_style]{file_name}[/link_style][/link] {app} ...")
+        open_file_cross_platform(path, APP)
     except Exception:
         raise FileError(f"Det gick inte att öppna filen {path}")
 
