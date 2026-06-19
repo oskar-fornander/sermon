@@ -6,6 +6,7 @@ import yaml
 import sqlite3
 import logging
 from app.presentation.common import console, user_confirmation
+from app.errors import DatabaseError
 
 
 CONFIG_DIR = Path.home() / ".config" / "sermon"  # This is the absolute path to config.yaml
@@ -26,7 +27,7 @@ HAS_CLOUD, HAS_SFTP, HAS_HTML, HAS_PODCAST = None, None, None, None  # Feature f
 
 DEFAULT_CONFIG = {
     "user": "",
-    "root": str(Path.home() / "predikan" / "archive"),
+    "archive_path": str(Path.home() / "predikan" / "archive"),
     "cloud": {
         "provider": "",
         "urls": {
@@ -64,42 +65,6 @@ DEFAULT_CONFIG = {
         "max_days": 60
     }
 }
-root = str(Path.home() / "predikan" / "archive")
-
-DEFAULT_CONFIG_TEXT = f"""
-# Sermon configuration
-user: Oskar Fornander                         # Namnet på användaren av denna applikation
-root: {root}                                  # Sökväg till predikoarkivet
-cloud:
-  provider:                                  # Name of cloud storage service
-  urls:
-    manuscripts: 
-    recordings: 
-    resources: 
-apps:                                       # Default apps used to open different files
-  pdf: Preview
-  audio: QuickTime Player
-  video: QuickTime Player
-  browser: Safari
-web:
-  url: 
-sftp:
-  root: 
-  host: 
-  port: 
-  username: 
-  key_file: 
-html:
-  remote_dir: 
-podcast:
-  remote_dir: 
-  cover_image:
-  title: 
-  description: 
-  author: 
-  min_episodes: 3       # The podcast will never have less than this number of episodes
-  max_days: 60          # The podcast episodes will be removed if older than this
-"""
 
 logging.getLogger('pypdf').setLevel(logging.ERROR)  # Hide non critical error messages
 
@@ -114,7 +79,6 @@ def init_environment():
     load_config()  # Load config.yaml
     if not CONFIG:
         raise RuntimeError(f"Fel vid inläsning av konfigurationsfilen {CONFIG_FILE}")
-        sys.exit(1)
 
     try:
         USER = CONFIG.get('user') or ''
@@ -129,7 +93,6 @@ def init_environment():
         HAS_PODCAST = PODCAST_REMOTE_DIR and PODCAST_TITLE
     except Exception as error:
         raise RuntimeError(f"Ett fel uppstod i uppstarten: {error}")
-        sys.exit(1)
 
     ensure_database()  # Create database file if it does not exist
 
@@ -141,19 +104,68 @@ def ensure_config_exists():
 
         with open(CONFIG_FILE, "w", encoding="utf-8") as f:
             yaml.safe_dump(DEFAULT_CONFIG, f, sort_keys=False)
-        #CONFIG_FILE.write_text(DEFAULT_CONFIG_TEXT, encoding="utf-8")
 
         console.print(f"Ny konfigurationsfil skapad: {CONFIG_FILE} \nRedigera den för att ange korrekt sökväg till predikoarkivet och övriga inställningar. \nProgrammet avslutas.")
         sys.exit(1)  # Quit
+
+
+def get_added_keys(default, user, prefix=""):
+    """Find keys present in default but missing in user."""
+    added = []
+    if not isinstance(user, dict):
+        user = {}
+    for key, val in default.items():
+        full_key = f"{prefix}.{key}" if prefix else key
+        if key not in user:
+            added.append(full_key)
+        elif isinstance(val, dict) and isinstance(user[key], dict):
+            added.extend(get_added_keys(val, user[key], full_key))
+    return added
 
 
 def load_config():
     """Load config file"""
     global CONFIG
     ensure_config_exists()
-    with open(CONFIG_FILE, 'r') as f:
-        CONFIG = yaml.safe_load(f)
+    with open(CONFIG_FILE, 'r', encoding='utf-8') as f:
+        loaded = yaml.safe_load(f)
     
+    if loaded is None or not isinstance(loaded, dict):
+        loaded = {}
+
+    CONFIG = deep_merge(DEFAULT_CONFIG, loaded)  # Ensure all fields are present
+
+    if CONFIG != loaded:
+        try:
+            with open(CONFIG_FILE, 'w', encoding='utf-8') as f:
+                yaml.safe_dump(CONFIG, f, sort_keys=False)
+            
+            # Find the missing keys that were merged in
+            added_keys = get_added_keys(DEFAULT_CONFIG, loaded)
+            if added_keys:
+                console.print(f"[info]Konfigurationsfilen {CONFIG_FILE} har uppdaterats med saknade inställningsfält: {', '.join(added_keys)}[/info]")
+            
+            if not CONFIG.get('user'):
+                console.print("[info]Tips: Ange ditt namn under 'user' i konfigurationsfilen för att anpassa predikoarkivet.[/info]")
+        except Exception as e:
+            logging.warning(f"Kunde inte spara den uppdaterade konfigurationen: {e}")
+
+
+def deep_merge(default, user):
+    """Merge user config with default config."""
+    if user is None:
+        return default
+    if not isinstance(user, dict):
+        return default
+    merged = default.copy()
+    for key, value in user.items():
+        if key in merged and isinstance(merged[key], dict) and isinstance(value, dict):
+            merged[key] = deep_merge(merged[key], value)
+        else:
+            if value is not None:  # Overwrite only if user has a value
+                merged[key] = value
+    return merged
+
 
 def define_paths():
     """Define some file paths"""
@@ -161,13 +173,13 @@ def define_paths():
     if not CONFIG:
         load_config()
 
-    ARCHIVE_ROOT = Path(CONFIG['root']).expanduser().resolve()
-    if not ARCHIVE_ROOT.exists():  # If the root directory does not exist: quit and make sure to change in config or create it
-        if user_confirmation(f"Konfigurerad rotmapp för predikoarkivet finns inte: {ARCHIVE_ROOT}. Ska den skapas?", default=False):
+    ARCHIVE_ROOT = Path(CONFIG['archive_path']).expanduser().resolve()
+    if not ARCHIVE_ROOT.exists():  # If the archive directory does not exist: quit and make sure to change in config or create it
+        if user_confirmation(f"Konfigurerad arkivmapp för predikoarkivet finns inte: {ARCHIVE_ROOT}. Ska den skapas?", default=False):
             ARCHIVE_ROOT.mkdir(parents=True, exist_ok=True)
             console.print(f"Mappen har skapats.")
         else:
-            console.print(f"Ange korrekt sökväg till rotmapp för predikoarkivet i konfigurationsfilen: {CONFIG_FILE}")
+            console.print(f"Ange korrekt sökväg under 'archive_path' i konfigurationsfilen: {CONFIG_FILE}")
             sys.exit(1)
 
     PATH_DATABASE = ARCHIVE_ROOT / 'data'

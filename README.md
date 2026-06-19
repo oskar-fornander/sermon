@@ -58,37 +58,37 @@ Första gången du kör appen skapas en standardkonfiguration i:
 
 ### Exempel på `config.yaml`
 ```yaml
-user: Oskar Fornander        # Namnet på användaren av denna applikation
-root: {root}                 # Sökväg till predikoarkivet
+user: Oskar Fornander             # Namnet på användaren av denna applikation
+archive_path: ~/predikan/archive  # Sökväg till predikoarkivet
 cloud:
-  provider:                  # Namn på molntjänst
+  provider:                       # Namn på molntjänst
   urls:
-    manuscripts:             # url till mapp för manuskript på molntjänsten
+    manuscripts:                  # url till mapp för manuskript på molntjänsten
     recordings: 
     resources: 
-apps:                        # Standardapplikationer för att öppna olika filer
+apps:                             # Standardapplikationer för att öppna olika filer
   pdf: Preview
   audio: QuickTime Player
   video: QuickTime Player
   browser: Safari
 web:
-  url:                       # Webbsida
-sftp:                        # Inställningar för uppladdning med SFTP
+  url:                            # Webbsida
+sftp:                             # Inställningar för uppladdning med SFTP
   root: 
   host: 
   port: 
   username: 
   key_file: 
 html:
-  remote_dir:                # Fjärrmapp för webböversikt av arkivet (`sermon export html` laddar upp hit)
-podcast:                     # Inställningar för podcast
+  remote_dir:                     # Fjärrmapp för webböversikt av arkivet (`sermon export html` laddar upp hit)
+podcast:                          # Inställningar för podcast
   remote_dir:                               
   cover_image:
   title: 
   description: 
   author: 
-  min_episodes: 3            # Podcasten kommer inte ha färre än så här många avsnitt
-  max_days: 60               # Podcastavsnitt raderas om de är äldre än så här många dagar
+  min_episodes: 3                 # Podcasten kommer inte ha färre än så här många avsnitt
+  max_days: 60                    # Podcastavsnitt raderas om de är äldre än så här många dagar
 ```
 
 ---
