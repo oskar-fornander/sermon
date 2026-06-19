@@ -35,6 +35,11 @@ from app.commands.search import search
 from app.commands.new import new
 from app.commands.delete import delete
 from app.commands.backup import backup
+def version_callback(value: bool):
+    if value:
+        typer.echo("Sermon version: 1.0.0")
+        raise typer.Exit()
+
 
 app = typer.Typer(
         cls=OrderedGroup, 
@@ -42,6 +47,21 @@ app = typer.Typer(
         no_args_is_help=True,
         add_completion=False
 )
+
+
+@app.callback()
+def main_callback(
+    version: bool = typer.Option(
+        None,
+        "--version",
+        "-v",
+        help="Visa programversion och avsluta.",
+        callback=version_callback,
+        is_eager=True,
+    ),
+):
+    pass
+
 
 # Register commands. The order they should be shown in --help are defined above
 command_groups = ('Överblick & sök', 'Innehållshantering', 'Export & underhåll')  # Headings for command groups - only for user friendly readability
