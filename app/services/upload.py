@@ -8,8 +8,7 @@ from app.errors import ValidationError
 def upload_file(local_path, remote_path, remote_name=''):
     """Upload file with sftp"""
     if not HAS_SFTP:
-        console.print(f"SFTP är inte konfigurerat.\nÄndra konfiguration i {CONFIG_FILE}.")
-        return None
+        raise ValidationError(f"SFTP är inte konfigurerat.\nÄndra konfiguration i {CONFIG_FILE}.")
 
     if remote_name:
         remote_path += '/' + remote_name
@@ -40,11 +39,7 @@ def upload_file(local_path, remote_path, remote_name=''):
 def delete_file(remote_path):
     """Delete file on remote server via ssh"""
     if not HAS_SFTP:
-        console.print(f"SFTP är inte konfigurerat.\nÄndra konfiguration i {CONFIG_FILE}.")
-        return None
-
-    if not SFTP_HOST:
-        raise ValidationError("SFTP ej konfigurerat")
+        raise ValidationError(f"SFTP är inte konfigurerat.\nÄndra konfiguration i {CONFIG_FILE}.")
 
     key_file = str(Path(SFTP_KEY).expanduser())
 
