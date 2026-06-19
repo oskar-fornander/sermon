@@ -58,48 +58,37 @@ Första gången du kör appen skapas en standardkonfiguration i:
 
 ### Exempel på `config.yaml`
 ```yaml
-user: Oskar Fornander
-root: ~/predikan/archive                # Mappen där databasen och filerna ligger
-database: sermon.db
-paths:
-  database: data
-  backup: data/backup
-  manuscripts: files/manuscripts
-  recordings: files/recordings
-  resources: files/resources
-  html: html
-  podcast: podcast
+user: Oskar Fornander        # Namnet på användaren av denna applikation
+root: {root}                 # Sökväg till predikoarkivet
 cloud:
-  provider: Mega                        # Namn på din molntjänst (Google Drive, Mega, etc.)
+  provider:                  # Namn på molntjänst
   urls:
-    manuscripts: "https://mega.nz/..."
-    recordings: "https://mega.nz/..."
-    resources: "https://mega.nz/..."
-apps:                                   # Program som öppnar dina filer på macOS
+    manuscripts:             # url till mapp för manuskript på molntjänsten
+    recordings: 
+    resources: 
+apps:                        # Standardapplikationer för att öppna olika filer
   pdf: Preview
   audio: QuickTime Player
   video: QuickTime Player
   browser: Safari
-sftp:                                   # Inställningar för uppladdning av HTML/podcast
-  host: din.server.se
-  port: 22
-  username: sftp_användare
-  key_file: ~/.ssh/id_rsa
 web:
-  site_url: "https://dinhemsida.se"
-  site_root: "/var/www/sermon"
+  url:                       # Webbsida
+sftp:                        # Inställningar för uppladdning med SFTP
+  root: 
+  host: 
+  port: 
+  username: 
+  key_file: 
 html:
-  remote_dir: "html"
-podcast:
-  remote_dir: "podcast"
-  feed_file: "feed.xml"
-  audio_path: "audio"
-  cover_image: "cover.jpg"
-  title: "Predikokanalen"
-  description: "Predikningar av Oskar Fornander"
-  author: "Oskar Fornander"
-  min_episodes: 3
-  max_days: 60
+  remote_dir:                # Fjärrmapp för webböversikt av arkivet (`sermon export html` laddar upp hit)
+podcast:                     # Inställningar för podcast
+  remote_dir:                               
+  cover_image:
+  title: 
+  description: 
+  author: 
+  min_episodes: 3            # Podcasten kommer inte ha färre än så här många avsnitt
+  max_days: 60               # Podcastavsnitt raderas om de är äldre än så här många dagar
 ```
 
 ---
