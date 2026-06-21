@@ -20,6 +20,12 @@ Sermon är ett terminalbaserat verktyg (CLI) skrivet i Python för att organiser
 
 Sermon kräver **Python 3.12 eller senare** installerat på datorn.
 
+**Förutsättning för SFTP-uppladdning:**
+För att kunna ladda upp html-sida av predikoregistret och podcast-filer till en server krävs att systemverktyget `scp` är installerat och tillgängligt i din terminal (i systemets sökväg/PATH).
+* **macOS och Linux:** Detta är installerat som standard och kräver ingen åtgärd.
+* **Windows:** Verktyget ingår i funktionen *OpenSSH-klient* (vilket är aktiverat som standard i moderna versioner av Windows 10 och 11).
+
+
 ### Alternativ 1: `pipx`
 
 Det enklaste och säkraste sättet att installera Sermon är med **pipx**. Det installerar programmet i en isolerad miljö på
