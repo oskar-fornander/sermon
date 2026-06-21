@@ -5,13 +5,13 @@
 
 Med enkla kommandon i terminalen kan du söka efter bibelord, öppna tillhörande PDF-manus eller ljudfiler direkt i dina favoritprogram, samt köra hälsokontroller av dina arkivfiler. Verktyget har dessutom inbyggt stöd för att exportera registret till en sökbar, mobilvänlig webbsida samt generera ett podcast-flöde (RSS) som laddas upp till din server via SFTP med en enkel knapptryckning.
 
-Läs mer nedan om verktyget och ur du installerar.
+Läs mer nedan om verktyget och hur du installerar.
 
 ---
 
 ## Funktioner i korthet
 
-*   **Översikt & Sök:** Sök på fritext eller bibelreferenser, samt lista predikningar sorterat efter datum eller predikokod.
+*   **Översikt & Sök:** Visa all data om en predikan, sök på fritext eller bibelreferenser, samt lista predikningar sorterat efter datum eller predikokod.
 *   **Interaktiv inmatning & redigering:** Skapa nya eller uppdatera befintliga predikningar med en kraftfull terminalbaserad redigerare för både metadata och kopplade filer.
 *   **Filhantering:** Öppna tillhörande manus, inspelningar eller resurser direkt från terminalen med dina förvalda program.
 *   **Hälsokontroll av filer:** Hitta saknade filer som refereras i databasen, samt oanvända filer som ligger i dina arkivmappar.
