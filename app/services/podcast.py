@@ -70,6 +70,8 @@ class Episode:
 
 
 def load_episodes_from_xml(feed_file: Path = LOCAL_PODCAST_FEED) -> list[Episode]:
+    if not feed_file.exists():
+        return []
     tree = ET.parse(feed_file)
     root = tree.getroot()
 
@@ -83,6 +85,8 @@ def load_episodes_from_xml(feed_file: Path = LOCAL_PODCAST_FEED) -> list[Episode
 
 def backup_feed():
     """Make a backup of feed.xml"""
+    if not LOCAL_PODCAST_FEED.exists():
+        return
     feed = Path(LOCAL_PODCAST_FEED)
     backup = feed.with_name(f"feed-backup.xml")
     shutil.copy2(feed, backup)

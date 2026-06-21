@@ -38,7 +38,7 @@ def find_editor() -> list[str]:
     editor = os.environ.get("VISUAL") or os.environ.get("EDITOR")
     if editor:
         return shlex.split(editor)
-    for editor in ("nvim", "vim", "nano"):
+    for editor in ("nvim", "vim", "nano", "notepad"):
         if shutil.which(editor):
             return [editor]
     raise RuntimeError("Ingen texteditor hittades. Sätt $VISUAL eller $EDITOR.")
