@@ -42,8 +42,6 @@ def get_sermon_by_code(code: str, conn = None):
         row = cur.fetchone()
         if row is None:
             raise NotFoundError(f"Predikan [key]{code}[/key] finns inte.")
-        if new_conn:
-            conn.close()
         return row
     except sqlite3.Error as e:
         raise DatabaseError(f"Databasfel: {e}")
@@ -67,8 +65,6 @@ def get_sermon_by_id(id: int, conn = None):
         row = cur.fetchone()
         if row is None:
             raise NotFoundError(f"Predikan finns inte.")
-        if new_conn:
-            conn.close()
         return row
     except sqlite3.Error as e:
         raise DatabaseError(f"Databasfel: {e}")
@@ -106,8 +102,6 @@ def sermon_exists(code: str, conn = None) -> True|False:
             (code,)
         )
         row = cur.fetchone()
-        if new_conn:
-            conn.close()
 
         if row is None:
             return False
@@ -298,10 +292,12 @@ def query_sermons(sort: str = 'code', limit: int = 0, query: [str] = [], bible_o
     try:
         cur.execute(sql, params)
         rows = cur.fetchall()
-        conn.close()
         return rows
     except sqlite3.Error as e:
         raise DatabaseError(f"Databasfel: {e}")
+    finally:
+        conn.close()
+
 
 def query_services(query: str = None, year: int = None, month: int = None, place: str = None, report: str = None, must_have_recording: bool = False, limit: int = 0):
     """Make a query for services"""
@@ -322,10 +318,11 @@ def list_sermon_codes():
             """
         )
         rows = cur.fetchall()
-        conn.close()
         return rows
     except sqlite3.Error as e:
         raise DatabaseError(f"Databasfel: {e}")
+    finally:
+        conn.close()
 
 
 def list_service_dates():
@@ -343,10 +340,12 @@ def list_service_dates():
             """
         )
         row = cur.fetchall()
-        conn.close()
         return row
     except sqlite3.Error as e:
         raise DatabaseError(f"Databasfel: {e}")
+    finally:
+        conn.close()
+
 
 
 def get_last_sermon_code():
@@ -378,12 +377,13 @@ def get_sermon_code_by_service_date(date: str):
             (date,)
         )
         row = cur.fetchone()
-        conn.close()
         if row is None:
             raise NotFoundError(f"Sermon for date {date} not found.")
         return row
     except sqlite3.Error as e:
         raise DatabaseError(f"Databasfel: {e}")
+    finally:
+        conn.close()
 
 def get_last_place():
     """Get the place for the last service"""
@@ -398,12 +398,14 @@ def get_last_place():
             """
         )
         row = cur.fetchone()
-        conn.close()
         if row is None:
             raise NotFoundError(f"No service found")
         return row
     except sqlite3.Error as e:
         raise DatabaseError(f"Databasfel: {e}")
+    finally:
+        conn.close()
+
 
 def get_services_for_sermon(code: str):
     """Get all services connected to this sermon"""
@@ -420,10 +422,11 @@ def get_services_for_sermon(code: str):
             (code,)
         )
         row = cur.fetchall()
-        conn.close()
         return row
     except sqlite3.Error as e:
         raise DatabaseError(f"Databasfel: {e}")
+    finally:
+        conn.close()
 
 def get_manuscripts_for_sermon(code: str):
     """Get all manuscripts connected to this sermon, ordered by version"""
@@ -440,10 +443,11 @@ def get_manuscripts_for_sermon(code: str):
             (code,)
         )
         row = cur.fetchall()
-        conn.close()
         return row
     except sqlite3.Error as e:
         raise DatabaseError(f"Databasfel: {e}")
+    finally:
+        conn.close()
 
 def get_recordings_for_sermon(code: str):
     """Get all recordings connected to this sermon"""
@@ -460,10 +464,11 @@ def get_recordings_for_sermon(code: str):
             (code,)
         )
         row = cur.fetchall()
-        conn.close()
         return row
     except sqlite3.Error as e:
         raise DatabaseError(f"Databasfel: {e}")
+    finally:
+        conn.close()
 
 def get_resources_for_sermon(code: str):
     """Get all resources connected to this sermon"""
@@ -480,10 +485,11 @@ def get_resources_for_sermon(code: str):
             (code,)
         )
         row = cur.fetchall()
-        conn.close()
         return row
     except sqlite3.Error as e:
         raise DatabaseError(f"Databasfel: {e}")
+    finally:
+        conn.close()
 
 
 def get_bible_references_for_sermon(code: str):
@@ -501,10 +507,11 @@ def get_bible_references_for_sermon(code: str):
             (code,)
         )
         row = cur.fetchall()
-        conn.close()
         return row
     except sqlite3.Error as e:
         raise DatabaseError(f"Databasfel: {e}")
+    finally:
+        conn.close()
 
 def get_related_sermons_for_sermon(code: str):
     """Get all related sermons connected to this sermon"""
@@ -531,10 +538,11 @@ def get_related_sermons_for_sermon(code: str):
             (id, id)
         )
         row = cur.fetchall()
-        conn.close()
         return row
     except sqlite3.Error as e:
         raise DatabaseError(f"Databasfel: {e}")
+    finally:
+        conn.close()
 
 
 def get_all_manuscripts():
@@ -550,10 +558,11 @@ def get_all_manuscripts():
             """
         )
         rows = cur.fetchall()
-        conn.close()
         return rows
     except sqlite3.Error as e:
         raise DatabaseError(f"Databasfel: {e}")
+    finally:
+        conn.close()
 
 def get_all_recordings():
     """Get all recordings in database"""
@@ -570,10 +579,11 @@ def get_all_recordings():
             """
         )
         rows = cur.fetchall()
-        conn.close()
         return rows
     except sqlite3.Error as e:
         raise DatabaseError(f"Databasfel: {e}")
+    finally:
+        conn.close()
 
 def get_all_resources():
     """Get all resources in database"""
@@ -588,10 +598,11 @@ def get_all_resources():
             """
         )
         rows = cur.fetchall()
-        conn.close()
         return rows
     except sqlite3.Error as e:
         raise DatabaseError(f"Databasfel: {e}")
+    finally:
+        conn.close()
 
 
 
