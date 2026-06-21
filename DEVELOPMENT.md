@@ -119,3 +119,24 @@ Alla index skapas automatiskt av `ensure_database()` i `app/config.py` med SQL f
 
 ### Valideringsregler
 All validering sker i `validate_sermon_draft` i `app/services/sermon_draft.py`. Regex-mönster för giltiga filnamn och koder finns samlade i `PATTERN`-konstanten i `app/utils.py`. Om du ändrar ett filnamnsformat, se till att uppdatera motsvarande regex där.
+
+
+
+## Uppdatering
+
+Höj versionsnumret i pyproject.toml innan ändringar pushas till Github.
+
+### Versionshantering
+
+Användning: Semantic Versioning (SemVer). Det använder formatet  MAJOR.MINOR.PATCH  (t.ex.  1.0.0 ):
+
+* PATCH (sista siffran, t.ex.  1.0.0  ->  1.0.1 ): Används för buggfixar och småjusteringar som inte ändrar hur programmet används eller lägger till nya funktioner.
+
+* MINOR (mellersta siffran, t.ex.  1.0.0  ->  1.1.0 ): Används när du lägger till nya funktioner (t.ex. ett nytt kommando eller nya inställningar i  config.yaml ), men där allt gammalt fortfarande fungerar precis som förut (bakåtkompatibelt).
+
+* MAJOR (första siffran, t.ex.  1.0.0  ->  2.0.0 ): Används vid stora förändringar som inte är bakåtkompatibla (t.ex. om du gör om databasstrukturen så att gamla databaser slutar fungera, eller tar bort/ändrar beteendet på befintliga kommandon radikalt).
+
+
+
+
+
