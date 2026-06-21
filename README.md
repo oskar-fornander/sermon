@@ -1,7 +1,11 @@
 # Sermon - Predikoarkiv
 *© Oskar Fornander 2026*
 
-Sermon är ett terminalbaserat verktyg (CLI) skrivet i Python för att organisera, söka i och underhålla ett personligt predikoregister. Det hanterar metadata om predikningar (rubrik, sammanhang, bibelreferenser, budskap, kommentarer, datum och platser) samt länkar till tillhörande manus (PDF), ljud-/ och filminspelningar (MP3/MP4), resurser och relaterade predikningar.
+**Sermon** är ett terminalbaserat verktyg (CLI) skrivet i Python för att organisera, söka i och underhålla ett personligt predikoregister. Det hanterar metadata om predikningar, såsom bibelreferenser, sammanhang, omdömen, manuskript och inspelningar – i en säker, lokal databas på din dator. Dessutom länkas till tillhörande manus (PDF), ljud-/ och filminspelningar (MP3/MP4), resurser och relaterade predikningar.
+
+Med enkla kommandon i terminalen kan du söka efter bibelord, öppna tillhörande PDF-manus eller ljudfiler direkt i dina favoritprogram, samt köra hälsokontroller av dina arkivfiler. Verktyget har dessutom inbyggt stöd för att exportera registret till en sökbar, mobilvänlig webbsida samt generera ett podcast-flöde (RSS) som laddas upp till din server via SFTP med en enkel knapptryckning.
+
+Läs mer nedan om verktyget och ur du installerar.
 
 ---
 
