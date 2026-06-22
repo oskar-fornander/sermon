@@ -5,7 +5,7 @@
 
 Med enkla kommandon i terminalen kan du söka efter bibelord, öppna tillhörande PDF-manus eller ljudfiler direkt i dina favoritprogram, samt köra hälsokontroller av dina arkivfiler. Verktyget har dessutom inbyggt stöd för att exportera registret till en sökbar, mobilvänlig webbsida samt generera ett podcast-flöde (RSS) som laddas upp till din server via SFTP med en enkel knapptryckning.
 
-Läs mer nedan om verktyget och hur du installerar.
+Sermon är ett fritt och öppet verktyg för hantering av predikoregister, utvecklat av Oskar Fornander. Läs mer nedan om verktyget och hur du installerar.
 
 ---
 
