@@ -24,93 +24,45 @@ Sermon är ett fritt och öppet verktyg för hantering av predikoregister, utvec
 
 Sermon kräver **Python 3.12 eller senare** installerat på datorn.
 
-**Förutsättning för SFTP-uppladdning:**
-För att kunna ladda upp html-sida av predikoregistret och podcast-filer till en server krävs att systemverktyget `scp` är installerat och tillgängligt i din terminal (i systemets sökväg/PATH).
-* **macOS och Linux:** Detta är installerat som standard och kräver ingen åtgärd.
-* **Windows:** Verktyget ingår i funktionen *OpenSSH-klient* (vilket är aktiverat som standard i moderna versioner av Windows 10 och 11).
+### Rekommenderad installation: `uv`
 
-
-### Alternativ 1: `pipx`
-
-Det enklaste och säkraste sättet att installera Sermon är med **pipx**. Det installerar programmet i en isolerad miljö på
-din dator och gör kommandot `sermon` tillgängligt globalt i din terminal.
-
-#### Steg 1: Installera pipx
-Om du inte redan har `pipx` installerat på din dator, gör så här:
-* **macOS (via Homebrew):**
 ```bash
-brew install pipx
-pipx ensurepath
+uv tool install git+https://github.com/oskar-fornander/sermon.git
 ```
 
-* Linux (Ubuntu/Debian):
+Du kan sedan köra programmet från valfri katalog med: `sermon`
+
+För att uppdatera till senaste version: 
 ```bash
-sudo apt update
-sudo apt install pipx
-pipx ensurepath
+uv tool upgrade sermon
 ```
 
-* Windows (via PowerShell):
+För att avinstallera:
 ```bash
-python -m pip install --user pipx
-python -m pipx ensurepath
+uv tool uninstall sermon
 ```
 
-(Starta om din terminal efter att du kört  ensurepath  för att ändringarna ska träda i kraft).
-
-#### Steg 2: Installera Sermon direkt från GitHub
-
-Du behöver inte ladda ner källkodsfilerna manuellt. Kör bara följande kommando i terminalen:
-
-`pipx install git+https://github.com/oskar-fornander/sermon.git`
-
-Nu är Sermon installerat! Du kan köra programmet från valfri mapp i terminalen genom att skriva:
-
-`sermon --help`
-
-#### Hur fungerar det under huven? (Bra att veta)
-
-* Var sparas programfilerna? Källkoden laddas ner av  pipx  och sparas i en dold, skyddad katalog i din hemkatalog ( ~/.local/share/pipx/  på macOS/Linux eller  %USERPROFILE%\.local\pipx\  på Windows). Du behöver aldrig röra dessa filer manuellt.
-
-* Var sparas mina inställningar? Första gången du kör programmet skapas inställningsfilen  config.yaml  automatiskt i mappen  ~/.config/sermon/  (macOS/Linux) eller  %USERPROFILE%\.config\sermon\  (Windows).
-
-* Var sparas mitt predikoarkiv? Dina predikofiler (PDF, MP3, databas etc.) sparas i den mapp du ställer in i  config.yaml  under nyckeln  archive_path (standard är  ~/predikan/archive ).
-
-* För att **uppdatera** programmet till en ny version, kör `pipx upgrade sermon`
-
-* För att **avinstallera** programmet, kör `pipx uninstall sermon`
-
-
-### Alternativ 2: Installation med `uv`
-Om du använder pakethanteraren `uv` kan du synka och installera verktyget i redigerbart läge (editable) globalt:
+### Alternativ installation: `pipx`
 
 ```bash
-# Synka dependencies (skapar/uppdaterar uv.lock)
-uv sync
-
-# Installera verktyget globalt i redigerbart läge
-uv tool install --editable .
-```
-Du kan sedan köra appen direkt med kommandot `sermon`. Om du vill köra koden utan att installera den globalt använder du:
-```bash
-uv run sermon [kommando]
+pipx install git+https://github.com/oskar-fornander/sermon.git
 ```
 
-### Alternativ 3: Installation med standard `venv` och `pip`
+Du kan sedan köra programmet från valfri katalog med: `sermon`
+
+För att uppdatera till senaste version: 
 ```bash
-# Skapa virtuell miljö
-python -m venv .venv
+pipx upgrade sermon
+```
 
-# Aktivera virtuell miljö (macOS/Linux)
-source .venv/bin/activate
-
-# Installera projektet i redigerbart läge
-pip install -e .
+För att avinstallera:
+```bash
+pipx uninstall sermon
 ```
 
 ## Konfiguration
 
-Första gången du kör appen skapas en standardkonfiguration i:
+Första gången du kör programmet skapas en standardkonfiguration i:
 `~/.config/sermon/config.yaml`
 
 Öppna den filen för att konfigurera sökvägar till ditt predikoarkiv samt SFTP-uppgifter.
@@ -152,6 +104,13 @@ Första gången du kör appen skapas en standardkonfiguration i:
 
 
 ---
+
+### Förutsättning för SFTP-uppladdning:
+
+För att kunna ladda upp html-sida av predikoregistret och podcast-filer till en server krävs att systemverktyget `scp` är installerat och tillgängligt i din terminal (i systemets sökväg/PATH).
+* **macOS och Linux:** Detta är installerat som standard och kräver ingen åtgärd.
+* **Windows:** Verktyget ingår i funktionen *OpenSSH-klient* (vilket är aktiverat som standard i moderna versioner av Windows 10 och 11).
+
 
 ## Användning
 
