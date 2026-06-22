@@ -214,3 +214,7 @@ sermon backup
 # Radera en predikan och flytta dess tillhörande PDF- och MP3-filer till papperskorgen
 sermon delete P371
 ```
+
+## Licens
+
+Sermon är fri programvara och distribueras under MIT-licensen. Projektet utvecklades ursprungligen för mitt eget predikoarkiv, men om det kan hjälpa andra predikanter eller församlingar är det en stor glädje. Förslag, felrapporter och förbättringar välkomnas.
