@@ -124,7 +124,7 @@ All validering sker i `validate_sermon_draft` i `app/services/sermon_draft.py`. 
 
 ## Uppdatering
 
-Höj versionsnumret i pyproject.toml innan ändringar pushas till Github.
+Höj versionsnumret i pyproject.toml och app.cli.py innan ändringar pushas till Github.
 
 ### Versionshantering
 

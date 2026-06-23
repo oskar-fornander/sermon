@@ -1,5 +1,7 @@
 #app/cli.py
 
+version = '1.0.1'
+
 import sys
 import traceback
 import typer
@@ -37,7 +39,7 @@ from app.commands.delete import delete
 from app.commands.backup import backup
 def version_callback(value: bool):
     if value:
-        typer.echo("Sermon version: 1.0.0")
+        typer.echo(f"Sermon version: {version}")
         raise typer.Exit()
 
 
