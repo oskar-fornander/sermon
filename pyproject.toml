@@ -20,3 +20,10 @@ dependencies = [
 
 [project.scripts]
 sermon = "app.main:main"
+
+[tool.setuptools]
+packages = ["app"]
+
+[tool.setuptools.package-data]
+app = ["schema.sql", "templates/*"]
+
